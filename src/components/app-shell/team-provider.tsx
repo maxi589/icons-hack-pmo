@@ -16,6 +16,8 @@ type Team = {
   /** Die 7 Teilprojekte (ohne „Vorbereitung“). */
   areas: Area[];
   /** Jeder Bereich inkl. „Vorbereitung“, z. B. für Farbpunkte an Meilensteinen. */
+  /** Alle 8 Bereiche inkl. „Vorbereitung“ (vorne), für die Zeilen der Roadmap. */
+  allAreas: Area[];
   areaById: (id: string | null | undefined) => Area | null;
   personById: (id: string | null | undefined) => Person | null;
   setAreaOwner: (areaId: string, ownerId: string | null) => Promise<boolean>;
@@ -25,6 +27,7 @@ const TeamContext = createContext<Team>({
   me: null,
   people: [],
   areas: [],
+  allAreas: [],
   areaById: () => null,
   personById: () => null,
   setAreaOwner: async () => false,
@@ -68,6 +71,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const areas = useMemo(() => allAreas.filter((a) => a.is_project), [allAreas]);
+  const lanes = useMemo(() => [...allAreas.filter((a) => !a.is_project), ...areas], [allAreas, areas]);
   const areaById = useCallback((id: string | null | undefined) => allAreas.find((a) => a.id === id) ?? null, [allAreas]);
   const personById = useCallback((id: string | null | undefined) => people.find((p) => p.id === id) ?? null, [people]);
 
@@ -88,7 +92,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     return true;
   }, []);
 
-  return <TeamContext value={{ me, people, areas, areaById, personById, setAreaOwner }}>{children}</TeamContext>;
+  return <TeamContext value={{ me, people, areas, allAreas: lanes, areaById, personById, setAreaOwner }}>{children}</TeamContext>;
 }
 
 export function useTeam() {

@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { daysBetween, relativeDays } from "@/lib/dates";
 
 // Chips laut Board: Status-Farbe als Text auf leichter Tönung, „heute“ als Lime-Fläche.
 const TONES = {
@@ -36,5 +37,22 @@ export function Chip({
       {dot && <i className="block size-1.5 rounded-full bg-current" aria-hidden />}
       {children}
     </span>
+  );
+}
+
+/** Frist als Chip: überfällig rot, heute Lime, ≤ 7 Tage amber, sonst neutral. */
+export function dueTone(due: string, today: string): ChipTone {
+  const n = daysBetween(today, due);
+  if (n < 0) return "red";
+  if (n === 0) return "today";
+  return n <= 7 ? "amber" : "gray";
+}
+
+export function DueChip({ due, today }: { due: string; today: string }) {
+  const n = daysBetween(today, due);
+  return (
+    <Chip tone={dueTone(due, today)} dot={n !== 0}>
+      {n < 0 ? `${-n} Tage überfällig` : relativeDays(due, today)}
+    </Chip>
   );
 }

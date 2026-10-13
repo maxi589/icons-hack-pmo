@@ -22,3 +22,7 @@ export function phaseFill(i: number, today: string) {
   if (today < p.start) return 0;
   return (daysBetween(p.start, today) + 1) / (daysBetween(p.start, p.end) + 1);
 }
+
+// Outreach: Start Welle 1 und die drei Nachfass-Runden (stammdaten.json).
+export const WAVE_1 = "2026-10-19";
+export const FOLLOW_UP_ROUNDS = ["2026-11-02", "2026-11-16", "2026-11-30"];

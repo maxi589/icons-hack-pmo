@@ -5,28 +5,19 @@ import Link from "next/link";
 import { Check, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
-import { Chip, type ChipTone } from "@/components/chip";
+import { Chip, DueChip } from "@/components/chip";
 import { Countdown } from "@/components/countdown";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { useToday } from "@/lib/use-today";
-import { daysBetween, formatDayMonth, formatHeaderDate, formatLong, formatShort, hourInVienna, relativeDays } from "@/lib/dates";
-import { currentPhase, phaseFill, PHASES } from "@/lib/phases";
+import { formatDayMonth, formatHeaderDate, formatLong, formatShort, hourInVienna, relativeDays } from "@/lib/dates";
+import { currentPhase, FOLLOW_UP_ROUNDS, phaseFill, PHASES, WAVE_1 } from "@/lib/phases";
+import { MilestoneChecklist } from "@/components/milestone-checklist";
 import { OwnersDialog } from "./owners-dialog";
 import { useOverviewData, type Milestone, type Org, type Task } from "./use-overview-data";
 
 // Übersicht (Board „Richtung A Graphit“): Wo stehen wir? Was ist als Nächstes dran? Wer ist zuständig?
 
 const card = "rounded-[14px] bg-card shadow-card";
-const FOLLOW_UP_ROUNDS = ["2026-11-02", "2026-11-16", "2026-11-30"];
-const WAVE_1 = "2026-10-19";
-
-/** Chip für eine Frist: überfällig rot, heute Lime, ≤ 7 Tage amber, sonst neutral. */
-function dueTone(due: string, today: string): ChipTone {
-  const n = daysBetween(today, due);
-  if (n < 0) return "red";
-  if (n === 0) return "today";
-  return n <= 7 ? "amber" : "gray";
-}
 
 function greeting() {
   const h = hourInVienna();
@@ -118,7 +109,6 @@ function NextMilestoneCard({
   today: string;
   onToggle: (id: string, done: boolean) => Promise<boolean>;
 }) {
-  const { areaById, personById } = useTeam();
   const next = milestones.find((m) => !m.parent_id && m.status !== "erledigt");
 
   if (!next) {
@@ -133,58 +123,22 @@ function NextMilestoneCard({
   const children = milestones.filter((m) => m.parent_id === next.id).sort((a, b) => a.sort - b.sort);
   const done = children.filter((m) => m.status === "erledigt").length;
   const allDone = children.length > 0 && done === children.length;
-  const n = daysBetween(today, next.due_date);
 
   return (
     <section className={cn(card, "flex min-w-0 flex-[1_1_320px] flex-col gap-3.5 px-5 py-[18px] md:px-6 md:py-[22px]")}>
       <div className="flex items-center justify-between gap-2">
         <h2 className="label-mono">Nächster Meilenstein</h2>
-        <Chip tone={dueTone(next.due_date, today)} dot={n !== 0}>
-          {n < 0 ? `${-n} Tage überfällig` : relativeDays(next.due_date, today)}
-        </Chip>
+        <DueChip due={next.due_date} today={today} />
       </div>
       <div className="flex flex-col gap-1.5">
-        <p className="text-[16.5px] leading-[1.35] font-semibold tracking-[-0.01em]">
+        <Link href={`/roadmap?m=${next.id}`} className="rounded-md text-[16.5px] leading-[1.35] font-semibold tracking-[-0.01em] hover:underline hover:decoration-line-2 hover:underline-offset-4">
           <span className="font-mono text-[13px] font-medium text-fg-3">{next.id} </span>
           {next.title}
-        </p>
+        </Link>
         <p className="text-[13px] text-fg-2">{formatHeaderDate(next.due_date)}</p>
       </div>
 
-      {children.length > 0 && (
-        <ul className="flex flex-col overflow-hidden rounded-[10px] shadow-[0_0_0_1px_var(--line)]">
-          {children.map((m) => {
-            const area = areaById(m.area_id);
-            const isDone = m.status === "erledigt";
-            return (
-              <li key={m.id} className="border-t border-line first:border-t-0">
-                <button
-                  type="button"
-                  aria-pressed={isDone}
-                  onClick={() => onToggle(m.id, !isDone)}
-                  className="flex min-h-11 w-full items-center gap-2.5 px-3 text-left text-[13px] transition-colors duration-150 hover:bg-hover md:min-h-[38px]"
-                >
-                  <span
-                    className={cn(
-                      "grid size-3.5 shrink-0 place-items-center rounded-full border-[1.5px] transition-colors duration-200",
-                      isDone ? "border-acc-line bg-acc-line text-bg" : "border-line-2"
-                    )}
-                    aria-hidden
-                  >
-                    {isDone && <Check className="size-2.5" strokeWidth={3.5} />}
-                  </span>
-                  <span className={cn("min-w-0 flex-1 truncate", isDone && "text-fg-3 line-through")}>
-                    <span className="sr-only">{m.id} </span>
-                    {m.title}
-                  </span>
-                  <span className="size-[7px] shrink-0 rounded-full" style={{ background: area?.color }} title={area?.name ?? m.area_id} aria-hidden />
-                  <Avatar person={personById(area?.owner_id)} size={22} />
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      )}
+      {children.length > 0 && <MilestoneChecklist items={children} onToggle={onToggle} />}
 
       {children.length > 0 && (
         <div className="flex items-center gap-2.5 text-[12.5px] text-fg-3 tabular">
@@ -293,7 +247,7 @@ function DueCard({ milestones, tasks, today }: { milestones: Milestone[]; tasks:
             {g.items.map((it) => {
               const area = areaById(it.areaId);
               return (
-                <li key={it.key} className="flex min-h-10 items-center gap-3 border-t border-line px-4 text-[13.5px]">
+                <li key={it.key} className="relative flex min-h-10 items-center gap-3 border-t border-line px-4 text-[13.5px] has-[a]:hover:bg-hover">
                   {it.kind === "milestone" ? (
                     <svg viewBox="0 0 24 24" className="size-[13px] shrink-0 text-fg-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" aria-label="Meilenstein">
                       <path d="M12 3 21 12 12 21 3 12z" />
@@ -302,7 +256,13 @@ function DueCard({ milestones, tasks, today }: { milestones: Milestone[]; tasks:
                     <span className="size-[13px] shrink-0 rounded-full border-[1.5px] border-line-2" aria-label="Aufgabe" />
                   )}
                   {it.id && <span className="w-[34px] shrink-0 font-mono text-[12px] text-fg-3">{it.id}</span>}
-                  <span className="min-w-0 flex-1 truncate">{it.title}</span>
+                  {it.kind === "milestone" ? (
+                    <Link href={`/roadmap?m=${it.id}`} className="min-w-0 flex-1 truncate rounded-sm after:absolute after:inset-0">
+                      {it.title}
+                    </Link>
+                  ) : (
+                    <span className="min-w-0 flex-1 truncate">{it.title}</span>
+                  )}
                   {area && (
                     <span className="hidden items-center gap-1.5 text-[12.5px] whitespace-nowrap text-fg-2 sm:inline-flex">
                       <span className="size-[7px] rounded-full" style={{ background: area.color }} aria-hidden />
