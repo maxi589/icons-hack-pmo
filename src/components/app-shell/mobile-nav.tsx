@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { ChevronRight, House, Inbox, Kanban, List, LogOut, Plus, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isActive, NAV_HACKATHON, NAV_MAIN, NEW_ACTIONS } from "@/lib/nav";
+import { useInbox } from "./inbox-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Avatar } from "@/components/avatar";
@@ -111,6 +112,7 @@ const TABS = [
 
 export function MobileTabBar() {
   const pathname = usePathname();
+  const { unread } = useInbox();
   const [newOpen, setNewOpen] = useState(false);
 
   return (
@@ -130,8 +132,16 @@ export function MobileTabBar() {
                 isActive(pathname, tab.href) && "text-fg"
               )}
             >
-              <tab.Icon className="size-5" strokeWidth={1.8} aria-hidden />
+              <span className="relative">
+                <tab.Icon className="size-5" strokeWidth={1.8} aria-hidden />
+                {tab.href === "/inbox" && unread > 0 && (
+                  <span className="absolute -top-1.5 -right-2.5 min-w-4 rounded-full bg-acc px-1 text-center text-[10px] leading-4 font-semibold text-acc-text tabular shadow-[0_0_0_2px_var(--panel)]">
+                    {unread}
+                  </span>
+                )}
+              </span>
               {tab.label}
+              {tab.href === "/inbox" && unread > 0 && <span className="sr-only">, {unread} ungelesen</span>}
             </Link>
           ) : (
             <button

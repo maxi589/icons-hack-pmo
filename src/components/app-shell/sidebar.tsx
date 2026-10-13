@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { LogOut, Moon, PanelLeftClose, PanelLeftOpen, Search, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { isActive, NAV_HACKATHON, NAV_MAIN, type NavItem } from "@/lib/nav";
+import { useInbox } from "./inbox-provider";
 import { toggleSidebar } from "@/lib/sidebar";
 import { setTheme } from "@/components/theme-toggle";
 import { Kbd } from "@/components/ui/command";
@@ -35,6 +36,8 @@ function ThemeIcon() {
 
 function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
   const on = isActive(pathname, item.href);
+  const { unread } = useInbox();
+  const count = item.href === "/inbox" ? unread : 0;
   return (
     <Link
       href={item.href}
@@ -46,24 +49,33 @@ function NavLink({ item, pathname }: { item: NavItem; pathname: string }) {
     >
       <item.Icon className={cn("size-4 shrink-0", on && "text-acc-line")} strokeWidth={1.8} aria-hidden />
       <span className="truncate">{item.label}</span>
+      {count > 0 && (
+        <span className="ml-auto rounded-full bg-acc px-1.5 text-[11px] leading-[18px] font-semibold text-acc-text tabular">
+          {count}
+          <span className="sr-only"> ungelesen</span>
+        </span>
+      )}
     </Link>
   );
 }
 
 function RailLink({ item, pathname }: { item: NavItem; pathname: string }) {
   const on = isActive(pathname, item.href);
+  const { unread } = useInbox();
+  const count = item.href === "/inbox" ? unread : 0;
   return (
     <Link
       href={item.href}
-      aria-label={item.label}
+      aria-label={count ? `${item.label}, ${count} ungelesen` : item.label}
       title={item.label}
       aria-current={on ? "page" : undefined}
       className={cn(
-        "grid size-9 place-items-center rounded-[9px] text-fg-2 transition-colors duration-150 hover:bg-hover hover:text-fg",
+        "relative grid size-9 place-items-center rounded-[9px] text-fg-2 transition-colors duration-150 hover:bg-hover hover:text-fg",
         on && "bg-active text-acc-line hover:text-acc-line"
       )}
     >
       <item.Icon className="size-[17px]" strokeWidth={1.8} aria-hidden />
+      {count > 0 && <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-acc-line shadow-[0_0_0_2px_var(--bg)]" aria-hidden />}
     </Link>
   );
 }

@@ -16,6 +16,7 @@ export type Org = {
   stage: "recherche" | "kontaktiert" | "im_gespraech" | "zugesagt" | "fix" | "abgesagt";
   next_follow_up: string | null;
   owner_id: string | null;
+  wave: number | null;
 };
 
 export type Task = {
@@ -34,7 +35,7 @@ export function useOverviewData() {
   const load = useCallback(async () => {
     const supabase = createClient();
     const [o, t] = await Promise.all([
-      supabase.from("organizations").select("id, name, roles, stage, next_follow_up, owner_id"),
+      supabase.from("organizations").select("id, name, roles, stage, next_follow_up, owner_id, wave"),
       supabase
         .from("tasks")
         .select("id, title, due_date, area_id, assignee_id, milestone_id")

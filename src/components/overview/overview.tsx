@@ -13,6 +13,7 @@ import { formatDayMonth, formatHeaderDate, formatLong, formatShort, hourInVienna
 import { currentPhase, FOLLOW_UP_ROUNDS, phaseFill, PHASES, WAVE_1 } from "@/lib/phases";
 import { MilestoneChecklist } from "@/components/milestone-checklist";
 import { OwnersDialog } from "./owners-dialog";
+import { TodayCard } from "./today-card";
 import { useOverviewData, type Milestone, type Org, type Task } from "./use-overview-data";
 
 // Übersicht (Board „Richtung A Graphit“): Wo stehen wir? Was ist als Nächstes dran? Wer ist zuständig?
@@ -48,6 +49,7 @@ export function Overview() {
 
       <div className="flex flex-wrap gap-4">
         <CountdownCard today={today} phase={phase} />
+        <TodayCard tasks={data.tasks} orgs={data.orgs} today={today} />
         <NextMilestoneCard milestones={data.milestones} today={today} onToggle={setMilestoneDone} />
       </div>
 
@@ -303,11 +305,13 @@ function FollowUpCard({ orgs, today }: { orgs: Org[]; today: string }) {
           {due.map((o) => {
             const late = o.next_follow_up! < today;
             return (
-              <li key={o.id} className="flex min-h-11 items-center gap-2.5 border-t border-line px-3 text-[13.5px] first:border-t-0 md:min-h-10">
+              <li key={o.id} className="relative flex min-h-11 items-center gap-2.5 border-t border-line px-3 text-[13.5px] first:border-t-0 hover:bg-hover md:min-h-10">
                 <span className="grid size-6 shrink-0 place-items-center rounded-md bg-active text-[10px] font-semibold text-fg-2" aria-hidden>
                   {o.name.slice(0, 2).toUpperCase()}
                 </span>
-                <span className="min-w-0 flex-1 truncate">{o.name}</span>
+                <Link href={`/pipeline?firma=${o.id}`} className="min-w-0 flex-1 truncate rounded-sm after:absolute after:inset-0">
+                  {o.name}
+                </Link>
                 <Chip tone={late ? "red" : "today"} dot={late}>
                   {late ? "überfällig" : "heute"}
                 </Chip>
