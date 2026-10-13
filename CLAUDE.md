@@ -13,7 +13,8 @@ Auftraggeber ist Maxi S (kein Entwickler): Deutsch, Ergebnis zuerst, einfache Sp
 - Original-Excels (`Partner.xlsx`, `Hackathon_Meilensteine.xlsx`) liegen nur im OneDrive-Ordner, nicht im Repo. Nie verändern. Lesen mit `node scripts/read-xlsx.js <datei.xlsx>` (kein Python vorhanden).
 
 ## Technik
-- Next.js (App Router, TypeScript), Tailwind v4, **shadcn/ui mit Base UI** (nie `-b radix`, keine Radix-Pakete).
+- **Next.js 16** (App Router, TypeScript, Cache Components an). Vor neuem Next-Code die passende Anleitung in `node_modules/next/dist/docs/` lesen, siehe @AGENTS.md.
+- Tailwind v4, **shadcn/ui mit Base UI** (Stil `base-nova`; nie `-b radix`, keine Radix-Pakete). Neue Bausteine mit `npx shadcn@latest add <name>`, danach an die Tokens anpassen (Fokusring, `--field`-Ränder, keine `dark:bg-input/…`-Flächen).
 - Supabase (Postgres, Auth, Realtime), Hosting auf Vercel.
 - Kanban aus **Kibo UI**. Zeitstrahl selbst gebaut. Sounds aus **soundcn**.
 - Schrift **Geist** und Geist Mono über das npm-Paket `geist`. **Michroma** lokal über `next/font`, kein Abruf von Google Fonts zur Laufzeit.
@@ -21,7 +22,9 @@ Auftraggeber ist Maxi S (kein Entwickler): Deutsch, Ergebnis zuerst, einfache Sp
 
 ## Design (Kurzfassung, Details in `docs/design/Design-System.md`)
 - Richtung **Graphit**, Signatur-Akzent **Lime**. Hell und dunkel gleichwertig, Standard ist die Systemeinstellung.
-- Alle Farben nur über die CSS-Variablen aus dem Design-System (`--bg`, `--panel`, `--text`, `--acc`, `--accLine` …), keine frei erfundenen Werte.
+- Alle Farben nur über die Tokens in `src/app/globals.css`, keine frei erfundenen Werte. Tailwind-Namen: `bg-bg`, `bg-panel`, `bg-card`, `bg-card-2`, `bg-col`, `border-line`, `border-line-2`, `border-field`, `text-fg` / `text-fg-2` / `text-fg-3`, `bg-hover`, `bg-active`, `bg-acc` + `text-acc-text`, `text-acc-line`, Status `*-st-gray|blue|amber|green|red`, Bereiche `bg-area-*`. Schrift `font-display` = Michroma, Hilfsklassen `tabular` und `label-mono`.
+- Hell/Dunkel über die Klasse `.dark` auf `<html>` (Inline-Skript in `src/app/layout.tsx`, Wahl im Cookie `theme`, sonst Systemeinstellung).
+- Daten-Hilfen in `src/lib/dates.ts` (`todayInVienna`, `daysUntil`) statt eigener Datumsrechnung.
 - Farbe nur für Bedeutung (Stufen, Bereichs-Punkte, Fälligkeit) plus der eine Lime-Akzent.
 - **Kontrastregeln:**
   - Dünne Linien, Icons und Text in Akzentfarbe immer mit `--accLine` (hell #4d7c0f). Lime #c6f432 nur als Fläche mit `--accText` darauf.

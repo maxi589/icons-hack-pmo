@@ -1,0 +1,254 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Dunkelmodus hängt an der Klasse .dark auf <html>. Das Inline-Skript im Root-Layout
+   setzt sie vor dem ersten Zeichnen (gespeicherte Wahl, sonst Systemeinstellung). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ------------------------------------------------------------------
+   Design-Tokens „Graphit“ (docs/design/Design-System.md, Abschnitt 2)
+   Hell = :root, Dunkel = .dark
+   ------------------------------------------------------------------ */
+:root {
+  color-scheme: light;
+
+  /* Flächen */
+  --bg: #f1f1f2;
+  --panel: #fbfbfb;
+  --card: #ffffff;
+  --card2: #f6f6f7;
+  --col: #f4f4f5;
+
+  /* Linien: --line/--line2 nur Dekoration, --field für Eingabefelder (mind. 3:1) */
+  --line: rgba(0, 0, 0, 0.09);
+  --line2: rgba(0, 0, 0, 0.13);
+  --field: #8e8e96;
+
+  /* Text: --text3 ist die hellste erlaubte Textfarbe */
+  --text: #18181b;
+  --text2: #52525b;
+  --text3: #6b6b73;
+
+  --hover: rgba(0, 0, 0, 0.035);
+  --active: rgba(0, 0, 0, 0.06);
+
+  /* Signatur-Akzent Lime: --acc nur als Fläche, Linien/Icons/Text mit --accLine */
+  --acc: #c6f432;
+  --accText: #0a0a0b;
+  --accLine: #4d7c0f;
+
+  /* Status (im Hellmodus nur 700er-Töne als Text) */
+  --st-gray: #52525b;
+  --st-blue: #1d4ed8;
+  --st-amber: #b45309;
+  --st-green: #047857;
+  --st-red: #b91c1c;
+
+  --shadow-card: 0 0 0 1px var(--line), 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-cmdk: 0 24px 64px rgba(0, 0, 0, 0.45);
+
+  /* shadcn/ui-Variablen, auf die Graphit-Tokens gelegt */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card-foreground: var(--text);
+  --popover: var(--card);
+  --popover-foreground: var(--text);
+  --primary: var(--acc);
+  --primary-foreground: var(--accText);
+  --secondary: var(--card2);
+  --secondary-foreground: var(--text);
+  --muted: var(--card2);
+  --muted-foreground: var(--text3);
+  --accent: var(--active);
+  --accent-foreground: var(--text);
+  --destructive: var(--st-red);
+  --border: var(--line);
+  --input: var(--field);
+  --ring: var(--accLine);
+  --chart-1: var(--st-blue);
+  --chart-2: var(--st-green);
+  --chart-3: var(--st-amber);
+  --chart-4: var(--st-red);
+  --chart-5: var(--st-gray);
+  --radius: 0.625rem;
+  --sidebar: var(--bg);
+  --sidebar-foreground: var(--text);
+  --sidebar-primary: var(--accLine);
+  --sidebar-primary-foreground: var(--bg);
+  --sidebar-accent: var(--active);
+  --sidebar-accent-foreground: var(--text);
+  --sidebar-border: var(--line);
+  --sidebar-ring: var(--accLine);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --bg: #0a0a0b;
+  --panel: #111113;
+  --card: #161618;
+  --card2: #1c1c1f;
+  --col: #141416;
+
+  --line: rgba(255, 255, 255, 0.09);
+  --line2: rgba(255, 255, 255, 0.13);
+  --field: #6b6b72;
+
+  --text: #ededee;
+  --text2: #a8a8ae;
+  --text3: #8b8b93;
+
+  --hover: rgba(255, 255, 255, 0.04);
+  --active: rgba(255, 255, 255, 0.075);
+
+  --acc: #c6f432;
+  --accText: #0a0a0b;
+  --accLine: #c6f432;
+
+  --st-gray: #a1a1aa;
+  --st-blue: #60a5fa;
+  --st-amber: #fbbf24;
+  --st-green: #34d399;
+  --st-red: #f87171;
+
+  --shadow-card: 0 0 0 1px var(--line), 0 1px 2px rgba(0, 0, 0, 0.35);
+}
+
+@theme inline {
+  /* Schriften: Geist/Geist Mono aus dem npm-Paket, Michroma nur für Logo und Countdown */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist-sans);
+  --font-display: var(--font-michroma);
+
+  /* Graphit-Tokens als Tailwind-Farben, z. B. bg-panel, text-fg-3, border-field */
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-card-2: var(--card2);
+  --color-col: var(--col);
+  --color-line: var(--line);
+  --color-line-2: var(--line2);
+  --color-field: var(--field);
+  --color-fg: var(--text);
+  --color-fg-2: var(--text2);
+  --color-fg-3: var(--text3);
+  --color-hover: var(--hover);
+  --color-active: var(--active);
+  --color-acc: var(--acc);
+  --color-acc-text: var(--accText);
+  --color-acc-line: var(--accLine);
+  --color-st-gray: var(--st-gray);
+  --color-st-blue: var(--st-blue);
+  --color-st-amber: var(--st-amber);
+  --color-st-green: var(--st-green);
+  --color-st-red: var(--st-red);
+
+  /* Bereichs-Farben: nur als 7–8px-Punkte, nie als Text auf hell */
+  --color-area-partner: #a78bfa;
+  --color-area-sponsoren: #f472b6;
+  --color-area-venue: #2dd4bf;
+  --color-area-marketing: #fb923c;
+  --color-area-jury: #facc15;
+  --color-area-teilnehmer: #60a5fa;
+  --color-area-event: #f87171;
+  --color-area-vorbereitung: #a1a1aa;
+
+  --shadow-card: var(--shadow-card);
+  --shadow-cmdk: var(--shadow-cmdk);
+
+  /* shadcn/ui */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /* Radien laut Design-System: 6 · 8 Navigation · 10 Knöpfe/Felder · 14 Karten/Panel · 16 Dialog · 26 Handy-Sheet */
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: 16px;
+  --radius-3xl: 26px;
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-size: 14px;
+  }
+  /* Fokusring: 2px --accLine mit 2px Abstand */
+  :focus-visible {
+    outline: 2px solid var(--accLine);
+    outline-offset: 2px;
+  }
+  /* Handy: Eingabefelder mind. 16px, sonst zoomt das iPhone */
+  @media (max-width: 767px) {
+    body {
+      font-size: 15px;
+    }
+    input,
+    textarea,
+    select {
+      font-size: 16px !important;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Abschnitts-Label: Geist Mono 10,5px, Großbuchstaben, Laufweite .12em, --text3 */
+@utility label-mono {
+  font-family: var(--font-geist-mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text3);
+}

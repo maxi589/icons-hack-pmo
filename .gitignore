@@ -1,6 +1,7 @@
 # Geheimnisse
-.env
-.env*.local
+.env*
+!.env.example
+*.pem
 
 # Excel-Originale und Exporte mit Partnerdaten
 *.xlsx
@@ -8,9 +9,12 @@
 
 # Abhängigkeiten und Build
 node_modules/
+.pnp
+.pnp.*
 .next/
 out/
 build/
+coverage/
 *.tsbuildinfo
 next-env.d.ts
 .vercel
