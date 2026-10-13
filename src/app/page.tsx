@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Countdown } from "@/components/countdown";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { UserBadge } from "@/components/user-badge";
 
 // Vorläufige Startseite: prüft Farben, Schriften und Bausteine des Grundgerüsts.
 // Wird durch Login und Übersicht ersetzt.
@@ -31,7 +32,10 @@ export default function Home() {
       <main className="mx-auto flex w-full max-w-[1080px] flex-1 flex-col gap-6 rounded-[14px] bg-panel p-6 shadow-card md:p-8">
         <header className="flex items-center justify-between">
           <span className="font-display text-[15px] tracking-[0.01em]">icons</span>
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            <UserBadge />
+            <ThemeToggle />
+          </div>
         </header>
 
         <section className="flex flex-col gap-1">

@@ -3,9 +3,11 @@
 !.env.example
 *.pem
 
-# Excel-Originale und Exporte mit Partnerdaten
+# Excel-Originale, Exporte mit Partnerdaten, Team-Adressen
 *.xlsx
 *.csv
+*.local.json
+supabase/.temp/
 
 # Abhängigkeiten und Build
 node_modules/
