@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Graphit – Roadmap</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Michroma&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}a:hover{color:inherit}
+:focus-visible{outline:2px solid var(--accLine);outline-offset:2px}
+.g-dark{--bg:#0a0a0b;--panel:#111113;--card:#161618;--card2:#1c1c1f;--line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.13);--text:#ededee;--text2:#a8a8ae;--text3:#8b8b93;--btn:#f4f4f5;--btnText:#0a0a0b;--hover:rgba(255,255,255,.04);--active:rgba(255,255,255,.075);--amber:#fbbf24;--green:#34d399;--shadow:0 1px 2px rgba(0,0,0,.35)}
+.g-light{--bg:#f1f1f2;--panel:#fbfbfb;--card:#ffffff;--card2:#f6f6f7;--line:rgba(0,0,0,.09);--line2:rgba(0,0,0,.13);--text:#18181b;--text2:#52525b;--text3:#6b6b73;--btn:#18181b;--btnText:#ffffff;--hover:rgba(0,0,0,.035);--active:rgba(0,0,0,.06);--amber:#b45309;--green:#047857;--shadow:0 1px 2px rgba(0,0,0,.05)}
+.sec{font-family:'Geist Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
+.nav{display:flex;align-items:center;gap:10px;height:32px;padding:0 10px;border-radius:8px;font-size:13.5px;color:var(--text2);text-decoration:none}
+.nav.on{background:var(--active);color:var(--text);box-shadow:inset 2px 0 0 var(--accLine)}
+.btn{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:9px;font-family:inherit;font-size:13px;font-weight:500;border:0;cursor:pointer;transition:transform .15s ease-out}
+.btn:active{transform:scale(.97)}
+.btn-g{background:transparent;color:var(--text2);box-shadow:inset 0 0 0 1px var(--line2)}
+.seg{display:inline-flex;padding:3px;border-radius:9px;box-shadow:inset 0 0 0 1px var(--line2)}
+.seg span{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:7px;font-size:12.5px;color:var(--text2)}
+.seg span.on{background:var(--active);color:var(--text)}
+.kbd{font-family:'Geist Mono',monospace;font-size:10.5px;line-height:16px;padding:0 5px;border-radius:5px;box-shadow:inset 0 0 0 1px var(--line2);color:var(--text3)}
+.lane{position:relative;height:58px;border-top:1px solid var(--line)}
+.dia{position:absolute;top:22px;width:14px;height:14px;margin-left:-7px;padding:0;border:0;border-radius:3px;transform:rotate(45deg);cursor:pointer;transition:transform .15s ease-out}
+.dia:hover{transform:rotate(45deg) scale(1.25)}
+.lab{position:absolute;font-size:11.5px;white-space:nowrap;color:var(--text2)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.av-empty{width:20px;height:20px;border-radius:50%;border:1px dashed var(--line2);box-sizing:border-box;flex:none}
+.card{background:var(--card);border-radius:14px;box-shadow:0 0 0 1px var(--line),var(--shadow)}
+</style>
+</helmet>
+<div class="{{theme}}" style="{{accVars}} min-height: 1000px; display: flex; flex-wrap: wrap; background: var(--bg); color: var(--text); font-family: 'Geist', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+
+  <nav aria-label="Hauptnavigation" style="flex: 1 1 232px; max-width: 260px; box-sizing: border-box; padding: 16px 12px; display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; align-items: baseline; gap: 10px; padding: 2px 8px 0"><span style="font-family: 'Michroma', 'Geist', sans-serif; font-size: 16px; letter-spacing: 0.05em">icons</span><span class="sec" style="font-size: 10px">Hackathon 27</span></div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <sc-for list="{{nav1}}" as="n" hint-placeholder-count="3"><a class="{{n.cls}}" href="#nav">{{n.label}}</a></sc-for>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <div class="sec" style="padding: 0 10px 6px">Hackathon</div>
+      <sc-for list="{{nav2}}" as="n" hint-placeholder-count="4"><a class="{{n.cls}}" href="#nav">{{n.label}}</a></sc-for>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 2px">
+      <div class="sec" style="padding: 0 10px 6px">Bereiche</div>
+      <sc-for list="{{areas}}" as="a" hint-placeholder-count="7"><a class="nav" href="#bereich"><span class="dot" style="background: {{a.color}}"></span>{{a.name}}</a></sc-for>
+    </div>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 8px 8px 8px 0">
+    <div style="min-height: 984px; box-sizing: border-box; background: var(--panel); border-radius: 14px; box-shadow: 0 0 0 1px var(--line); display: flex; flex-direction: column">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--line)">
+        <div style="display: flex; align-items: center; gap: 14px"><span style="font-size: 14px; font-weight: 600">Roadmap</span><span class="seg"><span class="on">Zeitstrahl</span><span>Liste</span></span></div>
+        <div style="display: flex; gap: 8px; align-items: center">
+          <span class="seg"><span>Wochen</span><span class="on">Monate</span></span>
+          <button class="btn btn-g">Alle Bereiche</button>
+          <button class="btn btn-g" onClick="{{toggleTheme}}" aria-label="Hell- oder Dunkelmodus">{{themeLabel}}</button>
+        </div>
+      </div>
+
+      <div style="padding: 20px 20px 0; display: flex; flex-wrap: wrap; align-items: center; gap: 18px; font-size: 12.5px; color: var(--text2)">
+        <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 2px; transform: rotate(45deg); background: var(--text2)"></span>Meilenstein</span>
+        <span style="display: flex; align-items: center; gap: 6px"><span style="width: 18px; height: 6px; border-radius: 3px; background: var(--line2)"></span>Zeitraum</span>
+        <span style="display: flex; align-items: center; gap: 6px"><span style="width: 0; height: 14px; border-left: 1.5px dashed var(--text3)"></span>Nachfass-Runde</span>
+        <span style="display: flex; align-items: center; gap: 6px"><span style="width: 2px; height: 14px; background: var(--accLine)"></span>Heute, 13.10.</span>
+        <span style="margin-left: auto" class="sec">Klick auf einen Meilenstein</span>
+      </div>
+
+      <div style="margin: 14px 20px 0; overflow-x: auto; border-radius: 12px; box-shadow: 0 0 0 1px var(--line)">
+        <div style="min-width: 980px; display: grid; grid-template-columns: 196px minmax(0, 1fr)">
+          <div style="border-right: 1px solid var(--line)">
+            <div style="height: 40px; display: flex; align-items: center; padding: 0 14px" class="sec">Bereich</div>
+            <sc-for list="{{lanes}}" as="l" hint-placeholder-count="8">
+              <div style="height: 58px; border-top: 1px solid var(--line); display: flex; align-items: center; gap: 10px; padding: 0 14px; box-sizing: border-box">
+                <span class="dot" style="background: {{l.color}}"></span>
+                <span style="flex: 1; font-size: 13px">{{l.name}}</span>
+                <span class="av-empty" title="Verantwortlich offen"></span>
+              </div>
+            </sc-for>
+          </div>
+          <div style="position: relative">
+            <div style="height: 40px; display: flex">
+              <sc-for list="{{months}}" as="m" hint-placeholder-count="5">
+                <div style="width: {{m.w}}; box-sizing: border-box; border-left: 1px solid var(--line); padding: 0 10px; display: flex; align-items: center; font-size: 12px; color: var(--text2)">{{m.name}}</div>
+              </sc-for>
+            </div>
+            <sc-for list="{{lanes}}" as="l" hint-placeholder-count="8">
+              <div class="lane">
+                <sc-for list="{{l.bars}}" as="b" hint-placeholder-count="1">
+                  <div style="position: absolute; top: 24px; height: 10px; left: {{b.left}}; width: {{b.w}}; border-radius: 5px; background: {{b.bg}}"></div>
+                  <div class="lab" style="left: {{b.left}}; top: 40px; color: var(--text3)">{{b.label}}</div>
+                </sc-for>
+                <sc-for list="{{l.ms}}" as="d" hint-placeholder-count="2">
+                  <button class="dia" style="left: {{d.left}}; background: {{d.bg}}; box-shadow: {{d.ring}}" onClick="{{d.pick}}" aria-label="{{d.aria}}"></button>
+                  <div class="lab" style="left: {{d.left}}; top: {{d.top}}; transform: {{d.tx}}; font-weight: 500; color: {{d.fg}}">{{d.label}}</div>
+                </sc-for>
+              </div>
+            </sc-for>
+            <div style="position: absolute; top: 0; bottom: 0; left: 0; right: 0; pointer-events: none">
+              <sc-for list="{{months}}" as="m" hint-placeholder-count="5"><div style="position: absolute; top: 40px; bottom: 0; left: {{m.left}}; border-left: 1px solid var(--line)"></div></sc-for>
+              <sc-for list="{{followups}}" as="f" hint-placeholder-count="3">
+                <div style="position: absolute; top: 40px; bottom: 0; left: {{f.left}}; border-left: 1.5px dashed var(--text3); opacity: .55"></div>
+                <div style="position: absolute; top: 4px; left: {{f.left}}; transform: translateX(-50%); font-family: 'Geist Mono', monospace; font-size: 10.5px; color: var(--text3); background: var(--panel); padding: 0 4px; white-space: nowrap">{{f.label}}</div>
+              </sc-for>
+              <div style="position: absolute; top: 30px; bottom: 0; left: 7.95%; width: 2px; margin-left: -1px; background: var(--accLine)"></div>
+              <div style="position: absolute; top: 20px; left: 7.95%; transform: translateX(-50%); width: 8px; height: 8px; border-radius: 50%; background: var(--accLine)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding: 16px 20px 24px">
+        <section class="card" style="padding: 18px 22px; display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+          <div style="flex: 1.4 1 420px; display: flex; flex-direction: column; gap: 8px">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+              <span style="font-family: 'Geist Mono', monospace; font-size: 12.5px; color: var(--text3)">{{sel.id}}</span>
+              <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text2)"><span class="dot" style="width: 7px; height: 7px; background: {{sel.color}}"></span>{{sel.area}}</span>
+              <span style="font-size: 12.5px; color: var(--text2)">· {{sel.date}}</span>
+              <span style="font-size: 12px; color: {{sel.dueColor}}">{{sel.due}}</span>
+            </div>
+            <div style="font-size: 19px; line-height: 1.3; font-weight: 600; letter-spacing: -0.015em">{{sel.title}}</div>
+            <div style="font-size: 14px; line-height: 1.55; color: var(--text2)">{{sel.desc}}</div>
+          </div>
+          <div style="flex: 1 1 280px; display: flex; flex-direction: column; gap: 8px">
+            <div class="sec">Gehört dazu</div>
+            <sc-for list="{{sel.subs}}" as="s" hint-placeholder-count="3">
+              <div style="display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 7px 10px; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line)">
+                <span style="font-family: 'Geist Mono', monospace; font-size: 11.5px; color: var(--text3); width: 34px">{{s.id}}</span><span style="flex: 1">{{s.title}}</span><span style="font-size: 11.5px; color: var(--text3)">{{s.date}}</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{sel.noSubs}}" hint-placeholder-val="{{false}}"><div style="font-size: 13px; color: var(--text3)">Keine Unterpunkte. Aufgaben dazu legt ihr direkt hier an.</div></sc-if>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"modus":{"editor":"enum","options":["dunkel","hell"],"default":"dunkel"},"akzent":{"editor":"enum","options":["Lime","Indigo","Orange"],"default":"Lime"},"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const mode = (this.state && this.state.mode) || this.props.modus || 'dunkel';
+    const isDark = mode !== 'hell';
+    const ACC = {
+      Lime: isDark ? ['#c6f432', '#c6f432', '#0a0a0b'] : ['#c6f432', '#4d7c0f', '#0a0a0b'],
+      Indigo: isDark ? ['#818cf8', '#818cf8', '#0a0a0b'] : ['#4f46e5', '#4f46e5', '#ffffff'],
+      Orange: isDark ? ['#fb923c', '#fb923c', '#0a0a0b'] : ['#c2410c', '#c2410c', '#ffffff']
+    };
+    const acc = ACC[this.props.akzent] || ACC.Lime;
+    const C = { Vorbereitung: '#a1a1aa', Partner: '#a78bfa', Sponsoren: '#f472b6', Venue: '#2dd4bf', Marketing: '#fb923c', Jury: '#facc15', Teilnehmer: '#60a5fa', Event: '#f87171' };
+    const pos = (day) => (Math.round(day / 151 * 10000) / 100) + '%';
+    const M = {
+      'M1': { t: 'Pitch Slides, Lead Listen, Venue Liste und Website final', d: 17, ds: 'So, 18.10.2026', a: 'Vorbereitung', x: 'Alles, was wir für den Outreach brauchen, ist fertig (M1.1 bis M1.4).', subs: ['M1.1', 'M1.2', 'M1.3', 'M1.4'] },
+      'M1.1': { t: 'Partner und Sponsoren Pitch Slides final', d: 17, ds: 'So, 18.10.', a: 'Vorbereitung' },
+      'M1.2': { t: 'Lead Liste Prio A und B final (inkl. warmen Kontakten)', d: 17, ds: 'So, 18.10.', a: 'Partner' },
+      'M1.3': { t: 'Venue Liste Prio A und B final', d: 17, ds: 'So, 18.10.', a: 'Venue' },
+      'M1.4': { t: 'Website fertig', d: 17, ds: 'So, 18.10.', a: 'Marketing' },
+      'M2': { t: 'Venue fixiert', d: 60, ds: 'Mo, 30.11.2026', a: 'Venue', x: 'Venue vom Team gewählt und vertraglich zugesagt, ein Backup bleibt als Option.', subs: ['M2.1', 'M2.2'] },
+      'M2.1': { t: 'Venue Anfragen raus', d: 18, ds: 'Mo, 19.10.', a: 'Venue', x: 'Unverbindliche Optionsanfrage für 27./28.2. an alle Prio A und B gleichzeitig.' },
+      'M2.2': { t: 'Angebote und Besichtigungen durch', d: 43, ds: 'Fr, 13.11.', a: 'Venue', x: 'Angebote vergleichbar, die Top 2 bis 3 besichtigt.' },
+      'M3': { t: 'Partner und Sponsoren fixiert', d: 78, ds: 'Fr, 18.12.2026', a: 'Partner', x: '4 Challenge Partner plus Sponsoren (Credits, Verpflegung) vertraglich zugesagt.', subs: ['M3.1', 'M3.2', 'M3.3'] },
+      'M3.1': { t: 'Welle 1: Outreach Prio A raus', d: 18, ds: 'Mo, 19.10.', a: 'Partner', x: 'Erste Ansprache der Wunschpartner, persönlich über warme Kontakte. Nachfassen am 2.11. und 16.11.' },
+      'M3.2': { t: 'Welle 2: Outreach Prio B raus', d: 32, ds: 'Mo, 2.11.', a: 'Partner', x: 'Ansprache der zweiten Reihe mit Learnings aus Welle 1. Nachfassen am 16.11. und 30.11.' },
+      'M3.3': { t: 'Welle 3: Sponsoren raus', d: 46, ds: 'Mo, 16.11.', a: 'Sponsoren', x: 'Ansprache für Credits und Verpflegung, mit Venue Stand als Seriositätsnachweis. Nachfassen am 30.11.' },
+      'M4': { t: 'Jury fixiert', d: 106, ds: 'Fr, 15.1.2027', a: 'Jury', x: '4 Jurymitglieder zugesagt.' },
+      'M5': { t: 'Event public und Anmeldestart (Luma)', d: 127, ds: 'Fr, 5.2.2027', a: 'Marketing', x: 'Luma Event veröffentlicht, ab jetzt kann man sich anmelden.' },
+      'M6': { t: 'Anmeldeschluss', d: 143, ds: 'So, 21.2.2027', a: 'Teilnehmer', x: 'Anmeldung in Luma geschlossen.' },
+      'M7': { t: 'Teilnehmerauswahl und Zusagen', d: 145, ds: 'Di, 23.2.2027', a: 'Teilnehmer', x: 'Auswahl getroffen, Zusagen und Absagen raus, Warteliste steht.' },
+      'M8': { t: 'Hackathon', d: 149, ds: 'Sa, 27.2.2027', a: 'Event', x: '27. und 28.2.2027, 24 Stunden.', subs: ['M8.1'] },
+      'M8.1': { t: 'Logistik Dry Run', d: 148, ds: 'Fr, 26.2.', a: 'Event', x: 'Technik, Räume, Verpflegung und Ablauf am Vortag im Venue geprüft.' }
+    };
+    const selId = (this.state && this.state.sel) || 'M2';
+    const mk = (id, label, place) => {
+      const m = M[id];
+      const on = id === selId;
+      const p = place || 'up';
+      return {
+        left: pos(m.d), label: label, aria: id + ' ' + m.t,
+        bg: on ? 'var(--text)' : C[m.a],
+        ring: on ? '0 0 0 3px var(--panel), 0 0 0 5px ' + C[m.a] : '0 0 0 3px var(--panel)',
+        fg: on ? 'var(--text)' : 'var(--text2)',
+        top: p === 'down' ? '40px' : '4px',
+        tx: p === 'left' ? 'translateX(calc(-100% - 12px)) translateY(18px)' : 'translateX(-50%)',
+        pick: () => this.setState({ sel: id })
+      };
+    };
+    const bar = (from, to, area, label, faint) => ({ left: pos(from), w: (Math.round((to - from) / 151 * 10000) / 100) + '%', bg: faint ? 'color-mix(in srgb, ' + C[area] + ' 16%, transparent)' : 'color-mix(in srgb, ' + C[area] + ' 30%, transparent)', label: label });
+    const lanes = [
+      { name: 'Vorbereitung', bars: [], ms: [mk('M1', 'M1 · 18.10.')] },
+      { name: 'Partner', bars: [bar(18, 78, 'Partner', '')], ms: [mk('M3.1', 'Welle 1', 'down'), mk('M3.2', 'Welle 2'), mk('M3', 'M3 · fixiert 18.12.')] },
+      { name: 'Sponsoren', bars: [bar(46, 78, 'Sponsoren', '', true)], ms: [mk('M3.3', 'Welle 3 · 16.11.')] },
+      { name: 'Venue', bars: [bar(18, 60, 'Venue', '')], ms: [mk('M2.1', 'Anfragen', 'down'), mk('M2.2', 'Besichtigungen'), mk('M2', 'M2 · fixiert 30.11.', 'down')] },
+      { name: 'Marketing', bars: [], ms: [mk('M5', 'M5 · Luma live 5.2.')] },
+      { name: 'Jury', bars: [], ms: [mk('M4', 'M4 · fixiert 15.1.')] },
+      { name: 'Teilnehmer', bars: [bar(127, 145, 'Teilnehmer', '')], ms: [mk('M6', 'Schluss', 'left'), mk('M7', 'Auswahl')] },
+      { name: 'Event', bars: [], ms: [mk('M8.1', ''), mk('M8', 'Dry Run + Hackathon 26.–28.2.', 'left')] }
+    ].map((l) => ({ ...l, color: C[l.name] }));
+    const months = [
+      { name: 'Oktober', w: '20.53%', left: '0%' }, { name: 'November', w: '19.87%', left: '20.53%' }, { name: 'Dezember', w: '20.53%', left: '40.4%' }, { name: 'Januar', w: '20.53%', left: '60.93%' }, { name: 'Februar', w: '18.54%', left: '81.46%' }
+    ];
+    const followups = [{ left: pos(32), label: '2.11.' }, { left: pos(46), label: '16.11.' }, { left: pos(60), label: '30.11.' }];
+    const s = M[selId];
+    const days = s.d - 12;
+    const sel = {
+      id: selId, title: s.t, date: s.ds, area: s.a, color: C[s.a], desc: s.x || '',
+      due: days > 0 ? 'in ' + days + ' Tagen' : 'heute', dueColor: days <= 7 ? 'var(--amber)' : 'var(--text3)',
+      subs: (s.subs || []).map((k) => ({ id: k, title: M[k].t, date: M[k].ds })),
+      noSubs: !(s.subs && s.subs.length)
+    };
+    const nv = (label, on) => ({ label: label, cls: on ? 'nav on' : 'nav' });
+    return {
+      theme: isDark ? 'g-dark' : 'g-light',
+      accVars: '--acc: ' + acc[0] + '; --accLine: ' + acc[1] + '; --accText: ' + acc[2] + ';',
+      themeLabel: isDark ? 'Hell' : 'Dunkel',
+      toggleTheme: () => this.setState({ mode: isDark ? 'hell' : 'dunkel' }),
+      nav1: [nv('Übersicht'), nv('Inbox'), nv('Meine Aufgaben')],
+      nav2: [nv('Roadmap', true), nv('Pipeline'), nv('Aufgaben'), nv('Wissen & Entscheidungen')],
+      areas: ['Partner', 'Sponsoren', 'Venue', 'Marketing', 'Jury', 'Teilnehmer', 'Event'].map((n) => ({ name: n, color: C[n] })),
+      lanes: lanes, months: months, followups: followups, sel: sel
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Graphit – Pipeline mit Firmen-Detail</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&family=Michroma&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit}a:hover{color:inherit}
+:focus-visible{outline:2px solid var(--accLine);outline-offset:2px}
+.g-dark{--bg:#0a0a0b;--panel:#111113;--card:#18181a;--card2:#1c1c1f;--col:#141416;--line:rgba(255,255,255,.09);--line2:rgba(255,255,255,.13);--field:#6b6b72;--text:#ededee;--text2:#a8a8ae;--text3:#8b8b93;--hover:rgba(255,255,255,.04);--active:rgba(255,255,255,.075);--gray:#a1a1aa;--blue:#60a5fa;--amber:#fbbf24;--green:#34d399;--red:#f87171;--shadow:0 1px 2px rgba(0,0,0,.35)}
+.g-light{--bg:#f1f1f2;--panel:#fbfbfb;--card:#ffffff;--card2:#f6f6f7;--col:#f4f4f5;--line:rgba(0,0,0,.09);--line2:rgba(0,0,0,.13);--field:#8e8e96;--text:#18181b;--text2:#52525b;--text3:#6b6b73;--hover:rgba(0,0,0,.035);--active:rgba(0,0,0,.06);--gray:#52525b;--blue:#1d4ed8;--amber:#b45309;--green:#047857;--red:#b91c1c;--shadow:0 1px 2px rgba(0,0,0,.06)}
+.sec{font-family:'Geist Mono',ui-monospace,monospace;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3)}
+.rail{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--text2);border:0;background:transparent}
+.rail.on{background:var(--active);color:var(--accLine)}
+.btn{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:9px;font-family:inherit;font-size:13px;font-weight:500;border:0;cursor:pointer;transition:transform .15s ease-out,background .15s ease-out}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--acc);color:var(--accText)}
+.btn-g{background:transparent;color:var(--text2);box-shadow:inset 0 0 0 1px var(--line2)}
+.btn-g:hover{background:var(--hover);color:var(--text)}
+.seg{display:inline-flex;padding:3px;border-radius:9px;box-shadow:inset 0 0 0 1px var(--line2);gap:2px}
+.seg span{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px;border-radius:7px;font-size:12.5px;color:var(--text2)}
+.seg span.on{background:var(--active);color:var(--text)}
+.kcard{display:flex;flex-direction:column;gap:9px;width:100%;padding:11px 12px;border-radius:10px;border:0;text-align:left;font-family:inherit;color:var(--text);background:var(--card);box-shadow:0 0 0 1px var(--line),var(--shadow);cursor:pointer;transition:box-shadow .15s ease-out,transform .15s ease-out}
+.kcard:hover{box-shadow:0 0 0 1px var(--line2),var(--shadow)}
+.kcard.sel{box-shadow:0 0 0 1.5px var(--accLine),var(--shadow)}
+.logo{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;background:var(--active);color:var(--text2);flex:none}
+.prio{font-family:'Geist Mono',monospace;font-size:10.5px;font-weight:500;padding:1px 5px;border-radius:5px;box-shadow:inset 0 0 0 1px var(--line2);color:var(--text2)}
+.chip{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 7px;border-radius:999px;font-size:11px;font-weight:500;white-space:nowrap}
+.chip i{width:5px;height:5px;border-radius:50%;background:currentColor;display:block}
+.c-n{color:var(--text2);box-shadow:inset 0 0 0 1px var(--line2)}
+.c-today{color:var(--accText);background:var(--acc)}
+.c-late{color:var(--red);background:color-mix(in srgb,var(--red) 12%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--red) 30%,transparent)}
+.av{width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:600;color:#111;flex:none}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.prop{display:grid;grid-template-columns:128px minmax(0,1fr);gap:10px;align-items:center;min-height:32px;font-size:13px}
+.prop>span:first-child{color:var(--text3)}
+.mini{display:inline-flex;align-items:center;height:26px;padding:0 9px;border-radius:7px;border:0;font-family:inherit;font-size:12px;color:var(--text2);background:transparent;box-shadow:inset 0 0 0 1px var(--line2);cursor:pointer}
+.mini:hover{color:var(--text);background:var(--hover)}
+</style>
+</helmet>
+<div class="{{theme}}" style="{{accVars}} position: relative; min-height: 1000px; display: flex; flex-wrap: wrap; background: var(--bg); color: var(--text); font-family: 'Geist', ui-sans-serif, system-ui, sans-serif; -webkit-font-smoothing: antialiased">
+
+  <nav aria-label="Hauptnavigation (eingeklappt)" style="flex: 0 0 60px; box-sizing: border-box; padding: 14px 12px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+    <div style="font-family: 'Michroma', sans-serif; font-size: 12px; margin: 4px 0 14px">ic</div>
+    <button class="rail" aria-label="Übersicht"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"></path><path d="M5 9.5V21h14V9.5"></path></svg></button>
+    <button class="rail" aria-label="Inbox"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-6l-2 3h-4l-2-3H2"></path><path d="M5.5 5.1 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.5-6.9A2 2 0 0 0 16.8 4H7.2a2 2 0 0 0-1.7 1.1z"></path></svg></button>
+    <button class="rail" aria-label="Roadmap"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21V4"></path><path d="M4 4h12l-2 4 2 4H4"></path></svg></button>
+    <button class="rail on" aria-label="Pipeline"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="5" height="16" rx="1.5"></rect><rect x="10" y="4" width="5" height="11" rx="1.5"></rect><rect x="17" y="4" width="4" height="7" rx="1.5"></rect></svg></button>
+    <button class="rail" aria-label="Aufgaben"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"></path><path d="M4 6h.01M4 12h.01M4 18h.01"></path></svg></button>
+    <button class="rail" aria-label="Wissen und Entscheidungen"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5z"></path><path d="M4 19.5A2.5 2.5 0 0 0 6.5 22H20v-5"></path></svg></button>
+  </nav>
+
+  <main style="flex: 999 1 560px; min-width: 0; box-sizing: border-box; padding: 8px 8px 8px 0">
+    <div style="position: relative; min-height: 984px; box-sizing: border-box; background: var(--panel); border-radius: 14px; box-shadow: 0 0 0 1px var(--line); display: flex; flex-direction: column; overflow: hidden">
+
+      <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line)">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 14px">
+          <span style="font-size: 14px; font-weight: 600">Pipeline</span>
+          <span class="seg"><span class="on">Partner <span style="color: var(--text3)">9</span></span><span>Sponsoren</span><span>Venues</span><span>Jury</span></span>
+          <span class="chip c-n">Beispieldaten · Stand Mo, 2.11.</span>
+        </div>
+        <div style="display: flex; gap: 8px; align-items: center">
+          <span class="seg"><span class="on">Board</span><span>Liste</span></span>
+          <button class="btn btn-g">Welle</button>
+          <button class="btn btn-g" onClick="{{toggleTheme}}">{{themeLabel}}</button>
+          <button class="btn btn-p">+ Firma</button>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 22px; padding: 12px 18px; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--text2)">
+        <span style="display: flex; align-items: center; gap: 10px">Challenge-Partner <span style="display: flex; gap: 3px"><sc-for list="{{goalSegs}}" as="g" hint-placeholder-count="4"><span style="width: 22px; height: 5px; border-radius: 3px; background: {{g.bg}}"></span></sc-for></span><b style="color: var(--text); font-weight: 600">{{won}} / 4</b> zugesagt</span>
+        <span style="display: flex; align-items: center; gap: 8px"><span class="chip c-today">heute</span>{{todayCount}} nachfassen</span>
+        <span style="display: flex; align-items: center; gap: 8px"><span class="chip c-late"><i></i>überfällig</span>1</span>
+        <span style="margin-left: auto">Nächste Runde: Mo, 16.11.</span>
+      </div>
+
+      <div style="flex: 1; display: flex; min-height: 0">
+        <div style="flex: 1; min-width: 0; overflow-x: auto; padding: 14px 14px 20px">
+          <div style="display: flex; gap: 10px; align-items: flex-start; min-width: 1010px">
+            <sc-for list="{{cols}}" as="c" hint-placeholder-count="6">
+              <div style="width: {{c.w}}; flex: none; display: flex; flex-direction: column; gap: 8px; padding: 8px; border-radius: 12px; background: var(--col); box-sizing: border-box">
+                <div style="display: flex; align-items: center; gap: 8px; height: 26px; padding: 0 4px">
+                  <span class="dot" style="background: {{c.color}}"></span>
+                  <span style="font-size: 12.5px; font-weight: 600; white-space: nowrap">{{c.name}}</span>
+                  <span style="font-size: 12px; color: var(--text3)">{{c.count}}</span>
+                  <span style="margin-left: auto; font-size: 11px; color: var(--text3)">{{c.hint}}</span>
+                </div>
+                <sc-for list="{{c.cards}}" as="k" hint-placeholder-count="2">
+                  <button class="{{k.cls}}" onClick="{{k.pick}}">
+                    <span style="display: flex; align-items: center; gap: 8px; width: 100%">
+                      <span class="logo">{{k.ini}}</span>
+                      <span style="flex: 1; min-width: 0; font-size: 13px; font-weight: 500; line-height: 1.3">{{k.name}}</span>
+                      <span class="prio">{{k.prio}}</span>
+                    </span>
+                    <span style="font-size: 12px; color: var(--text2)">{{k.warmLine}}</span>
+                    <span style="display: flex; align-items: center; gap: 6px; width: 100%">
+                      <span class="{{k.fcls}}">{{k.follow}}</span>
+                      <span class="av" style="margin-left: auto; background: {{k.ownerBg}}">{{k.owner}}</span>
+                    </span>
+                  </button>
+                </sc-for>
+                <sc-if value="{{c.empty}}" hint-placeholder-val="{{false}}">
+                  <div style="min-height: 70px; border-radius: 10px; border: 1px dashed var(--line2); display: flex; align-items: center; justify-content: center; text-align: center; padding: 8px; font-size: 12px; color: var(--text3)">{{c.emptyText}}</div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <aside aria-label="Firmen-Detail" style="flex: 0 0 400px; box-sizing: border-box; border-left: 1px solid var(--line); background: var(--card); display: flex; flex-direction: column">
+          <div style="padding: 16px 18px 14px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 12px">
+            <div style="display: flex; align-items: center; gap: 10px">
+              <span class="logo" style="width: 32px; height: 32px; font-size: 12px; border-radius: 8px">{{sel.ini}}</span>
+              <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 600; letter-spacing: -0.01em">{{sel.name}}</span><span style="font-size: 12px; color: var(--text3)">Prio {{sel.prio}} · {{sel.wave}} · Challenge-Partner</span></div>
+              <button class="mini" aria-label="Link kopieren">Link</button>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center">
+              <span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: 8px; box-shadow: inset 0 0 0 1px var(--line2); font-size: 12.5px"><span class="dot" style="width: 7px; height: 7px; background: {{sel.color}}"></span>{{sel.stage}}</span>
+              <sc-if value="{{sel.canAdvance}}" hint-placeholder-val="{{true}}"><button class="btn btn-p" style="height: 28px; font-size: 12.5px" onClick="{{advance}}">{{advLabel}}</button></sc-if>
+            </div>
+          </div>
+          <div style="padding: 10px 18px; border-bottom: 1px solid var(--line)">
+            <div class="prop"><span>Zuständig</span><span style="display: flex; align-items: center; gap: 8px"><span class="av" style="background: {{sel.ownerBg}}">{{sel.owner}}</span>{{sel.ownerName}}</span></div>
+            <div class="prop"><span>Warmer Kontakt</span><span>{{sel.warmLong}}</span></div>
+            <div class="prop"><span>Ansprechperson</span><span>{{sel.contact}}</span></div>
+            <div class="prop"><span>Nachfassen</span><span style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px"><span class="{{sel.fcls}}">{{sel.follow}}</span><button class="mini">+2 Tage</button><button class="mini">+1 Woche</button></span></div>
+          </div>
+          <div style="flex: 1; padding: 14px 18px; display: flex; flex-direction: column; gap: 14px">
+            <div class="sec">Verlauf</div>
+            <div style="display: flex; gap: 10px; font-size: 12.5px; color: var(--text3)"><span style="width: 20px; display: flex; justify-content: center"><span class="dot" style="width: 6px; height: 6px; background: var(--blue); margin-top: 5px"></span></span><span><b style="color: var(--text2); font-weight: 500">Maxi D</b> hat die Stufe auf Kontaktiert gesetzt · Mo, 19.10.</span></div>
+            <div style="display: flex; gap: 10px">
+              <span class="av" style="background: #bfdbfe">KI</span>
+              <div style="flex: 1; display: flex; flex-direction: column; gap: 4px">
+                <div style="font-size: 12.5px"><b style="font-weight: 600">Kilian</b> <span style="color: var(--text3)">· Mi, 21.10.</span></div>
+                <div style="font-size: 13.5px; line-height: 1.5; color: var(--text)">Hab sie auf LinkedIn angeschrieben, sie meldet sich nach dem Urlaub. <span style="color: var(--accLine); font-weight: 500">@Maxi D</span> bitte am 2.11. per Mail nachfassen.</div>
+              </div>
+            </div>
+            <sc-if value="{{moved}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; gap: 10px; font-size: 12.5px; color: var(--text3)"><span style="width: 20px; display: flex; justify-content: center"><span class="dot" style="width: 6px; height: 6px; background: var(--amber); margin-top: 5px"></span></span><span><b style="color: var(--text2); font-weight: 500">Du</b> hast die Stufe auf {{sel.stage}} gesetzt · gerade eben</span></div>
+            </sc-if>
+            <div style="margin-top: auto; display: flex; flex-direction: column; gap: 6px">
+              <label for="cm" style="font-size: 12px; color: var(--text3)">Kommentar</label>
+              <div style="display: flex; gap: 8px; align-items: flex-end">
+                <textarea id="cm" rows="2" placeholder="Schreib etwas … mit @ erwähnst du jemanden" style="flex: 1; resize: none; border: 0; border-radius: 10px; padding: 10px 12px; background: var(--panel); color: var(--text); box-shadow: inset 0 0 0 1px var(--field); font-family: inherit; font-size: 13.5px; line-height: 1.45; outline: 0"></textarea>
+                <button class="btn btn-p" style="height: 38px">Senden</button>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <sc-if value="{{toast}}" hint-placeholder-val="{{false}}">
+        <div role="status" style="position: fixed; left: 50%; bottom: 24px; z-index: 5; transform: translateX(-50%); display: flex; align-items: center; gap: 14px; padding: 10px 12px 10px 16px; border-radius: 12px; background: var(--card2); box-shadow: 0 0 0 1px var(--line2), 0 12px 32px rgba(0,0,0,.35); font-size: 13px; overflow: hidden">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>
+          <span>{{toastText}}</span>
+          <button class="mini" style="color: var(--text)" onClick="{{undo}}">Rückgängig</button>
+          <span style="position: absolute; left: 0; bottom: 0; height: 2px; width: 100%; background: var(--accLine); opacity: .7"></span>
+        </div>
+      </sc-if>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"modus":{"editor":"enum","options":["dunkel","hell"],"default":"dunkel"},"akzent":{"editor":"enum","options":["Lime","Indigo","Orange"],"default":"Lime"},"$preview":{"width":1440,"height":1000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      sel: 'nw', toast: '', prev: null, moved: false,
+      cards: [
+        { id: 'kr', name: 'Kessel Robotics', ini: 'KR', prio: 'B', wave: 'Welle 2', warm: 'kein warmer Kontakt', warmLong: 'keiner bekannt', contact: 'noch offen', owner: 'TI', follow: 'raus am 2.11.', fk: 'today', stage: 0 },
+        { id: 'gs', name: 'Graukopf Software', ini: 'GS', prio: 'B', wave: 'Welle 2', warm: 'warm über Manu', warmLong: 'Manu, über einen Studienkollegen', contact: 'Recruiting-Team', owner: 'MA', follow: 'raus am 2.11.', fk: 'today', stage: 0 },
+        { id: 'nw', name: 'Nordwerk Analytics', ini: 'NA', prio: 'A', wave: 'Welle 1', warm: 'warm über Kilian', warmLong: 'Kilian, über einen Praktikumskontakt', contact: 'Head of Data', owner: 'MD', follow: 'heute', fk: 'today', stage: 1 },
+        { id: 'dm', name: 'Donau Mobility', ini: 'DM', prio: 'A', wave: 'Welle 1', warm: 'kein warmer Kontakt', warmLong: 'keiner bekannt', contact: 'Innovation Lead', owner: 'MS', follow: 'heute', fk: 'today', stage: 1 },
+        { id: 'hb', name: 'Hafenblick Versicherung', ini: 'HV', prio: 'A', wave: 'Welle 1', warm: 'warm über Tim', warmLong: 'Tim, über einen Alumni-Kontakt', contact: 'Vorstandsbüro', owner: 'TI', follow: 'seit 30.10.', fk: 'late', stage: 1 },
+        { id: 'al', name: 'Alpenlicht Bank', ini: 'AB', prio: 'A', wave: 'Welle 1', warm: 'warm über Manu', warmLong: 'Manu, Alumni-Netzwerk', contact: 'Head of Digital', owner: 'MA', follow: 'Termin Do, 5.11.', fk: 'n', stage: 2 },
+        { id: 'wf', name: 'Wienfluss Energie', ini: 'WE', prio: 'A', wave: 'Welle 1', warm: 'kein warmer Kontakt', warmLong: 'keiner bekannt', contact: 'Employer Branding', owner: 'KI', follow: 'Mo, 16.11.', fk: 'n', stage: 2 },
+        { id: 'ps', name: 'Praterstern Ventures', ini: 'PV', prio: 'A', wave: 'Welle 1', warm: 'warm über Tim', warmLong: 'Tim, über das icons-Netzwerk', contact: 'Partnerin', owner: 'TI', follow: 'Vertrag bis 18.12.', fk: 'n', stage: 3 },
+        { id: 'lg', name: 'Lindgrün Foods', ini: 'LF', prio: 'B', wave: 'Welle 1', warm: 'kein warmer Kontakt', warmLong: 'keiner bekannt', contact: 'Marketing', owner: 'MS', follow: 'abgesagt 28.10.', fk: 'n', stage: 5 }
+      ]
+    };
+  }
+  renderVals() {
+    const s = this.state;
+    const mode = s.mode || this.props.modus || 'dunkel';
+    const isDark = mode !== 'hell';
+    const ACC = {
+      Lime: isDark ? ['#c6f432', '#c6f432', '#0a0a0b'] : ['#c6f432', '#4d7c0f', '#0a0a0b'],
+      Indigo: isDark ? ['#818cf8', '#818cf8', '#0a0a0b'] : ['#4f46e5', '#4f46e5', '#ffffff'],
+      Orange: isDark ? ['#fb923c', '#fb923c', '#0a0a0b'] : ['#c2410c', '#c2410c', '#ffffff']
+    };
+    const acc = ACC[this.props.akzent] || ACC.Lime;
+    const STAGES = [
+      { name: 'Recherche', color: 'var(--gray)', hint: '' },
+      { name: 'Kontaktiert', color: 'var(--blue)', hint: '' },
+      { name: 'Im Gespräch', color: 'var(--amber)', hint: '' },
+      { name: 'Zugesagt', color: 'var(--green)', hint: 'Ziel 4' },
+      { name: 'Fix', color: 'var(--green)', hint: 'Vertrag' },
+      { name: 'Abgesagt', color: 'var(--red)', hint: '' }
+    ];
+    const OWN = { MS: ['#c4b5fd', 'Maxi S'], MD: ['#fda4af', 'Maxi D'], MA: ['#99f6e4', 'Manu'], TI: ['#fde68a', 'Tim'], KI: ['#bfdbfe', 'Kilian'] };
+    const fcls = (fk) => fk === 'today' ? 'chip c-today' : fk === 'late' ? 'chip c-late' : 'chip c-n';
+    const cols = STAGES.map((st, i) => {
+      const cards = s.cards.filter((c) => c.stage === i).map((c) => ({
+        ...c, ownerBg: OWN[c.owner][0], fcls: fcls(c.fk), warmLine: c.warm + ' · ' + c.wave,
+        follow: c.fk === 'late' ? 'überfällig ' + c.follow : c.follow,
+        cls: c.id === s.sel ? 'kcard sel' : 'kcard',
+        pick: () => this.setState({ sel: c.id })
+      }));
+      return {
+        name: st.name, color: st.color, hint: st.hint, count: cards.length, cards: cards,
+        w: i === 5 ? '176px' : '208px',
+        empty: cards.length === 0, emptyText: i === 4 ? 'Vertrag unterschrieben? Karte hierher.' : 'Noch leer'
+      };
+    });
+    const c = s.cards.find((x) => x.id === s.sel) || s.cards[0];
+    const next = c.stage < 4 ? STAGES[c.stage + 1].name : '';
+    const won = s.cards.filter((x) => x.stage === 3 || x.stage === 4).length;
+    return {
+      theme: isDark ? 'g-dark' : 'g-light',
+      accVars: '--acc: ' + acc[0] + '; --accLine: ' + acc[1] + '; --accText: ' + acc[2] + ';',
+      themeLabel: isDark ? 'Hell' : 'Dunkel',
+      toggleTheme: () => this.setState({ mode: isDark ? 'hell' : 'dunkel' }),
+      cols: cols,
+      won: won,
+      goalSegs: [0, 1, 2, 3].map((i) => ({ bg: i < won ? 'var(--accLine)' : 'var(--line2)' })),
+      todayCount: s.cards.filter((x) => x.fk === 'today' && x.stage >= 1).length,
+      advLabel: 'Weiter zu „' + next + '“',
+      sel: {
+        ...c, color: STAGES[c.stage].color, stage: STAGES[c.stage].name, next: next, canAdvance: c.stage < 4,
+        ownerBg: OWN[c.owner][0], ownerName: OWN[c.owner][1], fcls: fcls(c.fk),
+        follow: c.fk === 'late' ? 'überfällig ' + c.follow : c.follow
+      },
+      moved: s.moved && s.prev && s.prev.id === c.id,
+      advance: () => {
+        if (c.stage >= 4) return;
+        const prev = { id: c.id, stage: c.stage };
+        const cards = s.cards.map((x) => x.id === c.id ? { ...x, stage: x.stage + 1 } : x);
+        this.setState({ cards: cards, prev: prev, moved: true, toast: c.name + ' → ' + STAGES[c.stage + 1].name });
+        clearTimeout(this.t);
+        this.t = setTimeout(() => this.setState({ toast: '' }), 5000);
+      },
+      undo: () => {
+        if (!s.prev) return;
+        const cards = s.cards.map((x) => x.id === s.prev.id ? { ...x, stage: s.prev.stage } : x);
+        this.setState({ cards: cards, toast: '', moved: false, prev: null });
+      },
+      toast: !!s.toast,
+      toastText: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

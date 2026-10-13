@@ -1,0 +1,21 @@
+# Geheimnisse
+.env
+.env*.local
+
+# Excel-Originale und Exporte mit Partnerdaten
+*.xlsx
+*.csv
+
+# Abhängigkeiten und Build
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+next-env.d.ts
+.vercel
+
+# System
+.DS_Store
+Thumbs.db
+npm-debug.log*
