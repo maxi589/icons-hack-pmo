@@ -1,35 +1,94 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-// Lädt einmal pro Sitzung die angemeldete Person und die Bereiche für Sidebar und Handy-Menü.
+// Lädt einmal pro Sitzung die angemeldete Person, das Team und die Bereiche.
 // Der App-Rahmen bleibt beim Seitenwechsel stehen, deshalb wird nicht bei jedem Klick neu geladen.
+// Bereiche hören live mit: Ändert jemand eine Zuständigkeit, sehen es alle sofort.
 
 export type Person = { id: string; name: string; initials: string; color: string };
-export type Area = { id: string; name: string; color: string; owner_id: string | null };
+export type Area = { id: string; name: string; color: string; owner_id: string | null; is_project: boolean };
 
-type Team = { me: Person | null; areas: Area[] };
+type Team = {
+  me: Person | null;
+  people: Person[];
+  /** Die 7 Teilprojekte (ohne „Vorbereitung“). */
+  areas: Area[];
+  /** Jeder Bereich inkl. „Vorbereitung“, z. B. für Farbpunkte an Meilensteinen. */
+  areaById: (id: string | null | undefined) => Area | null;
+  personById: (id: string | null | undefined) => Person | null;
+  setAreaOwner: (areaId: string, ownerId: string | null) => Promise<boolean>;
+};
 
-const TeamContext = createContext<Team>({ me: null, areas: [] });
+const TeamContext = createContext<Team>({
+  me: null,
+  people: [],
+  areas: [],
+  areaById: () => null,
+  personById: () => null,
+  setAreaOwner: async () => false,
+});
 
 export function TeamProvider({ children }: { children: React.ReactNode }) {
-  const [team, setTeam] = useState<Team>({ me: null, areas: [] });
+  const [me, setMe] = useState<Person | null>(null);
+  const [people, setPeople] = useState<Person[]>([]);
+  const [allAreas, setAreas] = useState<Area[]>([]);
 
   useEffect(() => {
     const supabase = createClient();
+    const loadAreas = async () => {
+      const { data } = await supabase
+        .from("areas")
+        .select("id, name, color, owner_id, is_project")
+        .order("sort");
+      if (data) setAreas(data);
+    };
+
     (async () => {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) return;
-      const [me, areas] = await Promise.all([
-        supabase.from("people").select("id, name, initials, color").eq("user_id", auth.user.id).maybeSingle(),
-        supabase.from("areas").select("id, name, color, owner_id").eq("is_project", true).order("sort"),
+      const [team] = await Promise.all([
+        supabase.from("people").select("id, name, initials, color, user_id").order("sort"),
+        loadAreas(),
       ]);
-      setTeam({ me: me.data, areas: areas.data ?? [] });
+      const list = team.data ?? [];
+      setPeople(list.map(({ id, name, initials, color }) => ({ id, name, initials, color })));
+      const mine = list.find((p) => p.user_id === auth.user!.id);
+      if (mine) setMe({ id: mine.id, name: mine.name, initials: mine.initials, color: mine.color });
     })();
+
+    const channel = supabase
+      .channel("areas")
+      .on("postgres_changes", { event: "*", schema: "public", table: "areas" }, loadAreas)
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
-  return <TeamContext value={team}>{children}</TeamContext>;
+  const areas = useMemo(() => allAreas.filter((a) => a.is_project), [allAreas]);
+  const areaById = useCallback((id: string | null | undefined) => allAreas.find((a) => a.id === id) ?? null, [allAreas]);
+  const personById = useCallback((id: string | null | undefined) => people.find((p) => p.id === id) ?? null, [people]);
+
+  const setAreaOwner = useCallback(async (areaId: string, ownerId: string | null) => {
+    let before: string | null = null;
+    setAreas((list) =>
+      list.map((a) => {
+        if (a.id !== areaId) return a;
+        before = a.owner_id;
+        return { ...a, owner_id: ownerId };
+      })
+    );
+    const { error } = await createClient().from("areas").update({ owner_id: ownerId }).eq("id", areaId);
+    if (error) {
+      setAreas((list) => list.map((a) => (a.id === areaId ? { ...a, owner_id: before } : a)));
+      return false;
+    }
+    return true;
+  }, []);
+
+  return <TeamContext value={{ me, people, areas, areaById, personById, setAreaOwner }}>{children}</TeamContext>;
 }
 
 export function useTeam() {

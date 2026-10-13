@@ -9,7 +9,8 @@ import { toggleSidebar } from "@/lib/sidebar";
 import { setTheme } from "@/components/theme-toggle";
 import { Kbd } from "@/components/ui/command";
 import { usePalette, signOut } from "./command-palette";
-import { useTeam, type Person } from "./team-provider";
+import { Avatar } from "@/components/avatar";
+import { useTeam } from "./team-provider";
 
 // Desktop-Sidebar (ab 768px). Ausgeklappt 240px, eingeklappt 60px-Icon-Band.
 // Beide Varianten stehen im HTML, CSS zeigt die passende (html[data-sidebar=collapsed]),
@@ -17,18 +18,6 @@ import { useTeam, type Person } from "./team-provider";
 
 const iconBtn =
   "grid size-[30px] place-items-center rounded-lg text-fg-2 transition-colors duration-150 hover:bg-hover hover:text-fg";
-
-export function Avatar({ person, size = 26 }: { person: Person | null; size?: number }) {
-  return (
-    <span
-      className="grid shrink-0 place-items-center rounded-full font-semibold text-[#111]"
-      style={{ width: size, height: size, fontSize: size * 0.385, background: person?.color ?? "var(--active)" }}
-      aria-hidden
-    >
-      {person?.initials}
-    </span>
-  );
-}
 
 function toggleDark() {
   setTheme(document.documentElement.classList.contains("dark") ? "light" : "dark");

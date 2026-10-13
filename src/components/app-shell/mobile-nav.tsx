@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronRight, House, Inbox, Kanban, List, LogOut, Plus, Search } from "lucide-react";
@@ -8,25 +8,14 @@ import { cn } from "@/lib/utils";
 import { isActive, NAV_HACKATHON, NAV_MAIN, NEW_ACTIONS } from "@/lib/nav";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
-import { Avatar } from "./sidebar";
+import { Avatar } from "@/components/avatar";
 import { signOut, usePalette } from "./command-palette";
 import { useTeam } from "./team-provider";
+import { useToday } from "@/lib/use-today";
+import { formatHeaderDate } from "@/lib/dates";
 
 // Handy (unter 768px): Kopfzeile mit Logo, Datum und Avatar (öffnet das Menü),
 // unten die Tab-Leiste Heute · Pipeline · + · Aufgaben · Inbox. Tippflächen mind. 44px.
-
-const dateFmt = new Intl.DateTimeFormat("de-AT", {
-  timeZone: "Europe/Vienna",
-  weekday: "short",
-  day: "numeric",
-  month: "long",
-});
-
-// Datum erst im Browser, damit „heute“ immer stimmt (der Server baut die Seite vorab).
-const noop = () => () => {};
-function useToday() {
-  return useSyncExternalStore(noop, () => dateFmt.format(new Date()).replace(".,", ","), () => "");
-}
 
 const sheetRow =
   "flex min-h-12 w-full items-center gap-3 rounded-xl px-3.5 text-left text-[15px] text-fg transition-colors duration-150 active:bg-active";
@@ -36,6 +25,7 @@ export function MobileHeader() {
   const [menu, setMenu] = useState(false);
   const { open } = usePalette();
   const today = useToday();
+  const todayLabel = today ? formatHeaderDate(today) : "";
 
   return (
     <header className="flex items-center justify-between px-[18px] pt-[max(12px,env(safe-area-inset-top))] pb-2 md:hidden">
@@ -44,7 +34,7 @@ export function MobileHeader() {
       </Link>
       <div className="flex items-center gap-1">
         <span className="text-[13px] text-fg-2">
-          {today}
+          {todayLabel}
         </span>
         <button type="button" onClick={() => open()} className="grid size-11 place-items-center text-fg-2" aria-label="Suchen">
           <Search className="size-[18px]" strokeWidth={1.8} aria-hidden />
