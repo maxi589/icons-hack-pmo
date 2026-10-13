@@ -12,7 +12,8 @@
 - Hell und dunkel sind gleichwertig. **Standard = Systemeinstellung** des Geräts. Umschalter in der Sidebar unten.
 - Genau zwei Wow-Momente: die große Countdown-Zahl (Michroma) und „Meilenstein erledigt“ (Animation + Sound).
 - Keine icons-Farben (Wunsch von Maxi). Das Logo erscheint nur als einfarbiger Schriftzug „icons“ in Michroma.
-- **Nicht verwenden:** Glas-Effekte, Glow, animierte Sidebar, Kipp- und Magnet-Effekte, eigener Mauszeiger, WebGL. Außerdem keine Werte oder Code von uimaxx.ing und aicss.dev (beide untersagen KI-Nutzung).
+- **Ausnahme Login-Seite (Maxi, 13.10.):** immer dunkel, Hintergrund schwarz, oben mittig ein leichter Lime-Schimmer (atmet langsam) und ein weicher Lime-Schein unter dem Mauszeiger. Login-Karte mittig und schlicht. Gilt nur dort.
+- **Nicht verwenden:** Glas-Effekte, Glow (Ausnahme oben), animierte Sidebar, Kipp- und Magnet-Effekte, eigener Mauszeiger, WebGL. Außerdem keine Werte oder Code von uimaxx.ing und aicss.dev (beide untersagen KI-Nutzung).
 
 ## 2. Farb-Tokens
 
