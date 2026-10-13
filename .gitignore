@@ -26,3 +26,4 @@ next-env.d.ts
 Thumbs.db
 npm-debug.log*
 *.local.sql
+.claude/settings.local.json
