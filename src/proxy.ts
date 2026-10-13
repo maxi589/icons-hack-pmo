@@ -9,9 +9,17 @@ const PUBLIC_PATHS = ["/login", "/auth"];
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  if (!url || !key) {
+    // Lokal ohne .env.local: Seiten trotzdem anzeigen (ohne Daten). In Produktion ein harter Fehler.
+    if (process.env.NODE_ENV === "development") return response;
+    throw new Error("Supabase-Umgebungsvariablen fehlen");
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    url,
+    key,
     {
       cookies: {
         getAll: () => request.cookies.getAll(),

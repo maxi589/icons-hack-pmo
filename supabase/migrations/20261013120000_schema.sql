@@ -71,34 +71,6 @@ as $$
   limit 1;
 $$;
 
--- Auth-Hook „Before User Created“: nur Adressen von der Allowlist dürfen ein Konto bekommen.
--- Im Dashboard aktivieren: Authentication → Auth Hooks → Before User Created → public.hook_before_user_created
-create or replace function public.hook_before_user_created(event jsonb)
-returns jsonb
-language plpgsql
-stable
-security definer
-set search_path = ''
-as $$
-declare
-  addr text := lower(coalesce(event -> 'user' ->> 'email', ''));
-begin
-  if exists (select 1 from public.people where email = addr) then
-    return '{}'::jsonb;
-  end if;
-  return jsonb_build_object(
-    'error', jsonb_build_object(
-      'http_code', 403,
-      'message', 'Diese Adresse hat keinen Zugang. Melde dich mit deiner icons-Adresse aus dem Orga-Team an.'
-    )
-  );
-end;
-$$;
-
-grant execute on function public.hook_before_user_created(jsonb) to supabase_auth_admin;
-revoke execute on function public.hook_before_user_created(jsonb) from authenticated, anon, public;
-grant select on table public.people to supabase_auth_admin;
-
 -- Nach dem ersten Login das Konto mit der Person verknüpfen.
 create or replace function public.link_person_on_signup()
 returns trigger
