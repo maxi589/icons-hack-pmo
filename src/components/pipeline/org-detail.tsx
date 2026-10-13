@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown, ExternalLink, Link2, X } from "lucide-react";
+import { EditText, miniButton as mini, PropRow, SelectBox } from "@/components/detail-fields";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { Chip } from "@/components/chip";
@@ -24,85 +25,6 @@ import {
 
 // Firmen-Detail (Board „Pipeline“, rechts 400px; am Handy als Bottom Sheet).
 // Felder speichern beim Verlassen (Text) bzw. sofort (Auswahl). Stufe mit „Rückgängig“ über die Seite.
-
-const selectCls =
-  "h-8 w-full cursor-pointer appearance-none rounded-lg bg-transparent pr-7 pl-2 text-[13px] text-fg transition-colors duration-150 hover:bg-hover focus-visible:bg-hover";
-
-function PropRow({ label, htmlFor, children }: { label: string; htmlFor?: string; children: React.ReactNode }) {
-  return (
-    <div className="grid min-h-9 grid-cols-[112px_minmax(0,1fr)] items-center gap-2.5 text-[13px]">
-      {htmlFor ? (
-        <label htmlFor={htmlFor} className="text-fg-3">
-          {label}
-        </label>
-      ) : (
-        <span className="text-fg-3">{label}</span>
-      )}
-      <div className="min-w-0">{children}</div>
-    </div>
-  );
-}
-
-function SelectBox({ id, value, onChange, children }: { id: string; value: string; onChange: (v: string) => void; children: React.ReactNode }) {
-  return (
-    <span className="relative block">
-      <select id={id} value={value} onChange={(e) => onChange(e.target.value)} className={selectCls}>
-        {children}
-      </select>
-      <ChevronDown className="pointer-events-none absolute top-1/2 right-2 size-3.5 -translate-y-1/2 text-fg-3" aria-hidden />
-    </span>
-  );
-}
-
-/** Textfeld, das wie Text aussieht und beim Verlassen speichert. */
-function EditText({
-  id,
-  value,
-  placeholder,
-  onSave,
-  multiline = false,
-}: {
-  id: string;
-  value: string | null;
-  placeholder: string;
-  onSave: (v: string | null) => void;
-  multiline?: boolean;
-}) {
-  const [draft, setDraft] = useState<string | null>(null);
-  const shown = draft ?? value ?? "";
-  const commit = () => {
-    if (draft === null) return;
-    const v = draft.trim() || null;
-    if (v !== (value ?? null)) onSave(v);
-    setDraft(null);
-  };
-  const cls =
-    "w-full rounded-lg bg-transparent px-2 text-[13px] text-fg placeholder:text-fg-3 transition-colors duration-150 hover:bg-hover focus-visible:bg-panel focus-visible:shadow-[inset_0_0_0_1px_var(--field)] focus-visible:outline-none";
-  return multiline ? (
-    <textarea
-      id={id}
-      rows={3}
-      value={shown}
-      placeholder={placeholder}
-      onChange={(e) => setDraft(e.target.value)}
-      onBlur={commit}
-      className={cn(cls, "resize-y py-1.5 leading-normal")}
-    />
-  ) : (
-    <input
-      id={id}
-      value={shown}
-      placeholder={placeholder}
-      onChange={(e) => setDraft(e.target.value)}
-      onBlur={commit}
-      onKeyDown={(e) => e.key === "Enter" && (e.currentTarget as HTMLInputElement).blur()}
-      className={cn(cls, "h-8")}
-    />
-  );
-}
-
-const mini =
-  "inline-flex h-[26px] items-center rounded-[7px] px-2.5 text-[12px] text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)] transition-colors duration-150 hover:bg-hover hover:text-fg";
 
 export function OrgDetail({
   org,

@@ -52,7 +52,7 @@ export function DueChip({ due, today }: { due: string; today: string }) {
   const n = daysBetween(today, due);
   return (
     <Chip tone={dueTone(due, today)} dot={n !== 0}>
-      {n < 0 ? `${-n} Tage überfällig` : relativeDays(due, today)}
+      {n < 0 ? `${-n} ${n === -1 ? "Tag" : "Tage"} überfällig` : relativeDays(due, today)}
     </Chip>
   );
 }

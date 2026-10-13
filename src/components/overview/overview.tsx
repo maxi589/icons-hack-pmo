@@ -261,7 +261,9 @@ function DueCard({ milestones, tasks, today }: { milestones: Milestone[]; tasks:
                       {it.title}
                     </Link>
                   ) : (
-                    <span className="min-w-0 flex-1 truncate">{it.title}</span>
+                    <Link href={`/aufgaben?aufgabe=${it.key}`} className="min-w-0 flex-1 truncate rounded-sm after:absolute after:inset-0">
+                      {it.title}
+                    </Link>
                   )}
                   {area && (
                     <span className="hidden items-center gap-1.5 text-[12.5px] whitespace-nowrap text-fg-2 sm:inline-flex">

@@ -10,7 +10,7 @@ import { Segmented } from "@/components/segmented";
 import { useToast } from "@/components/toast";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { useTeam } from "@/components/app-shell/team-provider";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { MobileSheet } from "@/components/mobile-sheet";
 import { KanbanBoard, KanbanCard, KanbanCards, KanbanHeader, KanbanProvider } from "@/components/ui/kanban";
 import { useToday } from "@/lib/use-today";
 import { useIsMobile } from "@/lib/use-is-mobile";
@@ -294,9 +294,9 @@ export function Pipeline() {
         </div>
       )}
 
-      <MobileDetail open={!!selected && isMobile} onClose={close} title={selected?.name ?? ""}>
+      <MobileSheet open={!!selected && isMobile} onClose={close} title={selected?.name ?? ""}>
         {detail}
-      </MobileDetail>
+      </MobileSheet>
 
       <NewOrgDialog
         open={newOpen}
@@ -378,19 +378,6 @@ function OrgList({ orgs, today, selectedId, onOpen }: { orgs: Organization[]; to
         );
       })}
     </div>
-  );
-}
-
-function MobileDetail({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: React.ReactNode }) {
-  // Nur am Handy: Bottom Sheet. Am Desktop steht das Detail rechts neben dem Board.
-  return (
-    <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
-      <SheetContent side="bottom" showCloseButton={false} className="max-h-[92dvh] gap-0 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
-        <SheetTitle className="sr-only">{title}</SheetTitle>
-        <div className="mx-auto mt-2.5 h-1 w-9 shrink-0 rounded-full bg-line-2" aria-hidden />
-        {children}
-      </SheetContent>
-    </Sheet>
   );
 }
 

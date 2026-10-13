@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Link2, RotateCcw } from "lucide-react";
+import Link from "next/link";
+import { Check, Link2, ListTodo, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { Chip, DueChip } from "@/components/chip";
@@ -112,6 +113,10 @@ export function MilestoneDetail({
             <Link2 className="size-3.5" aria-hidden />
             <span aria-live="polite">{copied ? "Link kopiert" : "Link kopieren"}</span>
           </button>
+          <Link href={`/aufgaben?meilenstein=${m.id}`} className={ghostBtn}>
+            <ListTodo className="size-3.5" aria-hidden />
+            Aufgaben dazu
+          </Link>
         </div>
       </div>
 
