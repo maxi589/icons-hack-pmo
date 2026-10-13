@@ -59,13 +59,15 @@ Auftraggeber ist Maxi S (kein Entwickler): Deutsch, Ergebnis zuerst, einfache Sp
 
 ## Daten und Sicherheit
 - Zugriff nur für die 5 Team-Adressen: Allowlist plus Row Level Security (Zugriffsregeln direkt in der Datenbank) auf **jeder** Tabelle.
-- Login per **6-stelligem Code** per Mail (`{{ .Token }}` im Template), kein Magic Link.
+- Login nur über **„Mit Google anmelden“** (icons.at ist Google Workspace, OAuth-Client „Intern“). Kein Mail-Login, kein Passwort. Rückweg über `/auth/callback`, Proxy in `src/proxy.ts` schickt Abgemeldete zu `/login`.
+- Allowlist = Tabelle `people`. Der Auth-Hook `hook_before_user_created` lehnt fremde Adressen ab, `is_team_member()` steckt in jeder RLS-Regel. Team-Adressen nur in `supabase/team.local.json` (nicht im Repo), einspielen mit `node --env-file=.env.local scripts/seed.mjs`.
+- Datenbank-Änderungen nur als neue Datei in `supabase/migrations/`, einspielen mit `npx supabase db push`.
 - Geheimnisse nur in `.env.local` bzw. den Vercel-Umgebungsvariablen, nie im Repo und nie im Chat. **Schlüssel und Passwörter trägt Maxi selbst ein.**
 - Personenbezogene Partner-Daten (Excel-Inhalte) nicht ins Repo committen. Der Import liest die Excel aus dem OneDrive-Ordner.
 
 ## Umfang
 - Nur bauen, was in `docs/Umfang_v1.md` steht, mit diesen späteren Entscheidungen (gehen vor):
-  - **Keine Benachrichtigungs-Mails in v1.** Erwähnungen und Zuweisungen landen nur in der Inbox, dazu „Link kopieren“ für WhatsApp. Mail nur für den Login-Code (Gmail-SMTP).
+  - **Keine Mails in v1.** Erwähnungen und Zuweisungen landen nur in der Inbox, dazu „Link kopieren“ für WhatsApp. Login über Google statt Mail-Code.
   - Prio-Feld kennt A/B/C.
   - Venues schlank: kein Feld „Nutzung“, kein Bucket. Zuordnung in `docs/daten/Venue-Liste-v1_Analyse.md`.
   - Event-Datum **27./28.2.2027**. Ausdrücklich **nicht in v1:** eigener Chat, Teilnehmerverwaltung, Zwei-Wege-Kalender, WhatsApp-Bot, animierte Sidebar, Glas-Effekte, virtualisierte Tabelle, Ziehen im Zeitstrahl.
