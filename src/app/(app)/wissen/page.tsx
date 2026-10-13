@@ -1,8 +1,14 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
-import { ComingSoon } from "@/components/app-shell/coming-soon";
+import { Knowledge } from "@/components/wissen/knowledge";
 
 export const metadata: Metadata = { title: "Wissen & Entscheidungen · icons Hackathon PMO" };
 
+// Suspense, weil die Seite ihren Zustand aus der Adresse liest (?entscheidung=…, ?neu=1).
 export default function KnowledgePage() {
-  return <ComingSoon title="Wissen & Entscheidungen" note="Entscheidungen mit Datum und wichtige Links an einem Ort." />;
+  return (
+    <Suspense fallback={<div className="m-3.5 h-[420px] rounded-xl bg-card-2 md:m-5" aria-busy="true" />}>
+      <Knowledge />
+    </Suspense>
+  );
 }

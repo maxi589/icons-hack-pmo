@@ -9,6 +9,7 @@ import { Chip } from "@/components/chip";
 import { Feed } from "@/components/feed";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { notifyAssignment } from "@/lib/data/use-feed";
+import { formatDayMonth } from "@/lib/dates";
 import type { OrgPatch } from "@/lib/data/use-organizations";
 import {
   followState,
@@ -283,7 +284,7 @@ export function OrgDetail({
               : a.action === "created"
                 ? "hat die Firma angelegt"
                 : a.action === "followed_up"
-                  ? "hat nachgefasst"
+                  ? `hat nachgefasst${a.data.next ? `, nächstes Mal ${formatDayMonth(String(a.data.next))}` : ""}`
                   : a.action === "imported"
                   ? `hat die Firma aus ${String(a.data.source ?? "der Excel").replace(/ Z\. \d+$/, "")} übernommen`
                   : a.action

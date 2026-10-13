@@ -17,7 +17,7 @@ import type { Org, Task } from "./use-overview-data";
 
 // „Heute für dich“ (Board „Graphit-Handy“), nur am Handy: was die angemeldete Person heute erledigen sollte.
 // - eigene Aufgaben, fällig heute oder überfällig → Abhaken = erledigt
-// - eigene Firmen mit Nachfassen heute oder überfällig → Abhaken = nachgefasst (Termin wird geleert), „+2 T“ verschiebt
+// - eigene Firmen mit Nachfassen heute oder überfällig → Abhaken = nachgefasst, nächster Termin automatisch in 7 Tagen (Maxi, 13.10.), „+2 T“ verschiebt
 // - ungelesene Erwähnungen → Abhaken = gelesen
 // Abgehakte Zeilen bleiben bis zum Neuladen durchgestrichen stehen und lassen sich wieder aufheben.
 
@@ -96,7 +96,7 @@ export function TodayCard({ tasks, orgs, today }: { tasks: Task[]; orgs: Org[]; 
         .update({ status: done ? "erledigt" : "offen", done_at: done ? new Date().toISOString() : null })
         .eq("id", i.id);
     } else if (i.kind === "follow") {
-      await supabase.from("organizations").update({ next_follow_up: done ? null : i.date }).eq("id", i.id);
+      await supabase.from("organizations").update({ next_follow_up: done ? shiftFollowUp(null, today, 7) : i.date }).eq("id", i.id);
     } else {
       await setRead([i.id], done);
     }
@@ -104,7 +104,7 @@ export function TodayCard({ tasks, orgs, today }: { tasks: Task[]; orgs: Org[]; 
 
   const log = (i: Item, done: boolean) => {
     if (i.kind === "task") logActivity("task", i.id, me.id, "status_changed", done ? { from: "offen", to: "erledigt" } : { from: "erledigt", to: "offen" });
-    if (i.kind === "follow" && done) logActivity("organization", i.id, me.id, "followed_up", { date: i.date });
+    if (i.kind === "follow" && done) logActivity("organization", i.id, me.id, "followed_up", { date: i.date, next: shiftFollowUp(null, today, 7) });
   };
 
   const check = (i: Item) => {
@@ -114,7 +114,7 @@ export function TodayCard({ tasks, orgs, today }: { tasks: Task[]; orgs: Org[]; 
     apply(i, true);
     if (i.kind === "mention") return;
     toast({
-      text: i.kind === "task" ? `„${i.title}“ erledigt` : `${i.title.replace(/ nachfassen$/, "")} nachgefasst`,
+      text: i.kind === "task" ? `„${i.title}“ erledigt` : `${i.title.replace(/ nachfassen$/, "")} nachgefasst · wieder am ${formatShort(shiftFollowUp(null, today, 7))}`,
       onAction: () => uncheck(i),
       onExpire: () => {
         if (entries.current.get(i.key) !== entry) return;
