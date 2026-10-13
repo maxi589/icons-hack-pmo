@@ -17,6 +17,9 @@ export const metadata: Metadata = {
   title: "icons Hackathon PMO",
   description: "Steuerung für den icons Hackathon 2027",
   robots: { index: false, follow: false },
+  // iPhone: „Zum Home-Bildschirm“ startet ohne Safari-Leiste. Statusleiste „default“ statt „black-translucent“:
+  // Durchsichtig hätte weiße Uhr-Schrift, die im Hellmodus auf hellem Grund verschwindet.
+  appleWebApp: { capable: true, title: "icons PMO", statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {
