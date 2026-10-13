@@ -360,7 +360,9 @@ export function OrgDetail({
               ? `hat die Stufe auf ${stageName(a.data.to as Stage)} gesetzt`
               : a.action === "created"
                 ? "hat die Firma angelegt"
-                : a.action
+                : a.action === "imported"
+                  ? `hat die Firma aus ${String(a.data.source ?? "der Excel").replace(/ Z\. \d+$/, "")} übernommen`
+                  : a.action
           }
         />
       </div>
