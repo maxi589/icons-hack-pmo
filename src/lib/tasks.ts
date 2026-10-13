@@ -59,3 +59,8 @@ export function shiftDue(current: string | null, today: string, days: number) {
   const base = current && current > today ? current : today;
   return format(addDays(parseISO(base), days), "yyyy-MM-dd");
 }
+
+/** Meilensteine für Auswahllisten: Hauptmeilensteine nach Datum, die Unterpunkte jeweils direkt darunter. */
+export function milestoneOptions<M extends { id: string; parent_id: string | null }>(list: M[]): M[] {
+  return list.filter((m) => !m.parent_id).flatMap((m) => [m, ...list.filter((s) => s.parent_id === m.id)]);
+}

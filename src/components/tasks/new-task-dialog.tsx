@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { useTeam } from "@/components/app-shell/team-provider";
 import type { Milestone } from "@/lib/data/use-milestones";
+import { milestoneOptions } from "@/lib/tasks";
 
 // „+ Aufgabe“ (Taste C): Titel, Zuständig (vorbelegt mit dir), Fällig, Bereich, Meilenstein.
 // Vorbelegung aus den aktiven Filtern der Seite, damit die neue Aufgabe gleich sichtbar bleibt.
@@ -114,7 +115,7 @@ export function NewTaskDialog({
             <span className="text-[13px] text-fg-2">Meilenstein</span>
             <select value={msValue} onChange={(e) => setMilestone(e.target.value)} className={field}>
               <option value="">Keiner</option>
-              {milestones.map((m) => (
+              {milestoneOptions(milestones).map((m) => (
                 <option key={m.id} value={m.id}>
                   {`${m.parent_id ? "   " : ""}${m.id} · ${m.title}`}
                 </option>

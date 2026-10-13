@@ -12,7 +12,7 @@ import { useTeam } from "@/components/app-shell/team-provider";
 import { notifyAssignment } from "@/lib/data/use-feed";
 import type { TaskPatch } from "@/lib/data/use-tasks";
 import type { Milestone } from "@/lib/data/use-milestones";
-import { shiftDue, TASK_STATUSES, taskStatusName, type Task, type TaskStatus } from "@/lib/tasks";
+import { milestoneOptions, shiftDue, TASK_STATUSES, taskStatusName, type Task, type TaskStatus } from "@/lib/tasks";
 import { StatusCheck } from "./status-check";
 
 // Aufgaben-Detail (rechts 400px wie in der Pipeline; am Handy als Bottom Sheet).
@@ -179,7 +179,7 @@ export function TaskDetail({
                 }}
               >
                 <option value="">Kein Meilenstein</option>
-                {milestones.map((m) => (
+                {milestoneOptions(milestones).map((m) => (
                   <option key={m.id} value={m.id}>
                     {`${m.parent_id ? "   " : ""}${m.id} · ${m.title}`}
                   </option>

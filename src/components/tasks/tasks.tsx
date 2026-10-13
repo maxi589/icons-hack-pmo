@@ -17,7 +17,7 @@ import { useIsMobile } from "@/lib/use-is-mobile";
 import { useMilestones, type Milestone } from "@/lib/data/use-milestones";
 import { useTasks, type TaskPatch } from "@/lib/data/use-tasks";
 import { logActivity, notifyAssignment } from "@/lib/data/use-feed";
-import { DUE_GROUPS, dueGroup, sortTasks, TASK_STATUSES, taskStatusName, type Task, type TaskStatus } from "@/lib/tasks";
+import { DUE_GROUPS, dueGroup, milestoneOptions, sortTasks, TASK_STATUSES, taskStatusName, type Task, type TaskStatus } from "@/lib/tasks";
 import { NewTaskDialog } from "./new-task-dialog";
 import { StatusCheck } from "./status-check";
 import { TaskDetail } from "./task-detail";
@@ -180,7 +180,7 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
         )}
         <FilterSelect wide label="Meilenstein" value={fMs} onChange={(v) => setParams({ meilenstein: v })}>
           <option value="">Alle Meilensteine</option>
-          {msList.map((m) => (
+          {milestoneOptions(msList).map((m) => (
             <option key={m.id} value={m.id}>
               {`${m.parent_id ? "   " : ""}${m.id} · ${m.title}`}
             </option>
