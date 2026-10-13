@@ -1,6 +1,5 @@
 "use server";
 
-import { timingSafeEqual } from "node:crypto";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -34,28 +33,14 @@ export async function signIn(_prev: LoginState, form: FormData): Promise<LoginSt
   redirect(safeNext(field(form, "next")));
 }
 
-function codeMatches(input: string) {
-  const expected = process.env.TEAM_INVITE_CODE ?? "";
-  if (!expected) return false;
-  const a = Buffer.from(input.toLowerCase());
-  const b = Buffer.from(expected.toLowerCase());
-  return a.length === b.length && timingSafeEqual(a, b);
-}
-
-// Erstes Mal: Konto für eine Adresse aus der Allowlist anlegen. Nur mit Team-Code,
-// damit niemand Fremdes das Konto einer Team-Person vorher beansprucht.
+// Erstes Mal: Konto für eine Adresse aus der Allowlist anlegen (eigenes Passwort, ohne Mail-Bestätigung).
 export async function setupAccount(_prev: LoginState, form: FormData): Promise<LoginState> {
   const email = field(form, "email").toLowerCase();
   const password = String(form.get("password") ?? "");
-  const code = field(form, "code");
 
-  if (!email || !password || !code) return { error: "Bitte alle drei Felder ausfüllen.", email };
+  if (!email || !password) return { error: "Bitte Mail und Passwort eingeben.", email };
   if (password.length < MIN_PASSWORD) {
     return { error: `Das Passwort braucht mindestens ${MIN_PASSWORD} Zeichen.`, email };
-  }
-  if (!codeMatches(code)) {
-    await new Promise((r) => setTimeout(r, 800)); // Raten bremsen
-    return { error: "Der Team-Code stimmt nicht. Du findest ihn in der WhatsApp-Gruppe.", email };
   }
 
   const admin = createAdminClient();

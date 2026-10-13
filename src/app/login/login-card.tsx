@@ -29,7 +29,7 @@ export function LoginCard() {
           </h1>
           <p className="text-fg-2">
             {isSetup
-              ? "Einmalig: Wähle dein Passwort. Den Team-Code findest du in der WhatsApp-Gruppe."
+              ? "Einmalig: Gib deine Team-Adresse ein und wähle dein Passwort."
               : "Hackathon-Steuerung für das Orga-Team."}
           </p>
         </div>
@@ -58,11 +58,6 @@ export function LoginCard() {
             className="h-10"
           />
         </Field>
-        {isSetup && (
-          <Field label="Team-Code">
-            <Input name="code" type="text" autoComplete="off" autoCapitalize="none" spellCheck={false} required className="h-10" />
-          </Field>
-        )}
 
         {state.error && (
           <p role="alert" className="rounded-lg bg-card-2 px-3 py-2.5 text-[13px] leading-snug text-st-red">

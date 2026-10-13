@@ -59,7 +59,7 @@ Auftraggeber ist Maxi S (kein Entwickler): Deutsch, Ergebnis zuerst, einfache Sp
 
 ## Daten und Sicherheit
 - Zugriff nur für die 5 Team-Adressen: Allowlist plus Row Level Security (Zugriffsregeln direkt in der Datenbank) auf **jeder** Tabelle.
-- Login mit **Mail + Passwort, nur auf Einladung**. Selbst-Registrierung ist in Supabase aus. Konten entstehen nur über „Konto einrichten“ (`src/app/login/actions.ts`): Adresse muss in `people` stehen, plus Team-Code (`TEAM_INVITE_CODE`). Angelegt wird mit dem Secret Key (`src/lib/supabase/admin.ts`, nur dort verwenden). Kein Mailversand, „Passwort vergessen“ = Maxi löscht das Konto, die Person richtet es neu ein.
+- Login mit **Mail + Passwort, nur auf Einladung**. Selbst-Registrierung ist in Supabase aus. Konten entstehen nur über „Konto einrichten“ (`src/app/login/actions.ts`): Adresse muss in `people` stehen und darf noch kein Konto haben (bewusst ohne Team-Code, Maxi will es einfach). Angelegt wird mit dem Secret Key (`src/lib/supabase/admin.ts`, nur dort verwenden). Kein Mailversand, „Passwort vergessen“ = Maxi löscht das Konto, die Person richtet es neu ein.
 - Proxy in `src/proxy.ts` schickt Abgemeldete zu `/login`.
 - Allowlist = Tabelle `people`; `is_team_member()` steckt in jeder RLS-Regel. Team-Adressen nur in `supabase/team.local.json` (nicht im Repo), einspielen mit `node --env-file=.env.local scripts/seed.mjs`.
 - Datenbank-Änderungen nur als neue Datei in `supabase/migrations/`, einspielen mit `npx supabase db push`.
