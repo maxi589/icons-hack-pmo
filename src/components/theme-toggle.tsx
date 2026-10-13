@@ -18,14 +18,19 @@ function subscribe(onChange: () => void) {
   return () => window.removeEventListener(EVENT, onChange);
 }
 
-function setTheme(choice: ThemeChoice) {
+export function setTheme(choice: ThemeChoice) {
   applyTheme(choice);
   window.dispatchEvent(new Event(EVENT));
 }
 
-export function ThemeToggle({ className }: { className?: string }) {
-  // Server kennt die Wahl nicht und rendert „System“; nach dem Hydrieren gilt das Cookie.
-  const choice = useSyncExternalStore(subscribe, readThemeChoice, () => "system" as ThemeChoice);
+/** Aktuelle Wahl (System, Hell, Dunkel). Server kennt sie nicht und liefert „System“; nach dem Hydrieren gilt das Cookie. */
+export function useThemeChoice() {
+  return useSyncExternalStore(subscribe, readThemeChoice, () => "system" as ThemeChoice);
+}
+
+/** Einmal im App-Rahmen: hält die Klasse auf <html> aktuell, auch wenn kein Umschalter sichtbar ist. */
+export function ThemeSync() {
+  const choice = useThemeChoice();
 
   // Im Dev-Modus setzt React die Klasse auf <html> beim Remount zurück, deshalb erneut anwenden.
   useLayoutEffect(() => {
@@ -40,6 +45,12 @@ export function ThemeToggle({ className }: { className?: string }) {
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, [choice]);
+
+  return null;
+}
+
+export function ThemeToggle({ className, size = "sm" }: { className?: string; size?: "sm" | "lg" }) {
+  const choice = useThemeChoice();
 
   return (
     <div
@@ -57,11 +68,13 @@ export function ThemeToggle({ className }: { className?: string }) {
           title={label}
           onClick={() => setTheme(value)}
           className={cn(
-            "grid size-7 place-items-center rounded-md text-fg-3 transition-colors duration-150 hover:bg-hover hover:text-fg",
+            size === "lg" ? "flex h-11 flex-1 items-center justify-center gap-2 rounded-md text-[15px]" : "grid size-7 place-items-center rounded-md",
+            "text-fg-3 transition-colors duration-150 hover:bg-hover hover:text-fg",
             choice === value && "bg-active text-fg"
           )}
         >
-          <Icon className="size-3.5" aria-hidden />
+          <Icon className={size === "lg" ? "size-4" : "size-3.5"} aria-hidden />
+          {size === "lg" && label}
         </button>
       ))}
     </div>

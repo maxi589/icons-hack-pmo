@@ -3,6 +3,7 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import { Michroma } from "next/font/google";
 import { THEME_SCRIPT } from "@/lib/theme";
+import { SIDEBAR_SCRIPT } from "@/lib/sidebar";
 import "./globals.css";
 
 // next/font lädt Michroma beim Build herunter und liefert sie selbst aus (kein Abruf bei Google zur Laufzeit).
@@ -34,7 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: `${THEME_SCRIPT};${SIDEBAR_SCRIPT}` }} />
       </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

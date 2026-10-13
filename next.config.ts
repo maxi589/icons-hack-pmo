@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Kein „N“-Knopf unten links in der Vorschau: er verdeckt Avatar und Tab-Leiste. Fehler zeigt Next trotzdem an.
+  devIndicators: false,
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {

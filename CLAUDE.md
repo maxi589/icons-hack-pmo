@@ -10,6 +10,7 @@ Auftraggeber ist Maxi S (kein Entwickler): Deutsch, Ergebnis zuerst, einfache Sp
 - `docs/design/leinwand/*.dc.html`: Referenz-Umsetzung der Boards in HTML/CSS. Werte, Aufbau und Texte von dort übernehmen.
 - `docs/daten/`: Startdaten (`meilensteine.json`, `stammdaten.json`) und die Auswertung der Partner-Liste.
 - Projektstand und Übergabe zwischen Chats: `C:\Users\maxis\OneDrive - WU Wien\01 icons Hack PMO\_STATUS.md` und `_UEBERGABE.md`. Nach jedem Meilenstein dort aktualisieren.
+- **App-Rahmen** in `src/components/app-shell/` (Sidebar, Handy-Kopfzeile und Tab-Leiste, Befehlsleiste Strg+K, `TeamProvider` mit angemeldeter Person und Bereichen). Neue Seiten liegen in `src/app/(app)/` und beginnen mit `<PageHeader title="…" />`. Navigation und Tastenkürzel (G + Buchstabe, C/F/E) stehen zentral in `src/lib/nav.ts`.
 - Original-Excels (`Partner.xlsx`, `Hackathon_Meilensteine.xlsx`) liegen nur im OneDrive-Ordner, nicht im Repo. Nie verändern. Lesen mit `node scripts/read-xlsx.js <datei.xlsx>` (kein Python vorhanden).
 
 ## Technik
