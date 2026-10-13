@@ -6,8 +6,17 @@ import { usePalette } from "./command-palette";
 
 // Kopfleiste im Hauptpanel (nur Desktop): Seitentitel links, „Befehle“ und „Neu“ rechts.
 // `children` sind zusätzliche Knöpfe der Seite (z. B. Board/Liste in der Pipeline).
+// `action` ersetzt „Neu“ durch eine seiteneigene Hauptaktion (z. B. „+ Firma“).
 
-export function PageHeader({ title, children }: { title: string; children?: React.ReactNode }) {
+export function PageHeader({
+  title,
+  children,
+  action,
+}: {
+  title: string;
+  children?: React.ReactNode;
+  action?: { label: string; onClick: () => void };
+}) {
   const { open } = usePalette();
   return (
     <div className="hidden flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-3 md:flex">
@@ -23,11 +32,11 @@ export function PageHeader({ title, children }: { title: string; children?: Reac
         </button>
         <button
           type="button"
-          onClick={() => open("new")}
+          onClick={action ? action.onClick : () => open("new")}
           className="inline-flex h-8 items-center gap-2 rounded-[9px] bg-acc px-3 text-[13px] font-medium text-acc-text transition-[scale] duration-150 active:scale-[.97]"
         >
           <Plus className="size-3.5" strokeWidth={2.2} aria-hidden />
-          Neu
+          {action ? action.label : "Neu"}
         </button>
       </div>
     </div>

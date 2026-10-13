@@ -267,3 +267,17 @@
   letter-spacing: 0.12em;
   color: var(--text3);
 }
+
+/* Hinweis „Rückgängig“: Ablauf-Linie über 5 s */
+@keyframes toast-timer {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+.toast-timer {
+  transform-origin: left;
+  animation: toast-timer 5s linear forwards;
+}

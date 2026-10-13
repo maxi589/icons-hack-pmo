@@ -50,7 +50,12 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
 
     (async () => {
       const { data: auth } = await supabase.auth.getUser();
-      if (!auth.user) return;
+      if (!auth.user) {
+        // Sitzung abgelaufen oder anderswo beendet: zum Login statt einer halb leeren Seite.
+        const next = window.location.pathname + window.location.search;
+        window.location.replace(`/login?next=${encodeURIComponent(next)}`);
+        return;
+      }
       const [team] = await Promise.all([
         supabase.from("people").select("id, name, initials, color, user_id").order("sort"),
         loadAreas(),

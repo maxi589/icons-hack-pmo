@@ -10,6 +10,7 @@ import { useMilestones, type Milestone } from "@/lib/data/use-milestones";
 import { daysBetween, formatDayMonth } from "@/lib/dates";
 import { FOLLOW_UP_ROUNDS } from "@/lib/phases";
 import { AXIS_DAYS, axisEdge, axisPos, MONTHS, PLAN_BARS } from "@/lib/roadmap";
+import { Segmented } from "@/components/segmented";
 import { MilestoneDetail } from "./milestone-detail";
 
 // Roadmap (Board „Graphit-Roadmap“): Zeitstrahl je Bereich mit Rauten und Balken, darunter das
@@ -55,7 +56,15 @@ export function Roadmap() {
   return (
     <>
       <PageHeader title="Roadmap">
-        <Segmented value={view} onChange={setView} />
+        <Segmented
+          label="Ansicht"
+          value={view}
+          onChange={setView}
+          options={[
+            { value: "timeline", label: "Zeitstrahl" },
+            { value: "list", label: "Liste" },
+          ]}
+        />
       </PageHeader>
       <h1 className="px-3.5 pt-2 pb-3 text-[21px] font-semibold tracking-[-0.025em] md:sr-only">Roadmap</h1>
 
@@ -93,35 +102,6 @@ export function Roadmap() {
         </>
       )}
     </>
-  );
-}
-
-// ---------------------------------------------------------------
-// Umschalter Zeitstrahl / Liste
-// ---------------------------------------------------------------
-function Segmented({ value, onChange }: { value: View; onChange: (v: View) => void }) {
-  const options: [View, string][] = [
-    ["timeline", "Zeitstrahl"],
-    ["list", "Liste"],
-  ];
-  return (
-    <div role="radiogroup" aria-label="Ansicht" className="inline-flex gap-0.5 rounded-[9px] p-[3px] shadow-[inset_0_0_0_1px_var(--line2)]">
-      {options.map(([v, label]) => (
-        <button
-          key={v}
-          type="button"
-          role="radio"
-          aria-checked={value === v}
-          onClick={() => onChange(v)}
-          className={cn(
-            "inline-flex h-[26px] items-center rounded-[7px] px-2.5 text-[12.5px] text-fg-2 transition-colors duration-150 hover:text-fg",
-            value === v && "bg-active text-fg"
-          )}
-        >
-          {label}
-        </button>
-      ))}
-    </div>
   );
 }
 
