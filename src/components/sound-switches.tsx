@@ -1,28 +1,10 @@
 "use client";
 
-import { Volume2, VolumeX } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSoundSettings } from "@/components/app-shell/sound-provider";
 
-// Schalter für Sounds: Icon-Knopf in der Sidebar (wie im Board), Schalter-Zeilen im Handy-Menü.
-// Fun-Modus am Desktop über die Befehlsleiste (Strg+K).
-
-export function SoundButton({ className }: { className?: string }) {
-  const { sounds, setPrefs } = useSoundSettings();
-  const Icon = sounds ? Volume2 : VolumeX;
-  return (
-    <button
-      type="button"
-      onClick={() => setPrefs({ sounds: !sounds })}
-      aria-pressed={sounds}
-      aria-label="Sounds"
-      title={sounds ? "Sounds an (Fun-Modus: Strg K)" : "Sounds aus"}
-      className={className}
-    >
-      <Icon className="size-4" strokeWidth={1.8} aria-hidden />
-    </button>
-  );
-}
+// Schalter-Zeilen für Sounds im Handy-Menü. Am Desktop über die Befehlsleiste (Strg+K).
+// Bewusst kein Lautsprecher-Knopf in der Sidebar (Maxi, 14.10.): Sounds sind Standard, stumm geht über das Gerät.
 
 function SwitchRow({ label, hint, on, disabled, onChange }: { label: string; hint: string; on: boolean; disabled?: boolean; onChange: () => void }) {
   return (

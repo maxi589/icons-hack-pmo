@@ -65,7 +65,7 @@ Wichtig: Dünne Lime-Linien auf Weiß sind unsichtbar. Im Hellmodus deshalb imme
 
 ## 5. Layout
 - **Desktop:** Sidebar 232–260px, auf ein 60px-Icon-Band einklappbar (wie im Pipeline-Board). Hauptpanel eingerückt (8px), Radius 14, Ring. Übersicht-Inhalt max. 1080px breit, mittig. Pipeline über die volle Breite, rechts Detail-Sheet mit 400px.
-- **Sidebar:** Logo · Suche (Strg K) · Übersicht, Inbox, Meine Aufgaben · HACKATHON: Roadmap, Pipeline, Aufgaben, Wissen & Entscheidungen · BEREICHE: 7 mit Punkt (amber Punkt rechts = Verantwortlich offen) · unten Avatar, Sound-Schalter, Hell/Dunkel.
+- **Sidebar:** Logo · Suche (Strg K) · Übersicht, Inbox, Meine Aufgaben · HACKATHON: Roadmap, Pipeline, Aufgaben, Wissen & Entscheidungen · BEREICHE: 7 mit Punkt (amber Punkt rechts = Verantwortlich offen) · unten Avatar, Hell/Dunkel, Abmelden. Kein Sound-Schalter (Maxi, 14.10.: Sounds sind Standard; Schalter nur in Strg+K und im Handy-Menü).
 - **Handy:** Tab-Leiste: Heute · Pipeline · **+** (Akzent-Kreis 52px) · Aufgaben · Inbox. Bottom Sheets, `env(safe-area-inset-bottom)`, Tippflächen mind. 44px, **kein Ziehen & Ablegen** (Status per Sheet).
 
 ## 6. Seiten (siehe Boards)

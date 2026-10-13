@@ -11,7 +11,6 @@ import { setTheme } from "@/components/theme-toggle";
 import { Kbd } from "@/components/ui/command";
 import { usePalette, signOut } from "./command-palette";
 import { Avatar } from "@/components/avatar";
-import { SoundButton } from "@/components/sound-switches";
 import { useTeam } from "./team-provider";
 
 // Desktop-Sidebar (ab 768px). Ausgeklappt 240px, eingeklappt 60px-Icon-Band.
@@ -160,7 +159,6 @@ export function Sidebar() {
         <div className="mt-auto flex items-center gap-2.5 border-t border-line px-1.5 pt-2">
           <Avatar person={me} />
           <span className="flex-1 truncate text-[13px]">{me?.name}</span>
-          <SoundButton className={iconBtn} />
           <button type="button" onClick={toggleDark} className={iconBtn} aria-label="Hell oder dunkel umschalten" title="Hell/Dunkel">
             <ThemeIcon />
           </button>
@@ -188,7 +186,6 @@ export function Sidebar() {
           <button type="button" onClick={toggleSidebar} className={iconBtn} aria-label="Sidebar ausklappen" title="Sidebar ausklappen">
             <PanelLeftOpen className="size-4" strokeWidth={1.8} aria-hidden />
           </button>
-          <SoundButton className={iconBtn} />
           <button type="button" onClick={toggleDark} className={iconBtn} aria-label="Hell oder dunkel umschalten" title="Hell/Dunkel">
             <ThemeIcon />
           </button>
