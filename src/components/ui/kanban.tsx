@@ -25,6 +25,7 @@ import { createContext, type HTMLAttributes, type ReactNode, useContext, useStat
 import { createPortal } from "react-dom";
 import tunnel from "tunnel-rat";
 import { cn } from "@/lib/utils";
+import { play } from "@/lib/sounds";
 
 const t = tunnel();
 
@@ -145,6 +146,7 @@ export function KanbanProvider<T extends KanbanItem>({
     const to = over ? columnOf(String(over.id)) : null;
     setActiveId(null);
     setPreview(null);
+    if (over) play("drop");
     if (to && from && to !== from) onMove(String(active.id), to);
   };
 

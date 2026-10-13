@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, LogOut, Monitor, Moon, PanelLeft, Plus, Sun } from "lucide-react";
+import { Check, LogOut, Monitor, Moon, PanelLeft, Plus, Sparkles, Sun, Volume2 } from "lucide-react";
 import {
   Command,
   CommandDialog,
@@ -16,8 +16,10 @@ import {
 } from "@/components/ui/command";
 import { setTheme, useThemeChoice } from "@/components/theme-toggle";
 import { useTeam } from "./team-provider";
+import { useSoundSettings } from "./sound-provider";
 import { NAV_ALL, NEW_ACTIONS } from "@/lib/nav";
 import { toggleSidebar } from "@/lib/sidebar";
+import { play } from "@/lib/sounds";
 
 // Befehlsleiste (Strg+K) plus Tastenkürzel: G dann Buchstabe = Gehe zu, C/F/E = Neu anlegen.
 
@@ -45,6 +47,13 @@ export function CommandProvider({ children }: { children: React.ReactNode }) {
   const gPressed = useRef(0);
 
   const open = useCallback((mode: Mode = "all") => setState({ open: true, mode }), []);
+
+  // Ton beim Öffnen und Schließen, egal ob per Strg+K, Klick oder Esc.
+  const wasOpen = useRef(false);
+  useEffect(() => {
+    if (wasOpen.current !== state.open) play(state.open ? "paletteOpen" : "paletteClose");
+    wasOpen.current = state.open;
+  }, [state.open]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -86,6 +95,7 @@ function Palette({ mode, close }: { mode: Mode; close: () => void }) {
   const router = useRouter();
   const { areas } = useTeam();
   const theme = useThemeChoice();
+  const sound = useSoundSettings();
   const [search, setSearch] = useState("");
 
   const run = (fn: () => void) => () => {
@@ -157,6 +167,21 @@ function Palette({ mode, close }: { mode: Mode; close: () => void }) {
                   {theme === value && <Check className="text-acc-line" aria-label="aktiv" />}
                 </CommandItem>
               ))}
+            </CommandGroup>
+            <CommandGroup heading="Sounds">
+              <CommandItem value="Sounds an oder aus" onSelect={run(() => sound.setPrefs({ sounds: !sound.sounds }))}>
+                <Volume2 aria-hidden />
+                <span className="flex-1">Sounds</span>
+                {sound.sounds && <Check className="text-acc-line" aria-label="an" />}
+              </CommandItem>
+              <CommandItem
+                value="Fun-Modus an oder aus, Klicks und Tippen"
+                onSelect={run(() => sound.setPrefs(sound.sounds ? { fun: !sound.fun } : { sounds: true, fun: true }))}
+              >
+                <Sparkles aria-hidden />
+                <span className="flex-1">Fun-Modus (Klicks und Tippen)</span>
+                {sound.sounds && sound.fun && <Check className="text-acc-line" aria-label="an" />}
+              </CommandItem>
             </CommandGroup>
             <CommandGroup heading="Sonstiges">
               <CommandItem value="Sidebar ein- oder ausklappen" onSelect={run(toggleSidebar)} className="max-md:hidden">

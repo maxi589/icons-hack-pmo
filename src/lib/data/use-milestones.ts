@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { play } from "@/lib/sounds";
+import { celebrateMilestone } from "@/components/milestone-celebration";
 
 // Alle Meilensteine (18, inkl. Unterpunkte) mit Live-Updates. Genutzt von Übersicht und Roadmap.
 
@@ -47,6 +49,12 @@ export function useMilestones() {
   /** Meilenstein abhaken oder wieder öffnen. Sofort sichtbar, bei Fehler zurück. */
   const setMilestoneDone = useCallback(async (id: string, done: boolean) => {
     const status: MilestoneStatus = done ? "erledigt" : "offen";
+    // Unterpunkt = Haken-Ton, ganzer Meilenstein = Wow-Moment mit Jingle.
+    const target = milestones?.find((m) => m.id === id);
+    if (done && target && target.status !== "erledigt") {
+      if (target.parent_id) play("taskDone");
+      else celebrateMilestone(target);
+    }
     let before: MilestoneStatus = "offen";
     setMilestones((list) =>
       list?.map((m) => {
@@ -61,7 +69,7 @@ export function useMilestones() {
       .eq("id", id);
     if (error) setMilestones((list) => list?.map((m) => (m.id === id ? { ...m, status: before } : m)) ?? null);
     return !error;
-  }, []);
+  }, [milestones]);
 
   return { milestones, setMilestoneDone };
 }

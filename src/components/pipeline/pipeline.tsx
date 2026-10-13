@@ -18,6 +18,7 @@ import { useOrganizations, type OrgPatch } from "@/lib/data/use-organizations";
 import { logActivity } from "@/lib/data/use-feed";
 import { formatShort } from "@/lib/dates";
 import { FOLLOW_UP_ROUNDS } from "@/lib/phases";
+import { play } from "@/lib/sounds";
 import {
   followState,
   inTab,
@@ -110,6 +111,8 @@ export function Pipeline() {
     const from = org.stage;
     if (from === to) return;
     update(org.id, { stage: to });
+    // Zusage ist ein Erfolg; von Fix zurück auf Zugesagt nicht.
+    if (to === "fix" || (to === "zugesagt" && from !== "fix")) play("dealWon");
     toast({
       text: `${org.name} → ${stageName(to)}`,
       onAction: () => update(org.id, { stage: from }),

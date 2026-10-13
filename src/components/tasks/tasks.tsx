@@ -12,6 +12,7 @@ import { MobileSheet } from "@/components/mobile-sheet";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { KanbanBoard, KanbanCard, KanbanCards, KanbanHeader, KanbanProvider } from "@/components/ui/kanban";
+import { play } from "@/lib/sounds";
 import { useToday } from "@/lib/use-today";
 import { useIsMobile } from "@/lib/use-is-mobile";
 import { useMilestones, type Milestone } from "@/lib/data/use-milestones";
@@ -104,6 +105,7 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
     const from = task.status;
     if (from === to) return;
     update(task.id, { status: to });
+    if (to === "erledigt") play("taskDone");
     toast({
       text: to === "erledigt" ? `„${task.title}“ erledigt` : `„${task.title}“ → ${taskStatusName(to)}`,
       onAction: () => update(task.id, { status: from }),

@@ -281,3 +281,64 @@
   transform-origin: left;
   animation: toast-timer 5s linear forwards;
 }
+
+/* Wow-Moment „Meilenstein erledigt“: Karte kommt rein, Haken springt auf, Punkte fliegen nach außen.
+   Bei „Bewegung reduzieren“ greift die Regel oben (Animationen sofort am Ende, Punkte unsichtbar). */
+@keyframes celebrate-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+}
+@keyframes celebrate-card-out {
+  to {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+}
+@keyframes celebrate-check {
+  0% {
+    transform: scale(0.4);
+  }
+  60% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes celebrate-ring {
+  from {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.1);
+  }
+}
+@keyframes celebrate-burst {
+  0% {
+    opacity: 1;
+    transform: rotate(var(--angle)) translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(calc(-1 * var(--dist))) scale(0.5);
+  }
+}
+.celebrate-card {
+  animation: celebrate-card-in 300ms ease-out both;
+}
+.celebrate-card[data-leaving] {
+  animation: celebrate-card-out 300ms ease-out both;
+}
+.celebrate-check {
+  animation: celebrate-check 450ms cubic-bezier(0.34, 1.56, 0.64, 1) 80ms both;
+}
+.celebrate-ring {
+  animation: celebrate-ring 700ms ease-out 120ms both;
+}
+.celebrate-dot {
+  animation: celebrate-burst 750ms cubic-bezier(0.2, 0.7, 0.3, 1) 120ms both;
+}

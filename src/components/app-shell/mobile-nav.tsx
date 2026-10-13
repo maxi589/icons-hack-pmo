@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { isActive, NAV_HACKATHON, NAV_MAIN, NEW_ACTIONS } from "@/lib/nav";
 import { useInbox } from "./inbox-provider";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { SoundSettings } from "@/components/sound-switches";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Avatar } from "@/components/avatar";
 import { signOut, usePalette } from "./command-palette";
@@ -91,6 +92,11 @@ function MenuSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (o: bo
         <div className="flex flex-col gap-1.5">
           <div className="label-mono px-3.5">Darstellung</div>
           <ThemeToggle size="lg" className="flex w-full" />
+        </div>
+
+        <div className="flex flex-col gap-0.5">
+          <div className="label-mono px-3.5">Sounds</div>
+          <SoundSettings />
         </div>
 
         <button type="button" onClick={signOut} className={cn(sheetRow, "text-fg-2")}>

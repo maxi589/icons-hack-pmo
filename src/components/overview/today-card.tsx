@@ -13,6 +13,7 @@ import { logActivity } from "@/lib/data/use-feed";
 import { formatShort } from "@/lib/dates";
 import { shiftFollowUp, TABS } from "@/lib/pipeline";
 import { targetHref } from "@/lib/links";
+import { play } from "@/lib/sounds";
 import type { Org, Task } from "./use-overview-data";
 
 // „Heute für dich“ (Board „Graphit-Handy“), nur am Handy: was die angemeldete Person heute erledigen sollte.
@@ -112,6 +113,7 @@ export function TodayCard({ tasks, orgs, today }: { tasks: Task[]; orgs: Org[]; 
     entries.current.set(i.key, entry);
     setChecked((c) => ({ ...c, [i.key]: i }));
     apply(i, true);
+    play("taskDone");
     if (i.kind === "mention") return;
     toast({
       text: i.kind === "task" ? `„${i.title}“ erledigt` : `${i.title.replace(/ nachfassen$/, "")} nachgefasst · wieder am ${formatShort(shiftFollowUp(null, today, 7))}`,
