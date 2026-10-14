@@ -1,6 +1,6 @@
-# Design-System „Tinte“: Bau-Spezifikation
+# Design-System „Graphit + Kobalt“: Bau-Spezifikation
 
-**Status:** Von Maxi entschieden am 13.10.2026 (Countdown in Michroma, Sounds „Standard“), Farben neu am 14.10.2026: **Palette „Tinte“** (Navy + Kobalt der Event-Website) statt Graphit + Lime.
+**Status:** Von Maxi entschieden am 13.10.2026 (Countdown in Michroma, Sounds „Standard“), Farben neu am 14.10.2026: **Graphit + Kobalt** (Lime durch das Blau der Event-Website ersetzt, dunkel bleibt schwarz).
 **Referenz-Umsetzung:** `design/leinwand/*.dc.html`. Das sind die Boards der Leinwand https://claude.ai/artifact/EAvS67Yi6WYS5rtPRhiw7Y. Werte und Aufbau dort sind verbindlich, sofern hier nichts anderes steht.
 **Alle Kontraste nachgerechnet** (WCAG-Formel) am 13.10.2026.
 
@@ -17,20 +17,20 @@
 - **Ausnahme Login-Seite (Maxi, 13.10.):** immer dunkel, Hintergrund schwarz, oben mittig ein leichter Kobalt-Schimmer (atmet langsam) und ein weicher Kobalt-Schein unter dem Mauszeiger. Login-Karte mittig und schlicht. Gilt nur dort.
 - **Nicht verwenden:** Glas-Effekte, Glow (Ausnahme oben), animierte Sidebar, Kipp- und Magnet-Effekte, eigener Mauszeiger, WebGL. Außerdem keine Werte oder Code von uimaxx.ing und aicss.dev (beide untersagen KI-Nutzung).
 
-## 2. Farb-Tokens: Palette „Tinte“ (Maxi, 14.10.2026)
-Navy und Kobalt der Event-Website, für langes Arbeiten ruhiger gestuft. Gebaut von einem Design-Agenten, geprüft von einem Kritiker: **1.005 Prüfungen bestanden** (WCAG 2.x, APCA 0.0.98G, Farbabstand ΔE2000 ≥ 15 zwischen allen Bedeutungsfarben, keine reinweiße Schrift auf Schwarz, Sättigung dunkel ≤ 0,14). Alle Werte und Prüfergebnisse: `docs/design/palette-tinte.json`. Werte stehen in `src/app/globals.css` und nirgends sonst.
+## 2. Farb-Tokens: Graphit + Kobalt (Maxi, 14.10.2026)
+Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der Event-Website statt Lime. Status-, Bereichs- und Avatarfarben neu abgestimmt. Gebaut von Design-Agenten, geprüft von einem Kritiker: **1.005 Prüfungen bestanden** (WCAG 2.x, APCA 0.0.98G, Farbabstand ΔE2000 ≥ 15 zwischen allen Bedeutungsfarben, keine reinweiße Schrift auf Schwarz, Sättigung dunkel ≤ 0,14). Prüfskript und Werte: `docs/design/palette.json`. Werte stehen in `src/app/globals.css` und nirgends sonst.
 
 | Token | Dunkel | Hell | Verwendung |
 |---|---|---|---|
-| `--bg` | #0e121b | #edf0f5 | App-Hintergrund, Sidebar |
-| `--panel` | #131824 | #f7f8fb | Hauptfläche |
-| `--card` | #181e2a | #ffffff | Karten |
-| `--card2` | #1e2532 | #f3f5f9 | Gruppenköpfe, Leerzustände |
-| `--col` | #10151f | #eef1f6 | Kanban-Spalte (Mulde) |
-| `--field` | #687284 | #778093 | Ränder von Eingabefeldern (≥ 3:1) |
-| `--text` | #e2e7ef | #161d2b | Haupttext (dunkel bewusst nicht reinweiß: 14,3:1) |
-| `--text2` | #b5bece | #465063 | Nebentext |
-| `--text3` | #97a2b5 | #5a6477 | Labels, Meta (hellste erlaubte Textfarbe, ≥ 4,6:1) |
+| `--bg` | #0c0c0d | #f1f1f2 | App-Hintergrund, Sidebar |
+| `--panel` | #121214 | #f9f9fa | Hauptfläche |
+| `--card` | #18181a | #ffffff | Karten |
+| `--card2` | #1e1e21 | #f6f6f7 | Gruppenköpfe, Leerzustände |
+| `--col` | #0b0b0d | #efeff1 | Kanban-Spalte (Mulde) |
+| `--field` | #6b6b72 | #7c7c85 | Ränder von Eingabefeldern (≥ 3:1) |
+| `--text` | #e4e4e8 | #18181b | Haupttext (dunkel bewusst nicht reinweiß: 14,3:1) |
+| `--text2` | #bbbbc2 | #52525b | Nebentext |
+| `--text3` | #a1a1aa | #5e5e66 | Labels, Meta (hellste erlaubte Textfarbe, ≥ 4,6:1) |
 | `--acc` | #0f5ba5 | #0f5ba5 | Fläche: Primärknopf, „+“, Chip „heute“ (Kobalt der Website) |
 | `--accText` | #ffffff | #ffffff | Text auf Akzentfläche (6,86:1) |
 | `--accLine` | #7fb2ee | #0f5ba5 | Linien, Icons, Fokus, Heute-Linie, aktive Navigation, Fortschritt |
@@ -43,7 +43,7 @@ Navy und Kobalt der Event-Website, für langes Arbeiten ruhiger gestuft. Gebaut 
 
 **Lichtstreifen in Chips:** „heute“ Weiß 16 % (Text an der hellsten Stelle 4,83:1), „überfällig“ Statusrot 10 % hell / 8 % dunkel. Nie stärker, sonst fällt der Text unter 4,5:1 (früher 55 % = 2,14:1).
 
-**Login:** Schimmer in #4f8fd9 (0,18 Mitte, 0,06 bei 45 %), Schein unterm Mauszeiger 0,06. **App-Icons:** Navy #0e121b, Schrift #e2e7ef, Strich #4f8fd9.
+**Login:** Schimmer in #4f8fd9 (0,18 Mitte, 0,06 bei 45 %), Schein unterm Mauszeiger 0,06. **App-Icons:** Schwarz #0c0c0d, Schrift #e4e4e8, Strich #4f8fd9.
 
 **Status-Chips (Maxi, 14.10.):** kein „Oval mit Punkt“ mehr. Chips sind Pillen mit Wort und einem ruhigen Farbverlauf in der Statusfarbe (Klassen `chip-tone`/`chip-amber|red|green`, `chip-today` in `globals.css`). Nur „heute“ (Kobalt) und „überfällig“ (rot) bewegen sich: Ein Lichtstreifen läuft alle 3,2 s einmal durch (Rot +14 %, Text bleibt über 4,5:1). Legenden-Chips mit 0 Einträgen bleiben still (`still`). Bei „Bewegung reduzieren“ im System steht alles still. Tönung im Hellmodus höchstens Amber 7 %, Grün 10 %, Rot 12 % (sonst Text unter 4,5:1, nachgerechnet 14.10.).
 

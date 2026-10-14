@@ -7,31 +7,31 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ------------------------------------------------------------------
-   Design-Tokens „Tinte“ (docs/design/Design-System.md, Abschnitt 2; Palette 14.10., geprüft mit WCAG + APCA)
+   Design-Tokens „Graphit + Kobalt“ (docs/design/Design-System.md, Abschnitt 2; 14.10., 1.005 Prüfungen WCAG + APCA)
    Hell = :root, Dunkel = .dark
    ------------------------------------------------------------------ */
 :root {
   color-scheme: light;
 
   /* Flächen */
-  --bg: #edf0f5;
-  --panel: #f7f8fb;
+  --bg: #f1f1f2;
+  --panel: #f9f9fa;
   --card: #ffffff;
-  --card2: #f3f5f9;
-  --col: #eef1f6;
+  --card2: #f6f6f7;
+  --col: #efeff1;
 
   /* Linien: --line/--line2 nur Dekoration, --field für Eingabefelder (mind. 3:1) */
-  --line: rgba(14, 18, 27, 0.09);
-  --line2: rgba(14, 18, 27, 0.14);
-  --field: #778093;
+  --line: rgba(0, 0, 0, 0.09);
+  --line2: rgba(0, 0, 0, 0.13);
+  --field: #7c7c85;
 
   /* Text: --text3 ist die hellste erlaubte Textfarbe */
-  --text: #161d2b;
-  --text2: #465063;
-  --text3: #5a6477;
+  --text: #18181b;
+  --text2: #52525b;
+  --text3: #5e5e66;
 
-  --hover: rgba(14, 18, 27, 0.035);
-  --active: rgba(14, 18, 27, 0.06);
+  --hover: rgba(0, 0, 0, 0.035);
+  --active: rgba(0, 0, 0, 0.06);
 
   /* Akzent Kobalt (Knopf der Event-Website): --acc als Fläche mit --accText, Linien/Icons/Text mit --accLine */
   --acc: #0f5ba5;
@@ -45,8 +45,8 @@
   --st-green: #206734;
   --st-red: #a32730;
 
-  --shadow-card: 0 0 0 1px var(--line), 0 1px 2px rgba(14, 18, 27, 0.05);
-  --shadow-cmdk: 0 24px 64px rgba(14, 18, 27, 0.28);
+  --shadow-card: 0 0 0 1px var(--line), 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-cmdk: 0 24px 64px rgba(0, 0, 0, 0.45);
 
   /* shadcn/ui-Variablen, auf die Graphit-Tokens gelegt */
   --background: var(--bg);
@@ -80,7 +80,7 @@
   --sidebar-accent-foreground: var(--text);
   --sidebar-border: var(--line);
   --sidebar-ring: var(--accLine);
-  /* Bereiche (Ringe/Punkte, Palette „Tinte“ 14.10.): je Modus eigene Töne, mind. 3:1 auf allen Flächen */
+  /* Bereiche (Ringe/Punkte, Palette 14.10.): je Modus eigene Töne, mind. 3:1 auf allen Flächen */
   --area-venue: #2b8c81;
   --area-partner: #0088b3;
   --area-sponsoren: #c25485;
@@ -100,22 +100,22 @@
 .dark {
   color-scheme: dark;
 
-  --bg: #0e121b;
-  --panel: #131824;
-  --card: #181e2a;
-  --card2: #1e2532;
-  --col: #10151f;
+  --bg: #0c0c0d;
+  --panel: #121214;
+  --card: #18181a;
+  --card2: #1e1e21;
+  --col: #0b0b0d;
 
-  --line: rgba(226, 231, 239, 0.08);
-  --line2: rgba(226, 231, 239, 0.13);
-  --field: #687284;
+  --line: rgba(255, 255, 255, 0.09);
+  --line2: rgba(255, 255, 255, 0.13);
+  --field: #6b6b72;
 
-  --text: #e2e7ef;
-  --text2: #b5bece;
-  --text3: #97a2b5;
+  --text: #e4e4e8;
+  --text2: #bbbbc2;
+  --text3: #a1a1aa;
 
-  --hover: rgba(230, 234, 242, 0.04);
-  --active: rgba(230, 234, 242, 0.07);
+  --hover: rgba(255, 255, 255, 0.04);
+  --active: rgba(255, 255, 255, 0.075);
 
   --acc: #0f5ba5;
   --accText: #ffffff;
@@ -128,8 +128,8 @@
   --st-red: #fc9382;
 
   --shadow-card: 0 0 0 1px var(--line), 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-cmdk: 0 24px 64px rgba(0, 0, 0, 0.55);
-  /* Bereiche (Ringe/Punkte, Palette „Tinte“ 14.10.): je Modus eigene Töne, mind. 3:1 auf allen Flächen */
+  --shadow-cmdk: 0 24px 64px rgba(0, 0, 0, 0.45);
+  /* Bereiche (Ringe/Punkte, Palette 14.10.): je Modus eigene Töne, mind. 3:1 auf allen Flächen */
   --area-venue: #258f7a;
   --area-partner: #1f8ba7;
   --area-sponsoren: #bc6c83;
@@ -365,7 +365,7 @@
 }
 
 /* Status-Chips: ruhiger Farbverlauf, Status steht immer als Wort im Chip.
-   Tönung laut Palette „Tinte“ (14.10., final-check.mjs): hell 3/8 %, Rot 6/6 %; dunkel 5/12 %, Amber 6/14 %, Rot 10/10 %. */
+   Tönung laut Palette 14.10. (docs/design/palette.json): hell 3/8 %, Rot 6/6 %; dunkel 5/12 %, Amber 6/14 %, Rot 10/10 %. */
 .chip-tone {
   --t1: 3%;
   --t2: 8%;
@@ -409,7 +409,7 @@
 }
 
 /* „heute“ und „überfällig“: Lichtstreifen hinter dem Text. Stärke so, dass der Text an der hellsten Stelle ≥ 4,5:1 bleibt
-   (Palette „Tinte“: heute Weiß 16 % → 4,83:1; überfällig Rot 10 % hell / 8 % dunkel → mind. 4,66:1). */
+   (Palette 14.10.: heute Weiß 16 % → 4,83:1; überfällig Rot 10 % hell / 8 % dunkel → mind. 4,66:1). */
 .chip-live {
   position: relative;
   overflow: hidden;

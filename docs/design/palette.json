@@ -1,0 +1,9264 @@
+{
+ "name": "Graphit + Kobalt",
+ "light": {
+  "bg": "#f1f1f2",
+  "panel": "#f9f9fa",
+  "card": "#ffffff",
+  "card2": "#f6f6f7",
+  "col": "#efeff1",
+  "line": "rgba(0, 0, 0, 0.09)",
+  "line2": "rgba(0, 0, 0, 0.13)",
+  "field": "#7c7c85",
+  "text": "#18181b",
+  "text2": "#52525b",
+  "text3": "#5e5e66",
+  "hover": "rgba(0, 0, 0, 0.035)",
+  "active": "rgba(0, 0, 0, 0.06)",
+  "acc": "#0f5ba5",
+  "accText": "#ffffff",
+  "accLine": "#0f5ba5",
+  "st-gray": "#474a52",
+  "st-blue": "#643b9b",
+  "st-amber": "#7e4801",
+  "st-green": "#206734",
+  "st-red": "#a32730",
+  "area-venue": "#2b8c81",
+  "area-partner": "#0088b3",
+  "area-sponsoren": "#c25485",
+  "area-jury": "#9b7a01",
+  "area-marketing": "#ca5e30",
+  "area-gesamtleitung": "#7b7f88",
+  "shadow-card": "0 0 0 1px var(--line), 0 1px 2px rgba(0, 0, 0, 0.05)",
+  "shadow-cmdk": "0 24px 64px rgba(0, 0, 0, 0.45)"
+ },
+ "dark": {
+  "bg": "#0c0c0d",
+  "panel": "#121214",
+  "card": "#18181a",
+  "card2": "#1e1e21",
+  "col": "#0b0b0d",
+  "line": "rgba(255, 255, 255, 0.09)",
+  "line2": "rgba(255, 255, 255, 0.13)",
+  "field": "#6b6b72",
+  "text": "#e4e4e8",
+  "text2": "#bbbbc2",
+  "text3": "#a1a1aa",
+  "hover": "rgba(255, 255, 255, 0.04)",
+  "active": "rgba(255, 255, 255, 0.075)",
+  "acc": "#0f5ba5",
+  "accText": "#ffffff",
+  "accLine": "#7fb2ee",
+  "st-gray": "#adb1b8",
+  "st-blue": "#c79be4",
+  "st-amber": "#f4b067",
+  "st-green": "#7dbf87",
+  "st-red": "#fc9382",
+  "area-venue": "#258f7a",
+  "area-partner": "#1f8ba7",
+  "area-sponsoren": "#bc6c83",
+  "area-jury": "#a29547",
+  "area-marketing": "#b6703f",
+  "area-gesamtleitung": "#7d8087",
+  "shadow-card": "0 0 0 1px var(--line), 0 1px 2px rgba(0, 0, 0, 0.35)",
+  "shadow-cmdk": "0 24px 64px rgba(0, 0, 0, 0.45)"
+ },
+ "chipTint": {
+  "light": {
+   "gray": {
+    "t1": 3,
+    "t2": 8
+   },
+   "blue": {
+    "t1": 3,
+    "t2": 8
+   },
+   "amber": {
+    "t1": 3,
+    "t2": 8
+   },
+   "green": {
+    "t1": 3,
+    "t2": 8
+   },
+   "red": {
+    "t1": 6,
+    "t2": 6
+   }
+  },
+  "dark": {
+   "gray": {
+    "t1": 5,
+    "t2": 12
+   },
+   "blue": {
+    "t1": 5,
+    "t2": 12
+   },
+   "amber": {
+    "t1": 6,
+    "t2": 14
+   },
+   "green": {
+    "t1": 5,
+    "t2": 12
+   },
+   "red": {
+    "t1": 10,
+    "t2": 10
+   }
+  }
+ },
+ "sheen": {
+  "light": {
+   "today": 16,
+   "todayColor": "#ffffff",
+   "red": 10
+  },
+  "dark": {
+   "today": 16,
+   "todayColor": "#ffffff",
+   "red": 8
+  },
+  "method": "„heute“: weisser Streifen mit 16 % Deckkraft ueber der Kobaltflaeche (vorher 55 %); „ueberfaellig“: Streifen = st-red mit 10 % (hell) bzw. 8 % (dunkel) ueber der 6 %/10 %-Toenung. CSS: .chip-today.chip-live { --sheen: rgb(255 255 255 / 0.16) } und .chip-live { --sheen: color-mix(in srgb, var(--c) 10%, transparent) }, .dark .chip-live { … 8% }."
+ },
+ "avatarText": "#111111",
+ "avatars": {
+  "Maxi S": "#dbd6ff",
+  "Maxi D": "#ffddd4",
+  "Manu": "#c4ffe4",
+  "Tim": "#fff2bc",
+  "Kilian": "#bbeaff"
+ },
+ "login": {
+  "glowColor": "#4f8fd9",
+  "glowOpacity": {
+   "center": 0.18,
+   "mid": 0.06
+  },
+  "cursorGlowOpacity": 0.06
+ },
+ "icon": {
+  "bg": "#0e121b",
+  "stroke": "#4f8fd9",
+  "text": "#e2e7ef"
+ },
+ "manifest": {
+  "light": {
+   "theme_color": "#edf0f5",
+   "background_color": "#edf0f5"
+  },
+  "dark": {
+   "theme_color": "#0e121b",
+   "background_color": "#0e121b"
+  },
+  "hinweis": "manifest.ts kennt nur einen Wert: dort #0e121b fuer beide (Icons sind dunkel). layout.tsx themeColor je Medienabfrage: hell #edf0f5, dunkel #0e121b."
+ },
+ "umsetzungshinweise": [
+  "Bereichs-Tokens: team-provider.tsx liest var(--area-<DB-id>). Die DB-id von „Gesamtleitung“ ist „vorbereitung“, also in CSS --area-vorbereitung (Wert = area-gesamtleitung) anlegen, sonst greift der Modus-Wert nicht. Die anderen ids passen: venue, partner, sponsoren, jury, marketing.",
+  "@theme: --color-area-* auf var(--area-*) zeigen lassen (wird z. B. in milestone-celebration.tsx benutzt); --color-area-teilnehmer und --color-area-event sind seit 14.10. ohne Bereich und koennen weg.",
+  "Chip-Toenung: .chip-tone { --t1/--t2 } je Farbe laut chipTint (Prozent der Statusfarbe ueber transparent, d. h. ueber der darunterliegenden Flaeche). Grau und Blau sind neu und optional (heute hat der graue Chip keine Toenung).",
+  "Lichtstreifen: .chip-today.chip-live { --sheen: rgb(255 255 255 / 0.16) }; .chip-live { --sheen: color-mix(in srgb, var(--c) 10%, transparent) }; .dark .chip-live { --sheen: color-mix(in srgb, var(--c) 8%, transparent) }.",
+  "Login: radial-gradient(… rgba(79,143,217,0.18), rgba(79,143,217,0.06) 45%, transparent 72%); Mausschein rgba(79,143,217,0.06). Text auf der hellsten Stelle bleibt > 13:1.",
+  "Avatare liegen in der Datenbank (people.color) und in supabase/seed.local.sql, nicht in CSS. Initialen bleiben #111."
+ ],
+ "changes_vs_B": [
+  {
+   "was": "Lichtstreifen „heute“: Weiss 55 % -> 16 %",
+   "warum": "B fiel an der hellsten Stelle auf 2,14:1. Mit 16 % bleibt Weiss auf Kobalt bei 4,83:1 (hell und dunkel, weil dieselbe Akzentflaeche), der Streifen bleibt sichtbar (dE00 9,2)."
+  },
+  {
+   "was": "Akzentflaeche dunkel #1468ba -> #0f5ba5 (= hell, = Website-Knopf)",
+   "warum": "Weniger leuchtend (OKLCH C 0,137 statt 0,149, L 0,47 statt 0,52), Weiss darauf 6,86:1 statt 5,65:1, dadurch Platz fuer den Streifen. #1468ba bleibt als Hover-Ton wie auf der Website moeglich."
+  },
+  {
+   "was": "Streifen „ueberfaellig“: 14 % -> 10 % (hell) / 8 % (dunkel), Rot dunkler (hell #a32730) bzw. heller (dunkel #fc9382)",
+   "warum": "Text an der Streifenspitze >= 4,66:1 auf allen Flaechen inkl. Hover."
+  },
+  {
+   "was": "Bereichsfarben als Tokens je Modus, hell kraeftiger und dunkel gedaempft (OKLCH C <= 0,10)",
+   "warum": "B hatte eine Farbe fuer beide Modi; hell lagen Jury 2,19, Venue 2,88, Marketing 2,95, Partner 2,99:1. Jetzt alle >= 3,12:1 auf jeder Flaeche inkl. aktiver Sidebar-Zeile."
+  },
+  {
+   "was": "Track-Partner Orchidee -> Cerulean (hell #0088b3, dunkel #1f8ba7); Sponsoren bleibt Rosa, Jury Ocker, Marketing Orange, Venue Petrol",
+   "warum": "Violett gehoert jetzt allein dem Status „Kontaktiert“. Partner vs Kontaktiert dE00 34 hell / 35 dunkel (B: 10,6)."
+  },
+  {
+   "was": "Jury dunkler Ocker #a29547, Status-Amber dunkel heller #f4b067",
+   "warum": "Trennung ueber Helligkeit: Jury vs Amber dE00 20,0 dunkel (B: 6,3), 20,0 hell."
+  },
+  {
+   "was": "Kontaktiert: hell #643b9b, dunkel #c79be4",
+   "warum": "Vom Kobalt-Akzent dE00 20,1 hell / 37,5 (Flaeche) und 23,4 (Linie) dunkel."
+  },
+  {
+   "was": "Dunkel: Haupttext #e6eaf2 -> #e2e7ef, text2 #aab2c2 -> #b5bece, text3 #8b95a8 -> #97a2b5",
+   "warum": "Haupttext weniger grell (14,3:1 statt 14,9:1 auf panel, Lc -90,9). text2 und text3 lagen in APCA unter Ziel (Lc 58,7 bzw. 42,3), jetzt >= 61,3 bzw. >= 45,8 auch auf aktiver Zeile ueber card2."
+  },
+  {
+   "was": "Hell: Haupttext #0e121b -> #161d2b, field #7c8597 -> #778093",
+   "warum": "Etwas weicheres Navy (Lc 99,6 auf panel statt 101), Feldraender mit Reserve (>= 3,47:1 statt 3,25:1)."
+  },
+  {
+   "was": "Ebenen neu abgestimmt, Kanban-Spalte in beiden Modi eine Mulde (dunkel col #10151f unter panel)",
+   "warum": "In B lag die Spalte dunkel zwischen panel und card (kaum sichtbar). Jetzt alle Stufen dE00 1,6 bis 3,9 und hell/dunkel im Verhaeltnis 0,75 bis 1,29."
+  },
+  {
+   "was": "Avatare aufgehellt und leicht verschoben (Lavendel, Pfirsich, Minze, Butter, Himmel)",
+   "warum": "Abstand zu den hellen Statusfarben im Dunkelmodus >= 15,7 dE00; Initialen #111 >= 13,6:1."
+  },
+  {
+   "was": "Login-Schimmer und App-Icon in Kobalt #4f8fd9 (Website --blue-hi) auf #0e121b",
+   "warum": "Passend zur Website; Icon-Strich 5,59:1."
+  }
+ ],
+ "rationale": "Basis ist das Website-Kobalt #0f5ba5 als einzige Akzentflaeche in beiden Modi und das Website-Navy #0e121b als Dunkel-Grund, damit Tool und Website als Paar wirken. Alle Farben wurden in OKLCH gesetzt und mit einer Suche so feinjustiert, dass Kontrast, APCA und Farbabstand gleichzeitig halten, aber nah an der Entwurfsabsicht bleiben. Status-Farben trennen sich von den Bereichsfarben vor allem ueber die Helligkeit: hell sind Status dunkel (Text) und Bereiche mittel (Ringe), dunkel umgekehrt. Violett ist nur noch „Kontaktiert“, Blau nur noch der Akzent. Im Dunkelmodus ist der Haupttext bewusst unter 15:1 und alle Farben sind in der Saettigung gedeckelt, damit nichts flimmert. Der Hellmodus vermeidet grosse weisse Flaechen: nur Karten sind weiss, Hintergrund und Panel sind kuehles Grau. Die Ebenen sind in beiden Modi gleich stark gestuft, die Kanban-Spalte ist in beiden eine Mulde. Die knappsten Werte sind dokumentiert, nichts liegt unter der Grenze.",
+ "checks": {
+  "wcag": [
+   {
+    "mode": "light",
+    "what": "text auf bg",
+    "fg": "#161d2b",
+    "bg": "#edf0f5",
+    "value": 14.77,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf bg",
+    "fg": "#465063",
+    "bg": "#edf0f5",
+    "value": 7.1,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3 auf bg",
+    "fg": "#5a6477",
+    "bg": "#edf0f5",
+    "value": 5.22,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Text/Punkt auf bg",
+    "fg": "#474a52",
+    "bg": "#edf0f5",
+    "value": 7.76,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Text/Punkt auf bg",
+    "fg": "#643b9b",
+    "bg": "#edf0f5",
+    "value": 6.96,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Text/Punkt auf bg",
+    "fg": "#7e4801",
+    "bg": "#edf0f5",
+    "value": 6.53,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Text/Punkt auf bg",
+    "fg": "#206734",
+    "bg": "#edf0f5",
+    "value": 6.03,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Text/Punkt auf bg",
+    "fg": "#a32730",
+    "bg": "#edf0f5",
+    "value": 6.36,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Text auf bg",
+    "fg": "#0f5ba5",
+    "bg": "#edf0f5",
+    "value": 6.01,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-venue Ring/Kern auf bg",
+    "fg": "#2b8c81",
+    "bg": "#edf0f5",
+    "value": 3.56,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-partner Ring/Kern auf bg",
+    "fg": "#0088b3",
+    "bg": "#edf0f5",
+    "value": 3.55,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-sponsoren Ring/Kern auf bg",
+    "fg": "#c25485",
+    "bg": "#edf0f5",
+    "value": 3.75,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-jury Ring/Kern auf bg",
+    "fg": "#9b7a01",
+    "bg": "#edf0f5",
+    "value": 3.55,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-marketing Ring/Kern auf bg",
+    "fg": "#ca5e30",
+    "bg": "#edf0f5",
+    "value": 3.57,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-gesamtleitung Ring/Kern auf bg",
+    "fg": "#7b7f88",
+    "bg": "#edf0f5",
+    "value": 3.51,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text auf bg+hover",
+    "fg": "#161d2b",
+    "bg": "#e5e8ed",
+    "value": 13.74,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf bg+hover",
+    "fg": "#465063",
+    "bg": "#e5e8ed",
+    "value": 6.61,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3 auf bg+hover",
+    "fg": "#5a6477",
+    "bg": "#e5e8ed",
+    "value": 4.85,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Text/Punkt auf bg+hover",
+    "fg": "#474a52",
+    "bg": "#e5e8ed",
+    "value": 7.22,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Text/Punkt auf bg+hover",
+    "fg": "#643b9b",
+    "bg": "#e5e8ed",
+    "value": 6.47,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Text/Punkt auf bg+hover",
+    "fg": "#7e4801",
+    "bg": "#e5e8ed",
+    "value": 6.07,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Text/Punkt auf bg+hover",
+    "fg": "#206734",
+    "bg": "#e5e8ed",
+    "value": 5.6,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Text/Punkt auf bg+hover",
+    "fg": "#a32730",
+    "bg": "#e5e8ed",
+    "value": 5.92,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Text auf bg+hover",
+    "fg": "#0f5ba5",
+    "bg": "#e5e8ed",
+    "value": 5.59,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-venue Ring/Kern auf bg+hover",
+    "fg": "#2b8c81",
+    "bg": "#e5e8ed",
+    "value": 3.31,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-partner Ring/Kern auf bg+hover",
+    "fg": "#0088b3",
+    "bg": "#e5e8ed",
+    "value": 3.31,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-sponsoren Ring/Kern auf bg+hover",
+    "fg": "#c25485",
+    "bg": "#e5e8ed",
+    "value": 3.49,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-jury Ring/Kern auf bg+hover",
+    "fg": "#9b7a01",
+    "bg": "#e5e8ed",
+    "value": 3.3,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-marketing Ring/Kern auf bg+hover",
+    "fg": "#ca5e30",
+    "bg": "#e5e8ed",
+    "value": 3.32,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-gesamtleitung Ring/Kern auf bg+hover",
+    "fg": "#7b7f88",
+    "bg": "#e5e8ed",
+    "value": 3.27,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text auf bg+active",
+    "fg": "#161d2b",
+    "bg": "#e0e3e8",
+    "value": 13.11,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf bg+active",
+    "fg": "#465063",
+    "bg": "#e0e3e8",
+    "value": 6.31,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3 auf bg+active",
+    "fg": "#5a6477",
+    "bg": "#e0e3e8",
+    "value": 4.63,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Text/Punkt auf bg+active",
+    "fg": "#474a52",
+    "bg": "#e0e3e8",
+    "value": 6.89,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Text/Punkt auf bg+active",
+    "fg": "#643b9b",
+    "bg": "#e0e3e8",
+    "value": 6.18,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Text/Punkt auf bg+active",
+    "fg": "#7e4801",
+    "bg": "#e0e3e8",
+    "value": 5.8,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Text/Punkt auf bg+active",
+    "fg": "#206734",
+    "bg": "#e0e3e8",
+    "value": 5.35,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Text/Punkt auf bg+active",
+    "fg": "#a32730",
+    "bg": "#e0e3e8",
+    "value": 5.65,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Text auf bg+active",
+    "fg": "#0f5ba5",
+    "bg": "#e0e3e8",
+    "value": 5.33,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-venue Ring/Kern auf bg+active",
+    "fg": "#2b8c81",
+    "bg": "#e0e3e8",
+    "value": 3.16,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-partner Ring/Kern auf bg+active",
+    "fg": "#0088b3",
+    "bg": "#e0e3e8",
+    "value": 3.16,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-sponsoren Ring/Kern auf bg+active",
+    "fg": "#c25485",
+    "bg": "#e0e3e8",
+    "value": 3.33,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-jury Ring/Kern auf bg+active",
+    "fg": "#9b7a01",
+    "bg": "#e0e3e8",
+    "value": 3.15,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-marketing Ring/Kern auf bg+active",
+    "fg": "#ca5e30",
+    "bg": "#e0e3e8",
+    "value": 3.17,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-gesamtleitung Ring/Kern auf bg+active",
+    "fg": "#7b7f88",
+    "bg": "#e0e3e8",
+    "value": 3.12,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text auf panel",
+    "fg": "#161d2b",
+    "bg": "#f7f8fb",
+    "value": 15.89,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf panel",
+    "fg": "#465063",
+    "bg": "#f7f8fb",
+    "value": 7.64,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3 auf panel",
+    "fg": "#5a6477",
+    "bg": "#f7f8fb",
+    "value": 5.61,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Text/Punkt auf panel",
+    "fg": "#474a52",
+    "bg": "#f7f8fb",
+    "value": 8.35,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Text/Punkt auf panel",
+    "fg": "#643b9b",
+    "bg": "#f7f8fb",
+    "value": 7.49,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Text/Punkt auf panel",
+    "fg": "#7e4801",
+    "bg": "#f7f8fb",
+    "value": 7.03,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Text/Punkt auf panel",
+    "fg": "#206734",
+    "bg": "#f7f8fb",
+    "value": 6.48,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Text/Punkt auf panel",
+    "fg": "#a32730",
+    "bg": "#f7f8fb",
+    "value": 6.84,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Text auf panel",
+    "fg": "#0f5ba5",
+    "bg": "#f7f8fb",
+    "value": 6.46,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-venue Ring/Kern auf panel",
+    "fg": "#2b8c81",
+    "bg": "#f7f8fb",
+    "value": 3.82,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-partner Ring/Kern auf panel",
+    "fg": "#0088b3",
+    "bg": "#f7f8fb",
+    "value": 3.82,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-sponsoren Ring/Kern auf panel",
+    "fg": "#c25485",
+    "bg": "#f7f8fb",
+    "value": 4.04,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-jury Ring/Kern auf panel",
+    "fg": "#9b7a01",
+    "bg": "#f7f8fb",
+    "value": 3.82,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-marketing Ring/Kern auf panel",
+    "fg": "#ca5e30",
+    "bg": "#f7f8fb",
+    "value": 3.84,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-gesamtleitung Ring/Kern auf panel",
+    "fg": "#7b7f88",
+    "bg": "#f7f8fb",
+    "value": 3.78,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text auf panel+hover",
+    "fg": "#161d2b",
+    "bg": "#eff0f3",
+    "value": 14.8,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf panel+hover",
+    "fg": "#465063",
+    "bg": "#eff0f3",
+    "value": 7.12,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3 auf panel+hover",
+    "fg": "#5a6477",
+    "bg": "#eff0f3",
+    "value": 5.23,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Text/Punkt auf panel+hover",
+    "fg": "#474a52",
+    "bg": "#eff0f3",
+    "value": 7.78,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Text/Punkt auf panel+hover",
+    "fg": "#643b9b",
+    "bg": "#eff0f3",
+    "value": 6.98,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Text/Punkt auf panel+hover",
+    "fg": "#7e4801",
+    "bg": "#eff0f3",
+    "value": 6.55,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Text/Punkt auf panel+hover",
+    "fg": "#206734",
+    "bg": "#eff0f3",
+    "value": 6.04,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Text/Punkt auf panel+hover",
+    "fg": "#a32730",
+    "bg": "#eff0f3",
+    "value": 6.38,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Text auf panel+hover",
+    "fg": "#0f5ba5",
+    "bg": "#eff0f3",
+    "value": 6.02,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-venue Ring/Kern auf panel+hover",
+    "fg": "#2b8c81",
+    "bg": "#eff0f3",
+    "value": 3.56,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-partner Ring/Kern auf panel+hover",
+    "fg": "#0088b3",
+    "bg": "#eff0f3",
+    "value": 3.56,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-sponsoren Ring/Kern auf panel+hover",
+    "fg": "#c25485",
+    "bg": "#eff0f3",
+    "value": 3.76,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-jury Ring/Kern auf panel+hover",
+    "fg": "#9b7a01",
+    "bg": "#eff0f3",
+    "value": 3.56,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-marketing Ring/Kern auf panel+hover",
+    "fg": "#ca5e30",
+    "bg": "#eff0f3",
+    "value": 3.57,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-gesamtleitung Ring/Kern auf panel+hover",
+    "fg": "#7b7f88",
+    "bg": "#eff0f3",
+    "value": 3.52,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text auf panel+active",
+    "fg": "#161d2b",
+    "bg": "#e9eaee",
+    "value": 14.03,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf panel+active",
+    "fg": "#465063",
+    "bg": "#e9eaee",
+    "value": 6.75,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3 auf panel+active",
+    "fg": "#5a6477",
+    "bg": "#e9eaee",
+    "value": 4.96,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Text/Punkt auf panel+active",
+    "fg": "#474a52",
+    "bg": "#e9eaee",
+    "value": 7.37,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Text/Punkt auf panel+active",
+    "fg": "#643b9b",
+    "bg": "#e9eaee",
+    "value": 6.61,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Text/Punkt auf panel+active",
+    "fg": "#7e4801",
+    "bg": "#e9eaee",
+    "value": 6.21,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Text/Punkt auf panel+active",
+    "fg": "#206734",
+    "bg": "#e9eaee",
+    "value": 5.73,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Text/Punkt auf panel+active",
+    "fg": "#a32730",
+    "bg": "#e9eaee",
+    "value": 6.04,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Text auf panel+active",
+    "fg": "#0f5ba5",
+    "bg": "#e9eaee",
+    "value": 5.71,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-venue Ring/Kern auf panel+active",
+    "fg": "#2b8c81",
+    "bg": "#e9eaee",
+    "value": 3.38,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-partner Ring/Kern auf panel+active",
+    "fg": "#0088b3",
+    "bg": "#e9eaee",
+    "value": 3.38,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-sponsoren Ring/Kern auf panel+active",
+    "fg": "#c25485",
+    "bg": "#e9eaee",
+    "value": 3.56,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-jury Ring/Kern auf panel+active",
+    "fg": "#9b7a01",
+    "bg": "#e9eaee",
+    "value": 3.37,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-marketing Ring/Kern auf panel+active",
+    "fg": "#ca5e30",
+    "bg": "#e9eaee",
+    "value": 3.39,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-gesamtleitung Ring/Kern auf panel+active",
+    "fg": "#7b7f88",
+    "bg": "#e9eaee",
+    "value": 3.34,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text auf card",
+    "fg": "#161d2b",
+    "bg": "#ffffff",
+    "value": 16.87,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf card",
+    "fg": "#465063",
+    "bg": "#ffffff",
+    "value": 8.11,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3 auf card",
+    "fg": "#5a6477",
+    "bg": "#ffffff",
+    "value": 5.96,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Text/Punkt auf card",
+    "fg": "#474a52",
+    "bg": "#ffffff",
+    "value": 8.86,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Text/Punkt auf card",
+    "fg": "#643b9b",
+    "bg": "#ffffff",
+    "value": 7.95,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Text/Punkt auf card",
+    "fg": "#7e4801",
+    "bg": "#ffffff",
+    "value": 7.46,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Text/Punkt auf card",
+    "fg": "#206734",
+    "bg": "#ffffff",
+    "value": 6.88,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Text/Punkt auf card",
+    "fg": "#a32730",
+    "bg": "#ffffff",
+    "value": 7.27,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Text auf card",
+    "fg": "#0f5ba5",
+    "bg": "#ffffff",
+    "value": 6.86,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-venue Ring/Kern auf card",
+    "fg": "#2b8c81",
+    "bg": "#ffffff",
+    "value": 4.06,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-partner Ring/Kern auf card",
+    "fg": "#0088b3",
+    "bg": "#ffffff",
+    "value": 4.06,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-sponsoren Ring/Kern auf card",
+    "fg": "#c25485",
+    "bg": "#ffffff",
+    "value": 4.29,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-jury Ring/Kern auf card",
+    "fg": "#9b7a01",
+    "bg": "#ffffff",
+    "value": 4.06,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-marketing Ring/Kern auf card",
+    "fg": "#ca5e30",
+    "bg": "#ffffff",
+    "value": 4.07,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-gesamtleitung Ring/Kern auf card",
+    "fg": "#7b7f88",
+    "bg": "#ffffff",
+    "value": 4.01,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text auf card+hover",
+    "fg": "#161d2b",
+    "bg": "#f7f7f7",
+    "value": 15.75,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf card+hover",
+    "fg": "#465063",
+    "bg": "#f7f7f7",
+    "value": 7.57,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3 auf card+hover",
+    "fg": "#5a6477",
+    "bg": "#f7f7f7",
+    "value": 5.56,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Text/Punkt auf card+hover",
+    "fg": "#474a52",
+    "bg": "#f7f7f7",
+    "value": 8.27,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Text/Punkt auf card+hover",
+    "fg": "#643b9b",
+    "bg": "#f7f7f7",
+    "value": 7.42,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Text/Punkt auf card+hover",
+    "fg": "#7e4801",
+    "bg": "#f7f7f7",
+    "value": 6.96,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Text/Punkt auf card+hover",
+    "fg": "#206734",
+    "bg": "#f7f7f7",
+    "value": 6.42,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Text/Punkt auf card+hover",
+    "fg": "#a32730",
+    "bg": "#f7f7f7",
+    "value": 6.78,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Text auf card+hover",
+    "fg": "#0f5ba5",
+    "bg": "#f7f7f7",
+    "value": 6.41,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-venue Ring/Kern auf card+hover",
+    "fg": "#2b8c81",
+    "bg": "#f7f7f7",
+    "value": 3.79,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-partner Ring/Kern auf card+hover",
+    "fg": "#0088b3",
+    "bg": "#f7f7f7",
+    "value": 3.79,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-sponsoren Ring/Kern auf card+hover",
+    "fg": "#c25485",
+    "bg": "#f7f7f7",
+    "value": 4,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-jury Ring/Kern auf card+hover",
+    "fg": "#9b7a01",
+    "bg": "#f7f7f7",
+    "value": 3.79,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-marketing Ring/Kern auf card+hover",
+    "fg": "#ca5e30",
+    "bg": "#f7f7f7",
+    "value": 3.8,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-gesamtleitung Ring/Kern auf card+hover",
+    "fg": "#7b7f88",
+    "bg": "#f7f7f7",
+    "value": 3.75,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text auf card+active",
+    "fg": "#161d2b",
+    "bg": "#f1f1f1",
+    "value": 14.94,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf card+active",
+    "fg": "#465063",
+    "bg": "#f1f1f1",
+    "value": 7.18,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3 auf card+active",
+    "fg": "#5a6477",
+    "bg": "#f1f1f1",
+    "value": 5.28,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Text/Punkt auf card+active",
+    "fg": "#474a52",
+    "bg": "#f1f1f1",
+    "value": 7.85,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Text/Punkt auf card+active",
+    "fg": "#643b9b",
+    "bg": "#f1f1f1",
+    "value": 7.04,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Text/Punkt auf card+active",
+    "fg": "#7e4801",
+    "bg": "#f1f1f1",
+    "value": 6.61,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Text/Punkt auf card+active",
+    "fg": "#206734",
+    "bg": "#f1f1f1",
+    "value": 6.09,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Text/Punkt auf card+active",
+    "fg": "#a32730",
+    "bg": "#f1f1f1",
+    "value": 6.43,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Text auf card+active",
+    "fg": "#0f5ba5",
+    "bg": "#f1f1f1",
+    "value": 6.08,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-venue Ring/Kern auf card+active",
+    "fg": "#2b8c81",
+    "bg": "#f1f1f1",
+    "value": 3.6,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-partner Ring/Kern auf card+active",
+    "fg": "#0088b3",
+    "bg": "#f1f1f1",
+    "value": 3.59,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-sponsoren Ring/Kern auf card+active",
+    "fg": "#c25485",
+    "bg": "#f1f1f1",
+    "value": 3.79,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-jury Ring/Kern auf card+active",
+    "fg": "#9b7a01",
+    "bg": "#f1f1f1",
+    "value": 3.59,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-marketing Ring/Kern auf card+active",
+    "fg": "#ca5e30",
+    "bg": "#f1f1f1",
+    "value": 3.61,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-gesamtleitung Ring/Kern auf card+active",
+    "fg": "#7b7f88",
+    "bg": "#f1f1f1",
+    "value": 3.55,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text auf card2",
+    "fg": "#161d2b",
+    "bg": "#f3f5f9",
+    "value": 15.46,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf card2",
+    "fg": "#465063",
+    "bg": "#f3f5f9",
+    "value": 7.43,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3 auf card2",
+    "fg": "#5a6477",
+    "bg": "#f3f5f9",
+    "value": 5.46,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Text/Punkt auf card2",
+    "fg": "#474a52",
+    "bg": "#f3f5f9",
+    "value": 8.12,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Text/Punkt auf card2",
+    "fg": "#643b9b",
+    "bg": "#f3f5f9",
+    "value": 7.29,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Text/Punkt auf card2",
+    "fg": "#7e4801",
+    "bg": "#f3f5f9",
+    "value": 6.84,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Text/Punkt auf card2",
+    "fg": "#206734",
+    "bg": "#f3f5f9",
+    "value": 6.31,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Text/Punkt auf card2",
+    "fg": "#a32730",
+    "bg": "#f3f5f9",
+    "value": 6.66,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Text auf card2",
+    "fg": "#0f5ba5",
+    "bg": "#f3f5f9",
+    "value": 6.29,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-venue Ring/Kern auf card2",
+    "fg": "#2b8c81",
+    "bg": "#f3f5f9",
+    "value": 3.72,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-partner Ring/Kern auf card2",
+    "fg": "#0088b3",
+    "bg": "#f3f5f9",
+    "value": 3.72,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-sponsoren Ring/Kern auf card2",
+    "fg": "#c25485",
+    "bg": "#f3f5f9",
+    "value": 3.93,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-jury Ring/Kern auf card2",
+    "fg": "#9b7a01",
+    "bg": "#f3f5f9",
+    "value": 3.72,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-marketing Ring/Kern auf card2",
+    "fg": "#ca5e30",
+    "bg": "#f3f5f9",
+    "value": 3.73,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-gesamtleitung Ring/Kern auf card2",
+    "fg": "#7b7f88",
+    "bg": "#f3f5f9",
+    "value": 3.68,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text auf card2+hover",
+    "fg": "#161d2b",
+    "bg": "#ebedf1",
+    "value": 14.39,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf card2+hover",
+    "fg": "#465063",
+    "bg": "#ebedf1",
+    "value": 6.92,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3 auf card2+hover",
+    "fg": "#5a6477",
+    "bg": "#ebedf1",
+    "value": 5.08,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Text/Punkt auf card2+hover",
+    "fg": "#474a52",
+    "bg": "#ebedf1",
+    "value": 7.56,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Text/Punkt auf card2+hover",
+    "fg": "#643b9b",
+    "bg": "#ebedf1",
+    "value": 6.78,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Text/Punkt auf card2+hover",
+    "fg": "#7e4801",
+    "bg": "#ebedf1",
+    "value": 6.37,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Text/Punkt auf card2+hover",
+    "fg": "#206734",
+    "bg": "#ebedf1",
+    "value": 5.87,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Text/Punkt auf card2+hover",
+    "fg": "#a32730",
+    "bg": "#ebedf1",
+    "value": 6.2,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Text auf card2+hover",
+    "fg": "#0f5ba5",
+    "bg": "#ebedf1",
+    "value": 5.85,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-venue Ring/Kern auf card2+hover",
+    "fg": "#2b8c81",
+    "bg": "#ebedf1",
+    "value": 3.46,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-partner Ring/Kern auf card2+hover",
+    "fg": "#0088b3",
+    "bg": "#ebedf1",
+    "value": 3.46,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-sponsoren Ring/Kern auf card2+hover",
+    "fg": "#c25485",
+    "bg": "#ebedf1",
+    "value": 3.66,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-jury Ring/Kern auf card2+hover",
+    "fg": "#9b7a01",
+    "bg": "#ebedf1",
+    "value": 3.46,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-marketing Ring/Kern auf card2+hover",
+    "fg": "#ca5e30",
+    "bg": "#ebedf1",
+    "value": 3.48,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-gesamtleitung Ring/Kern auf card2+hover",
+    "fg": "#7b7f88",
+    "bg": "#ebedf1",
+    "value": 3.42,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text auf card2+active",
+    "fg": "#161d2b",
+    "bg": "#e5e7ec",
+    "value": 13.64,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf card2+active",
+    "fg": "#465063",
+    "bg": "#e5e7ec",
+    "value": 6.56,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3 auf card2+active",
+    "fg": "#5a6477",
+    "bg": "#e5e7ec",
+    "value": 4.82,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Text/Punkt auf card2+active",
+    "fg": "#474a52",
+    "bg": "#e5e7ec",
+    "value": 7.16,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Text/Punkt auf card2+active",
+    "fg": "#643b9b",
+    "bg": "#e5e7ec",
+    "value": 6.43,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Text/Punkt auf card2+active",
+    "fg": "#7e4801",
+    "bg": "#e5e7ec",
+    "value": 6.03,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Text/Punkt auf card2+active",
+    "fg": "#206734",
+    "bg": "#e5e7ec",
+    "value": 5.56,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Text/Punkt auf card2+active",
+    "fg": "#a32730",
+    "bg": "#e5e7ec",
+    "value": 5.87,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Text auf card2+active",
+    "fg": "#0f5ba5",
+    "bg": "#e5e7ec",
+    "value": 5.55,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-venue Ring/Kern auf card2+active",
+    "fg": "#2b8c81",
+    "bg": "#e5e7ec",
+    "value": 3.28,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-partner Ring/Kern auf card2+active",
+    "fg": "#0088b3",
+    "bg": "#e5e7ec",
+    "value": 3.28,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-sponsoren Ring/Kern auf card2+active",
+    "fg": "#c25485",
+    "bg": "#e5e7ec",
+    "value": 3.46,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-jury Ring/Kern auf card2+active",
+    "fg": "#9b7a01",
+    "bg": "#e5e7ec",
+    "value": 3.28,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-marketing Ring/Kern auf card2+active",
+    "fg": "#ca5e30",
+    "bg": "#e5e7ec",
+    "value": 3.29,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-gesamtleitung Ring/Kern auf card2+active",
+    "fg": "#7b7f88",
+    "bg": "#e5e7ec",
+    "value": 3.24,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text auf col",
+    "fg": "#161d2b",
+    "bg": "#eef1f6",
+    "value": 14.9,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf col",
+    "fg": "#465063",
+    "bg": "#eef1f6",
+    "value": 7.17,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3 auf col",
+    "fg": "#5a6477",
+    "bg": "#eef1f6",
+    "value": 5.26,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Text/Punkt auf col",
+    "fg": "#474a52",
+    "bg": "#eef1f6",
+    "value": 7.83,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Text/Punkt auf col",
+    "fg": "#643b9b",
+    "bg": "#eef1f6",
+    "value": 7.02,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Text/Punkt auf col",
+    "fg": "#7e4801",
+    "bg": "#eef1f6",
+    "value": 6.59,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Text/Punkt auf col",
+    "fg": "#206734",
+    "bg": "#eef1f6",
+    "value": 6.08,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Text/Punkt auf col",
+    "fg": "#a32730",
+    "bg": "#eef1f6",
+    "value": 6.42,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Text auf col",
+    "fg": "#0f5ba5",
+    "bg": "#eef1f6",
+    "value": 6.06,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-venue Ring/Kern auf col",
+    "fg": "#2b8c81",
+    "bg": "#eef1f6",
+    "value": 3.59,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-partner Ring/Kern auf col",
+    "fg": "#0088b3",
+    "bg": "#eef1f6",
+    "value": 3.59,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-sponsoren Ring/Kern auf col",
+    "fg": "#c25485",
+    "bg": "#eef1f6",
+    "value": 3.78,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-jury Ring/Kern auf col",
+    "fg": "#9b7a01",
+    "bg": "#eef1f6",
+    "value": 3.58,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-marketing Ring/Kern auf col",
+    "fg": "#ca5e30",
+    "bg": "#eef1f6",
+    "value": 3.6,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-gesamtleitung Ring/Kern auf col",
+    "fg": "#7b7f88",
+    "bg": "#eef1f6",
+    "value": 3.54,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text auf col+hover",
+    "fg": "#161d2b",
+    "bg": "#e6e9ee",
+    "value": 13.86,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf col+hover",
+    "fg": "#465063",
+    "bg": "#e6e9ee",
+    "value": 6.67,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3 auf col+hover",
+    "fg": "#5a6477",
+    "bg": "#e6e9ee",
+    "value": 4.9,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Text/Punkt auf col+hover",
+    "fg": "#474a52",
+    "bg": "#e6e9ee",
+    "value": 7.28,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Text/Punkt auf col+hover",
+    "fg": "#643b9b",
+    "bg": "#e6e9ee",
+    "value": 6.53,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Text/Punkt auf col+hover",
+    "fg": "#7e4801",
+    "bg": "#e6e9ee",
+    "value": 6.13,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Text/Punkt auf col+hover",
+    "fg": "#206734",
+    "bg": "#e6e9ee",
+    "value": 5.66,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Text/Punkt auf col+hover",
+    "fg": "#a32730",
+    "bg": "#e6e9ee",
+    "value": 5.97,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Text auf col+hover",
+    "fg": "#0f5ba5",
+    "bg": "#e6e9ee",
+    "value": 5.64,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-venue Ring/Kern auf col+hover",
+    "fg": "#2b8c81",
+    "bg": "#e6e9ee",
+    "value": 3.34,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-partner Ring/Kern auf col+hover",
+    "fg": "#0088b3",
+    "bg": "#e6e9ee",
+    "value": 3.34,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-sponsoren Ring/Kern auf col+hover",
+    "fg": "#c25485",
+    "bg": "#e6e9ee",
+    "value": 3.52,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-jury Ring/Kern auf col+hover",
+    "fg": "#9b7a01",
+    "bg": "#e6e9ee",
+    "value": 3.33,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-marketing Ring/Kern auf col+hover",
+    "fg": "#ca5e30",
+    "bg": "#e6e9ee",
+    "value": 3.35,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-gesamtleitung Ring/Kern auf col+hover",
+    "fg": "#7b7f88",
+    "bg": "#e6e9ee",
+    "value": 3.3,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text auf col+active",
+    "fg": "#161d2b",
+    "bg": "#e1e4e9",
+    "value": 13.24,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf col+active",
+    "fg": "#465063",
+    "bg": "#e1e4e9",
+    "value": 6.37,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3 auf col+active",
+    "fg": "#5a6477",
+    "bg": "#e1e4e9",
+    "value": 4.68,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Text/Punkt auf col+active",
+    "fg": "#474a52",
+    "bg": "#e1e4e9",
+    "value": 6.95,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Text/Punkt auf col+active",
+    "fg": "#643b9b",
+    "bg": "#e1e4e9",
+    "value": 6.24,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Text/Punkt auf col+active",
+    "fg": "#7e4801",
+    "bg": "#e1e4e9",
+    "value": 5.85,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Text/Punkt auf col+active",
+    "fg": "#206734",
+    "bg": "#e1e4e9",
+    "value": 5.4,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Text/Punkt auf col+active",
+    "fg": "#a32730",
+    "bg": "#e1e4e9",
+    "value": 5.7,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Text auf col+active",
+    "fg": "#0f5ba5",
+    "bg": "#e1e4e9",
+    "value": 5.38,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-venue Ring/Kern auf col+active",
+    "fg": "#2b8c81",
+    "bg": "#e1e4e9",
+    "value": 3.19,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-partner Ring/Kern auf col+active",
+    "fg": "#0088b3",
+    "bg": "#e1e4e9",
+    "value": 3.19,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-sponsoren Ring/Kern auf col+active",
+    "fg": "#c25485",
+    "bg": "#e1e4e9",
+    "value": 3.36,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-jury Ring/Kern auf col+active",
+    "fg": "#9b7a01",
+    "bg": "#e1e4e9",
+    "value": 3.18,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-marketing Ring/Kern auf col+active",
+    "fg": "#ca5e30",
+    "bg": "#e1e4e9",
+    "value": 3.2,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "area-gesamtleitung Ring/Kern auf col+active",
+    "fg": "#7b7f88",
+    "bg": "#e1e4e9",
+    "value": 3.15,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "field (Eingaberand) auf bg",
+    "fg": "#778093",
+    "bg": "#edf0f5",
+    "value": 3.47,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine Linie/Icon/Fokus auf bg",
+    "fg": "#0f5ba5",
+    "bg": "#edf0f5",
+    "value": 6.01,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "field (Eingaberand) auf panel",
+    "fg": "#778093",
+    "bg": "#f7f8fb",
+    "value": 3.74,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine Linie/Icon/Fokus auf panel",
+    "fg": "#0f5ba5",
+    "bg": "#f7f8fb",
+    "value": 6.46,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "field (Eingaberand) auf card",
+    "fg": "#778093",
+    "bg": "#ffffff",
+    "value": 3.97,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine Linie/Icon/Fokus auf card",
+    "fg": "#0f5ba5",
+    "bg": "#ffffff",
+    "value": 6.86,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "field (Eingaberand) auf card2",
+    "fg": "#778093",
+    "bg": "#f3f5f9",
+    "value": 3.63,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine Linie/Icon/Fokus auf card2",
+    "fg": "#0f5ba5",
+    "bg": "#f3f5f9",
+    "value": 6.29,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "field (Eingaberand) auf col",
+    "fg": "#778093",
+    "bg": "#eef1f6",
+    "value": 3.5,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine Linie/Icon/Fokus auf col",
+    "fg": "#0f5ba5",
+    "bg": "#eef1f6",
+    "value": 6.06,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accText auf acc (Primaerknopf)",
+    "fg": "#ffffff",
+    "bg": "#0f5ba5",
+    "value": 6.86,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "card (Haken) auf st-green (erledigt-Kreis)",
+    "fg": "#ffffff",
+    "bg": "#206734",
+    "value": 6.88,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip gray: st-gray auf 8 % Toenung ueber panel",
+    "fg": "#474a52",
+    "bg": "#e9eaed",
+    "value": 7.37,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip gray: st-gray auf 8 % Toenung ueber panel+hover",
+    "fg": "#474a52",
+    "bg": "#e2e3e6",
+    "value": 6.91,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip gray: st-gray auf 8 % Toenung ueber card",
+    "fg": "#474a52",
+    "bg": "#f0f1f1",
+    "value": 7.83,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip gray: st-gray auf 8 % Toenung ueber card+hover",
+    "fg": "#474a52",
+    "bg": "#e9e9ea",
+    "value": 7.31,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip gray: st-gray auf 8 % Toenung ueber card2",
+    "fg": "#474a52",
+    "bg": "#e5e7ec",
+    "value": 7.16,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip gray: st-gray auf 8 % Toenung ueber card2+hover",
+    "fg": "#474a52",
+    "bg": "#dee0e4",
+    "value": 6.71,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip gray: st-gray auf 8 % Toenung ueber col",
+    "fg": "#474a52",
+    "bg": "#e1e4e9",
+    "value": 6.95,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip gray: st-gray auf 8 % Toenung ueber col+hover",
+    "fg": "#474a52",
+    "bg": "#d9dce2",
+    "value": 6.45,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip blue: st-blue auf 8 % Toenung ueber panel",
+    "fg": "#643b9b",
+    "bg": "#ebe9f3",
+    "value": 6.62,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip blue: st-blue auf 8 % Toenung ueber panel+hover",
+    "fg": "#643b9b",
+    "bg": "#e4e2ec",
+    "value": 6.21,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip blue: st-blue auf 8 % Toenung ueber card",
+    "fg": "#643b9b",
+    "bg": "#f3eff7",
+    "value": 7.01,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip blue: st-blue auf 8 % Toenung ueber card+hover",
+    "fg": "#643b9b",
+    "bg": "#ebe8f0",
+    "value": 6.56,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip blue: st-blue auf 8 % Toenung ueber card2",
+    "fg": "#643b9b",
+    "bg": "#e8e6f1",
+    "value": 6.45,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip blue: st-blue auf 8 % Toenung ueber card2+hover",
+    "fg": "#643b9b",
+    "bg": "#e0dfea",
+    "value": 6.03,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip blue: st-blue auf 8 % Toenung ueber col",
+    "fg": "#643b9b",
+    "bg": "#e3e2ef",
+    "value": 6.21,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip blue: st-blue auf 8 % Toenung ueber col+hover",
+    "fg": "#643b9b",
+    "bg": "#dcdbe7",
+    "value": 5.81,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip amber: st-amber auf 8 % Toenung ueber panel",
+    "fg": "#7e4801",
+    "bg": "#edeae7",
+    "value": 6.23,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip amber: st-amber auf 8 % Toenung ueber panel+hover",
+    "fg": "#7e4801",
+    "bg": "#e6e3e0",
+    "value": 5.84,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip amber: st-amber auf 8 % Toenung ueber card",
+    "fg": "#7e4801",
+    "bg": "#f5f0eb",
+    "value": 6.59,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip amber: st-amber auf 8 % Toenung ueber card+hover",
+    "fg": "#7e4801",
+    "bg": "#ede9e3",
+    "value": 6.17,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip amber: st-amber auf 8 % Toenung ueber card2",
+    "fg": "#7e4801",
+    "bg": "#eae7e5",
+    "value": 6.06,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip amber: st-amber auf 8 % Toenung ueber card2+hover",
+    "fg": "#7e4801",
+    "bg": "#e2e0de",
+    "value": 5.67,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip amber: st-amber auf 8 % Toenung ueber col",
+    "fg": "#7e4801",
+    "bg": "#e5e3e2",
+    "value": 5.83,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip amber: st-amber auf 8 % Toenung ueber col+hover",
+    "fg": "#7e4801",
+    "bg": "#dedcdb",
+    "value": 5.46,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip green: st-green auf 8 % Toenung ueber panel",
+    "fg": "#206734",
+    "bg": "#e6eceb",
+    "value": 5.76,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip green: st-green auf 8 % Toenung ueber panel+hover",
+    "fg": "#206734",
+    "bg": "#dee5e4",
+    "value": 5.39,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip green: st-green auf 8 % Toenung ueber card",
+    "fg": "#206734",
+    "bg": "#edf3ef",
+    "value": 6.12,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip green: st-green auf 8 % Toenung ueber card+hover",
+    "fg": "#206734",
+    "bg": "#e6ebe7",
+    "value": 5.7,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip green: st-green auf 8 % Toenung ueber card2",
+    "fg": "#206734",
+    "bg": "#e2eae9",
+    "value": 5.63,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip green: st-green auf 8 % Toenung ueber card2+hover",
+    "fg": "#206734",
+    "bg": "#dbe2e2",
+    "value": 5.24,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip green: st-green auf 8 % Toenung ueber col",
+    "fg": "#206734",
+    "bg": "#dee6e6",
+    "value": 5.43,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip green: st-green auf 8 % Toenung ueber col+hover",
+    "fg": "#206734",
+    "bg": "#d6dfdf",
+    "value": 5.07,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip ueberfaellig: st-red auf 6 % + Streifen 10 % ueber panel (Spitze)",
+    "fg": "#a32730",
+    "bg": "#ead7dc",
+    "value": 5.28,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip ueberfaellig: st-red auf 6 % + Streifen 10 % ueber panel+hover (Spitze)",
+    "fg": "#a32730",
+    "bg": "#e3d1d5",
+    "value": 4.96,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip ueberfaellig: st-red auf 6 % + Streifen 10 % ueber card (Spitze)",
+    "fg": "#a32730",
+    "bg": "#f0dee0",
+    "value": 5.62,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip ueberfaellig: st-red auf 6 % + Streifen 10 % ueber card+hover (Spitze)",
+    "fg": "#a32730",
+    "bg": "#ead7d8",
+    "value": 5.26,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip ueberfaellig: st-red auf 6 % + Streifen 10 % ueber card2 (Spitze)",
+    "fg": "#a32730",
+    "bg": "#e7d6da",
+    "value": 5.2,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip ueberfaellig: st-red auf 6 % + Streifen 10 % ueber card2+hover (Spitze)",
+    "fg": "#a32730",
+    "bg": "#e0ced3",
+    "value": 4.82,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip ueberfaellig: st-red auf 6 % + Streifen 10 % ueber col (Spitze)",
+    "fg": "#a32730",
+    "bg": "#e3d2d7",
+    "value": 5.01,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip ueberfaellig: st-red auf 6 % + Streifen 10 % ueber col+hover (Spitze)",
+    "fg": "#a32730",
+    "bg": "#dccbd1",
+    "value": 4.67,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip heute: accText auf acc (ohne Streifen)",
+    "fg": "#ffffff",
+    "bg": "#0f5ba5",
+    "value": 6.86,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip heute: accText auf acc + 16 % Streifen (Spitze)",
+    "fg": "#ffffff",
+    "bg": "#3575b3",
+    "value": 4.83,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text auf bg",
+    "fg": "#e2e7ef",
+    "bg": "#0e121b",
+    "value": 15.08,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf bg",
+    "fg": "#b5bece",
+    "bg": "#0e121b",
+    "value": 10.01,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3 auf bg",
+    "fg": "#97a2b5",
+    "bg": "#0e121b",
+    "value": 7.27,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Text/Punkt auf bg",
+    "fg": "#adb1b8",
+    "bg": "#0e121b",
+    "value": 8.7,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Text/Punkt auf bg",
+    "fg": "#c79be4",
+    "bg": "#0e121b",
+    "value": 8.24,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Text/Punkt auf bg",
+    "fg": "#f4b067",
+    "bg": "#0e121b",
+    "value": 10.04,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Text/Punkt auf bg",
+    "fg": "#7dbf87",
+    "bg": "#0e121b",
+    "value": 8.63,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Text/Punkt auf bg",
+    "fg": "#fc9382",
+    "bg": "#0e121b",
+    "value": 8.59,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Text auf bg",
+    "fg": "#7fb2ee",
+    "bg": "#0e121b",
+    "value": 8.48,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-venue Ring/Kern auf bg",
+    "fg": "#258f7a",
+    "bg": "#0e121b",
+    "value": 4.72,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-partner Ring/Kern auf bg",
+    "fg": "#1f8ba7",
+    "bg": "#0e121b",
+    "value": 4.74,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-sponsoren Ring/Kern auf bg",
+    "fg": "#bc6c83",
+    "bg": "#0e121b",
+    "value": 5.01,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-jury Ring/Kern auf bg",
+    "fg": "#a29547",
+    "bg": "#0e121b",
+    "value": 6.18,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-marketing Ring/Kern auf bg",
+    "fg": "#b6703f",
+    "bg": "#0e121b",
+    "value": 4.8,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-gesamtleitung Ring/Kern auf bg",
+    "fg": "#7d8087",
+    "bg": "#0e121b",
+    "value": 4.74,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text auf bg+hover",
+    "fg": "#e2e7ef",
+    "bg": "#171b24",
+    "value": 13.88,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf bg+hover",
+    "fg": "#b5bece",
+    "bg": "#171b24",
+    "value": 9.21,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3 auf bg+hover",
+    "fg": "#97a2b5",
+    "bg": "#171b24",
+    "value": 6.69,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Text/Punkt auf bg+hover",
+    "fg": "#adb1b8",
+    "bg": "#171b24",
+    "value": 8.01,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Text/Punkt auf bg+hover",
+    "fg": "#c79be4",
+    "bg": "#171b24",
+    "value": 7.58,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Text/Punkt auf bg+hover",
+    "fg": "#f4b067",
+    "bg": "#171b24",
+    "value": 9.23,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Text/Punkt auf bg+hover",
+    "fg": "#7dbf87",
+    "bg": "#171b24",
+    "value": 7.94,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Text/Punkt auf bg+hover",
+    "fg": "#fc9382",
+    "bg": "#171b24",
+    "value": 7.91,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Text auf bg+hover",
+    "fg": "#7fb2ee",
+    "bg": "#171b24",
+    "value": 7.8,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-venue Ring/Kern auf bg+hover",
+    "fg": "#258f7a",
+    "bg": "#171b24",
+    "value": 4.34,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-partner Ring/Kern auf bg+hover",
+    "fg": "#1f8ba7",
+    "bg": "#171b24",
+    "value": 4.36,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-sponsoren Ring/Kern auf bg+hover",
+    "fg": "#bc6c83",
+    "bg": "#171b24",
+    "value": 4.6,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-jury Ring/Kern auf bg+hover",
+    "fg": "#a29547",
+    "bg": "#171b24",
+    "value": 5.68,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-marketing Ring/Kern auf bg+hover",
+    "fg": "#b6703f",
+    "bg": "#171b24",
+    "value": 4.41,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-gesamtleitung Ring/Kern auf bg+hover",
+    "fg": "#7d8087",
+    "bg": "#171b24",
+    "value": 4.36,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text auf bg+active",
+    "fg": "#e2e7ef",
+    "bg": "#1d212a",
+    "value": 12.98,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf bg+active",
+    "fg": "#b5bece",
+    "bg": "#1d212a",
+    "value": 8.61,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3 auf bg+active",
+    "fg": "#97a2b5",
+    "bg": "#1d212a",
+    "value": 6.25,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Text/Punkt auf bg+active",
+    "fg": "#adb1b8",
+    "bg": "#1d212a",
+    "value": 7.49,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Text/Punkt auf bg+active",
+    "fg": "#c79be4",
+    "bg": "#1d212a",
+    "value": 7.09,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Text/Punkt auf bg+active",
+    "fg": "#f4b067",
+    "bg": "#1d212a",
+    "value": 8.63,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Text/Punkt auf bg+active",
+    "fg": "#7dbf87",
+    "bg": "#1d212a",
+    "value": 7.42,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Text/Punkt auf bg+active",
+    "fg": "#fc9382",
+    "bg": "#1d212a",
+    "value": 7.39,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Text auf bg+active",
+    "fg": "#7fb2ee",
+    "bg": "#1d212a",
+    "value": 7.29,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-venue Ring/Kern auf bg+active",
+    "fg": "#258f7a",
+    "bg": "#1d212a",
+    "value": 4.06,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-partner Ring/Kern auf bg+active",
+    "fg": "#1f8ba7",
+    "bg": "#1d212a",
+    "value": 4.07,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-sponsoren Ring/Kern auf bg+active",
+    "fg": "#bc6c83",
+    "bg": "#1d212a",
+    "value": 4.31,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-jury Ring/Kern auf bg+active",
+    "fg": "#a29547",
+    "bg": "#1d212a",
+    "value": 5.31,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-marketing Ring/Kern auf bg+active",
+    "fg": "#b6703f",
+    "bg": "#1d212a",
+    "value": 4.13,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-gesamtleitung Ring/Kern auf bg+active",
+    "fg": "#7d8087",
+    "bg": "#1d212a",
+    "value": 4.07,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text auf panel",
+    "fg": "#e2e7ef",
+    "bg": "#131824",
+    "value": 14.28,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf panel",
+    "fg": "#b5bece",
+    "bg": "#131824",
+    "value": 9.48,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3 auf panel",
+    "fg": "#97a2b5",
+    "bg": "#131824",
+    "value": 6.89,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Text/Punkt auf panel",
+    "fg": "#adb1b8",
+    "bg": "#131824",
+    "value": 8.24,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Text/Punkt auf panel",
+    "fg": "#c79be4",
+    "bg": "#131824",
+    "value": 7.8,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Text/Punkt auf panel",
+    "fg": "#f4b067",
+    "bg": "#131824",
+    "value": 9.51,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Text/Punkt auf panel",
+    "fg": "#7dbf87",
+    "bg": "#131824",
+    "value": 8.17,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Text/Punkt auf panel",
+    "fg": "#fc9382",
+    "bg": "#131824",
+    "value": 8.14,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Text auf panel",
+    "fg": "#7fb2ee",
+    "bg": "#131824",
+    "value": 8.03,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-venue Ring/Kern auf panel",
+    "fg": "#258f7a",
+    "bg": "#131824",
+    "value": 4.47,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-partner Ring/Kern auf panel",
+    "fg": "#1f8ba7",
+    "bg": "#131824",
+    "value": 4.48,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-sponsoren Ring/Kern auf panel",
+    "fg": "#bc6c83",
+    "bg": "#131824",
+    "value": 4.74,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-jury Ring/Kern auf panel",
+    "fg": "#a29547",
+    "bg": "#131824",
+    "value": 5.85,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-marketing Ring/Kern auf panel",
+    "fg": "#b6703f",
+    "bg": "#131824",
+    "value": 4.54,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-gesamtleitung Ring/Kern auf panel",
+    "fg": "#7d8087",
+    "bg": "#131824",
+    "value": 4.49,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text auf panel+hover",
+    "fg": "#e2e7ef",
+    "bg": "#1b202c",
+    "value": 13.11,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf panel+hover",
+    "fg": "#b5bece",
+    "bg": "#1b202c",
+    "value": 8.7,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3 auf panel+hover",
+    "fg": "#97a2b5",
+    "bg": "#1b202c",
+    "value": 6.32,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Text/Punkt auf panel+hover",
+    "fg": "#adb1b8",
+    "bg": "#1b202c",
+    "value": 7.57,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Text/Punkt auf panel+hover",
+    "fg": "#c79be4",
+    "bg": "#1b202c",
+    "value": 7.16,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Text/Punkt auf panel+hover",
+    "fg": "#f4b067",
+    "bg": "#1b202c",
+    "value": 8.73,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Text/Punkt auf panel+hover",
+    "fg": "#7dbf87",
+    "bg": "#1b202c",
+    "value": 7.5,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Text/Punkt auf panel+hover",
+    "fg": "#fc9382",
+    "bg": "#1b202c",
+    "value": 7.47,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Text auf panel+hover",
+    "fg": "#7fb2ee",
+    "bg": "#1b202c",
+    "value": 7.37,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-venue Ring/Kern auf panel+hover",
+    "fg": "#258f7a",
+    "bg": "#1b202c",
+    "value": 4.1,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-partner Ring/Kern auf panel+hover",
+    "fg": "#1f8ba7",
+    "bg": "#1b202c",
+    "value": 4.12,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-sponsoren Ring/Kern auf panel+hover",
+    "fg": "#bc6c83",
+    "bg": "#1b202c",
+    "value": 4.35,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-jury Ring/Kern auf panel+hover",
+    "fg": "#a29547",
+    "bg": "#1b202c",
+    "value": 5.37,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-marketing Ring/Kern auf panel+hover",
+    "fg": "#b6703f",
+    "bg": "#1b202c",
+    "value": 4.17,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-gesamtleitung Ring/Kern auf panel+hover",
+    "fg": "#7d8087",
+    "bg": "#1b202c",
+    "value": 4.12,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text auf panel+active",
+    "fg": "#e2e7ef",
+    "bg": "#222732",
+    "value": 12.04,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf panel+active",
+    "fg": "#b5bece",
+    "bg": "#222732",
+    "value": 7.99,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3 auf panel+active",
+    "fg": "#97a2b5",
+    "bg": "#222732",
+    "value": 5.8,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Text/Punkt auf panel+active",
+    "fg": "#adb1b8",
+    "bg": "#222732",
+    "value": 6.95,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Text/Punkt auf panel+active",
+    "fg": "#c79be4",
+    "bg": "#222732",
+    "value": 6.58,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Text/Punkt auf panel+active",
+    "fg": "#f4b067",
+    "bg": "#222732",
+    "value": 8.01,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Text/Punkt auf panel+active",
+    "fg": "#7dbf87",
+    "bg": "#222732",
+    "value": 6.89,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Text/Punkt auf panel+active",
+    "fg": "#fc9382",
+    "bg": "#222732",
+    "value": 6.86,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Text auf panel+active",
+    "fg": "#7fb2ee",
+    "bg": "#222732",
+    "value": 6.77,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-venue Ring/Kern auf panel+active",
+    "fg": "#258f7a",
+    "bg": "#222732",
+    "value": 3.77,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-partner Ring/Kern auf panel+active",
+    "fg": "#1f8ba7",
+    "bg": "#222732",
+    "value": 3.78,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-sponsoren Ring/Kern auf panel+active",
+    "fg": "#bc6c83",
+    "bg": "#222732",
+    "value": 4,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-jury Ring/Kern auf panel+active",
+    "fg": "#a29547",
+    "bg": "#222732",
+    "value": 4.93,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-marketing Ring/Kern auf panel+active",
+    "fg": "#b6703f",
+    "bg": "#222732",
+    "value": 3.83,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-gesamtleitung Ring/Kern auf panel+active",
+    "fg": "#7d8087",
+    "bg": "#222732",
+    "value": 3.78,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text auf card",
+    "fg": "#e2e7ef",
+    "bg": "#181e2a",
+    "value": 13.44,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf card",
+    "fg": "#b5bece",
+    "bg": "#181e2a",
+    "value": 8.92,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3 auf card",
+    "fg": "#97a2b5",
+    "bg": "#181e2a",
+    "value": 6.48,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Text/Punkt auf card",
+    "fg": "#adb1b8",
+    "bg": "#181e2a",
+    "value": 7.76,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Text/Punkt auf card",
+    "fg": "#c79be4",
+    "bg": "#181e2a",
+    "value": 7.34,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Text/Punkt auf card",
+    "fg": "#f4b067",
+    "bg": "#181e2a",
+    "value": 8.94,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Text/Punkt auf card",
+    "fg": "#7dbf87",
+    "bg": "#181e2a",
+    "value": 7.69,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Text/Punkt auf card",
+    "fg": "#fc9382",
+    "bg": "#181e2a",
+    "value": 7.66,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Text auf card",
+    "fg": "#7fb2ee",
+    "bg": "#181e2a",
+    "value": 7.56,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-venue Ring/Kern auf card",
+    "fg": "#258f7a",
+    "bg": "#181e2a",
+    "value": 4.2,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-partner Ring/Kern auf card",
+    "fg": "#1f8ba7",
+    "bg": "#181e2a",
+    "value": 4.22,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-sponsoren Ring/Kern auf card",
+    "fg": "#bc6c83",
+    "bg": "#181e2a",
+    "value": 4.46,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-jury Ring/Kern auf card",
+    "fg": "#a29547",
+    "bg": "#181e2a",
+    "value": 5.51,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-marketing Ring/Kern auf card",
+    "fg": "#b6703f",
+    "bg": "#181e2a",
+    "value": 4.28,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-gesamtleitung Ring/Kern auf card",
+    "fg": "#7d8087",
+    "bg": "#181e2a",
+    "value": 4.22,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text auf card+hover",
+    "fg": "#e2e7ef",
+    "bg": "#202632",
+    "value": 12.21,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf card+hover",
+    "fg": "#b5bece",
+    "bg": "#202632",
+    "value": 8.1,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3 auf card+hover",
+    "fg": "#97a2b5",
+    "bg": "#202632",
+    "value": 5.89,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Text/Punkt auf card+hover",
+    "fg": "#adb1b8",
+    "bg": "#202632",
+    "value": 7.05,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Text/Punkt auf card+hover",
+    "fg": "#c79be4",
+    "bg": "#202632",
+    "value": 6.67,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Text/Punkt auf card+hover",
+    "fg": "#f4b067",
+    "bg": "#202632",
+    "value": 8.13,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Text/Punkt auf card+hover",
+    "fg": "#7dbf87",
+    "bg": "#202632",
+    "value": 6.99,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Text/Punkt auf card+hover",
+    "fg": "#fc9382",
+    "bg": "#202632",
+    "value": 6.96,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Text auf card+hover",
+    "fg": "#7fb2ee",
+    "bg": "#202632",
+    "value": 6.86,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-venue Ring/Kern auf card+hover",
+    "fg": "#258f7a",
+    "bg": "#202632",
+    "value": 3.82,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-partner Ring/Kern auf card+hover",
+    "fg": "#1f8ba7",
+    "bg": "#202632",
+    "value": 3.83,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-sponsoren Ring/Kern auf card+hover",
+    "fg": "#bc6c83",
+    "bg": "#202632",
+    "value": 4.05,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-jury Ring/Kern auf card+hover",
+    "fg": "#a29547",
+    "bg": "#202632",
+    "value": 5,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-marketing Ring/Kern auf card+hover",
+    "fg": "#b6703f",
+    "bg": "#202632",
+    "value": 3.88,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-gesamtleitung Ring/Kern auf card+hover",
+    "fg": "#7d8087",
+    "bg": "#202632",
+    "value": 3.83,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text auf card+active",
+    "fg": "#e2e7ef",
+    "bg": "#262c38",
+    "value": 11.28,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf card+active",
+    "fg": "#b5bece",
+    "bg": "#262c38",
+    "value": 7.48,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3 auf card+active",
+    "fg": "#97a2b5",
+    "bg": "#262c38",
+    "value": 5.43,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Text/Punkt auf card+active",
+    "fg": "#adb1b8",
+    "bg": "#262c38",
+    "value": 6.51,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Text/Punkt auf card+active",
+    "fg": "#c79be4",
+    "bg": "#262c38",
+    "value": 6.16,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Text/Punkt auf card+active",
+    "fg": "#f4b067",
+    "bg": "#262c38",
+    "value": 7.5,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Text/Punkt auf card+active",
+    "fg": "#7dbf87",
+    "bg": "#262c38",
+    "value": 6.45,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Text/Punkt auf card+active",
+    "fg": "#fc9382",
+    "bg": "#262c38",
+    "value": 6.42,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Text auf card+active",
+    "fg": "#7fb2ee",
+    "bg": "#262c38",
+    "value": 6.34,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-venue Ring/Kern auf card+active",
+    "fg": "#258f7a",
+    "bg": "#262c38",
+    "value": 3.53,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-partner Ring/Kern auf card+active",
+    "fg": "#1f8ba7",
+    "bg": "#262c38",
+    "value": 3.54,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-sponsoren Ring/Kern auf card+active",
+    "fg": "#bc6c83",
+    "bg": "#262c38",
+    "value": 3.74,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-jury Ring/Kern auf card+active",
+    "fg": "#a29547",
+    "bg": "#262c38",
+    "value": 4.62,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-marketing Ring/Kern auf card+active",
+    "fg": "#b6703f",
+    "bg": "#262c38",
+    "value": 3.59,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-gesamtleitung Ring/Kern auf card+active",
+    "fg": "#7d8087",
+    "bg": "#262c38",
+    "value": 3.54,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text auf card2",
+    "fg": "#e2e7ef",
+    "bg": "#1e2532",
+    "value": 12.38,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf card2",
+    "fg": "#b5bece",
+    "bg": "#1e2532",
+    "value": 8.22,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3 auf card2",
+    "fg": "#97a2b5",
+    "bg": "#1e2532",
+    "value": 5.97,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Text/Punkt auf card2",
+    "fg": "#adb1b8",
+    "bg": "#1e2532",
+    "value": 7.14,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Text/Punkt auf card2",
+    "fg": "#c79be4",
+    "bg": "#1e2532",
+    "value": 6.76,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Text/Punkt auf card2",
+    "fg": "#f4b067",
+    "bg": "#1e2532",
+    "value": 8.24,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Text/Punkt auf card2",
+    "fg": "#7dbf87",
+    "bg": "#1e2532",
+    "value": 7.08,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Text/Punkt auf card2",
+    "fg": "#fc9382",
+    "bg": "#1e2532",
+    "value": 7.05,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Text auf card2",
+    "fg": "#7fb2ee",
+    "bg": "#1e2532",
+    "value": 6.96,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-venue Ring/Kern auf card2",
+    "fg": "#258f7a",
+    "bg": "#1e2532",
+    "value": 3.87,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-partner Ring/Kern auf card2",
+    "fg": "#1f8ba7",
+    "bg": "#1e2532",
+    "value": 3.89,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-sponsoren Ring/Kern auf card2",
+    "fg": "#bc6c83",
+    "bg": "#1e2532",
+    "value": 4.11,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-jury Ring/Kern auf card2",
+    "fg": "#a29547",
+    "bg": "#1e2532",
+    "value": 5.07,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-marketing Ring/Kern auf card2",
+    "fg": "#b6703f",
+    "bg": "#1e2532",
+    "value": 3.94,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-gesamtleitung Ring/Kern auf card2",
+    "fg": "#7d8087",
+    "bg": "#1e2532",
+    "value": 3.89,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text auf card2+hover",
+    "fg": "#e2e7ef",
+    "bg": "#262d3a",
+    "value": 11.13,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf card2+hover",
+    "fg": "#b5bece",
+    "bg": "#262d3a",
+    "value": 7.39,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3 auf card2+hover",
+    "fg": "#97a2b5",
+    "bg": "#262d3a",
+    "value": 5.37,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Text/Punkt auf card2+hover",
+    "fg": "#adb1b8",
+    "bg": "#262d3a",
+    "value": 6.42,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Text/Punkt auf card2+hover",
+    "fg": "#c79be4",
+    "bg": "#262d3a",
+    "value": 6.08,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Text/Punkt auf card2+hover",
+    "fg": "#f4b067",
+    "bg": "#262d3a",
+    "value": 7.41,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Text/Punkt auf card2+hover",
+    "fg": "#7dbf87",
+    "bg": "#262d3a",
+    "value": 6.37,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Text/Punkt auf card2+hover",
+    "fg": "#fc9382",
+    "bg": "#262d3a",
+    "value": 6.34,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Text auf card2+hover",
+    "fg": "#7fb2ee",
+    "bg": "#262d3a",
+    "value": 6.26,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-venue Ring/Kern auf card2+hover",
+    "fg": "#258f7a",
+    "bg": "#262d3a",
+    "value": 3.48,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-partner Ring/Kern auf card2+hover",
+    "fg": "#1f8ba7",
+    "bg": "#262d3a",
+    "value": 3.5,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-sponsoren Ring/Kern auf card2+hover",
+    "fg": "#bc6c83",
+    "bg": "#262d3a",
+    "value": 3.69,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-jury Ring/Kern auf card2+hover",
+    "fg": "#a29547",
+    "bg": "#262d3a",
+    "value": 4.56,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-marketing Ring/Kern auf card2+hover",
+    "fg": "#b6703f",
+    "bg": "#262d3a",
+    "value": 3.54,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-gesamtleitung Ring/Kern auf card2+hover",
+    "fg": "#7d8087",
+    "bg": "#262d3a",
+    "value": 3.5,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text auf card2+active",
+    "fg": "#e2e7ef",
+    "bg": "#2c333f",
+    "value": 10.23,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf card2+active",
+    "fg": "#b5bece",
+    "bg": "#2c333f",
+    "value": 6.79,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3 auf card2+active",
+    "fg": "#97a2b5",
+    "bg": "#2c333f",
+    "value": 4.93,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Text/Punkt auf card2+active",
+    "fg": "#adb1b8",
+    "bg": "#2c333f",
+    "value": 5.91,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Text/Punkt auf card2+active",
+    "fg": "#c79be4",
+    "bg": "#2c333f",
+    "value": 5.59,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Text/Punkt auf card2+active",
+    "fg": "#f4b067",
+    "bg": "#2c333f",
+    "value": 6.81,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Text/Punkt auf card2+active",
+    "fg": "#7dbf87",
+    "bg": "#2c333f",
+    "value": 5.85,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Text/Punkt auf card2+active",
+    "fg": "#fc9382",
+    "bg": "#2c333f",
+    "value": 5.83,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Text auf card2+active",
+    "fg": "#7fb2ee",
+    "bg": "#2c333f",
+    "value": 5.75,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-venue Ring/Kern auf card2+active",
+    "fg": "#258f7a",
+    "bg": "#2c333f",
+    "value": 3.2,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-partner Ring/Kern auf card2+active",
+    "fg": "#1f8ba7",
+    "bg": "#2c333f",
+    "value": 3.21,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-sponsoren Ring/Kern auf card2+active",
+    "fg": "#bc6c83",
+    "bg": "#2c333f",
+    "value": 3.4,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-jury Ring/Kern auf card2+active",
+    "fg": "#a29547",
+    "bg": "#2c333f",
+    "value": 4.19,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-marketing Ring/Kern auf card2+active",
+    "fg": "#b6703f",
+    "bg": "#2c333f",
+    "value": 3.25,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-gesamtleitung Ring/Kern auf card2+active",
+    "fg": "#7d8087",
+    "bg": "#2c333f",
+    "value": 3.21,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text auf col",
+    "fg": "#e2e7ef",
+    "bg": "#10151f",
+    "value": 14.72,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf col",
+    "fg": "#b5bece",
+    "bg": "#10151f",
+    "value": 9.77,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3 auf col",
+    "fg": "#97a2b5",
+    "bg": "#10151f",
+    "value": 7.09,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Text/Punkt auf col",
+    "fg": "#adb1b8",
+    "bg": "#10151f",
+    "value": 8.49,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Text/Punkt auf col",
+    "fg": "#c79be4",
+    "bg": "#10151f",
+    "value": 8.04,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Text/Punkt auf col",
+    "fg": "#f4b067",
+    "bg": "#10151f",
+    "value": 9.79,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Text/Punkt auf col",
+    "fg": "#7dbf87",
+    "bg": "#10151f",
+    "value": 8.42,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Text/Punkt auf col",
+    "fg": "#fc9382",
+    "bg": "#10151f",
+    "value": 8.38,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Text auf col",
+    "fg": "#7fb2ee",
+    "bg": "#10151f",
+    "value": 8.27,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-venue Ring/Kern auf col",
+    "fg": "#258f7a",
+    "bg": "#10151f",
+    "value": 4.6,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-partner Ring/Kern auf col",
+    "fg": "#1f8ba7",
+    "bg": "#10151f",
+    "value": 4.62,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-sponsoren Ring/Kern auf col",
+    "fg": "#bc6c83",
+    "bg": "#10151f",
+    "value": 4.88,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-jury Ring/Kern auf col",
+    "fg": "#a29547",
+    "bg": "#10151f",
+    "value": 6.03,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-marketing Ring/Kern auf col",
+    "fg": "#b6703f",
+    "bg": "#10151f",
+    "value": 4.68,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-gesamtleitung Ring/Kern auf col",
+    "fg": "#7d8087",
+    "bg": "#10151f",
+    "value": 4.62,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text auf col+hover",
+    "fg": "#e2e7ef",
+    "bg": "#191e27",
+    "value": 13.46,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf col+hover",
+    "fg": "#b5bece",
+    "bg": "#191e27",
+    "value": 8.93,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3 auf col+hover",
+    "fg": "#97a2b5",
+    "bg": "#191e27",
+    "value": 6.49,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Text/Punkt auf col+hover",
+    "fg": "#adb1b8",
+    "bg": "#191e27",
+    "value": 7.77,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Text/Punkt auf col+hover",
+    "fg": "#c79be4",
+    "bg": "#191e27",
+    "value": 7.35,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Text/Punkt auf col+hover",
+    "fg": "#f4b067",
+    "bg": "#191e27",
+    "value": 8.96,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Text/Punkt auf col+hover",
+    "fg": "#7dbf87",
+    "bg": "#191e27",
+    "value": 7.7,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Text/Punkt auf col+hover",
+    "fg": "#fc9382",
+    "bg": "#191e27",
+    "value": 7.67,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Text auf col+hover",
+    "fg": "#7fb2ee",
+    "bg": "#191e27",
+    "value": 7.57,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-venue Ring/Kern auf col+hover",
+    "fg": "#258f7a",
+    "bg": "#191e27",
+    "value": 4.21,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-partner Ring/Kern auf col+hover",
+    "fg": "#1f8ba7",
+    "bg": "#191e27",
+    "value": 4.23,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-sponsoren Ring/Kern auf col+hover",
+    "fg": "#bc6c83",
+    "bg": "#191e27",
+    "value": 4.47,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-jury Ring/Kern auf col+hover",
+    "fg": "#a29547",
+    "bg": "#191e27",
+    "value": 5.51,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-marketing Ring/Kern auf col+hover",
+    "fg": "#b6703f",
+    "bg": "#191e27",
+    "value": 4.28,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-gesamtleitung Ring/Kern auf col+hover",
+    "fg": "#7d8087",
+    "bg": "#191e27",
+    "value": 4.23,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text auf col+active",
+    "fg": "#e2e7ef",
+    "bg": "#1f242e",
+    "value": 12.53,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf col+active",
+    "fg": "#b5bece",
+    "bg": "#1f242e",
+    "value": 8.31,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3 auf col+active",
+    "fg": "#97a2b5",
+    "bg": "#1f242e",
+    "value": 6.04,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Text/Punkt auf col+active",
+    "fg": "#adb1b8",
+    "bg": "#1f242e",
+    "value": 7.23,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Text/Punkt auf col+active",
+    "fg": "#c79be4",
+    "bg": "#1f242e",
+    "value": 6.84,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Text/Punkt auf col+active",
+    "fg": "#f4b067",
+    "bg": "#1f242e",
+    "value": 8.33,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Text/Punkt auf col+active",
+    "fg": "#7dbf87",
+    "bg": "#1f242e",
+    "value": 7.17,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Text/Punkt auf col+active",
+    "fg": "#fc9382",
+    "bg": "#1f242e",
+    "value": 7.14,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Text auf col+active",
+    "fg": "#7fb2ee",
+    "bg": "#1f242e",
+    "value": 7.04,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-venue Ring/Kern auf col+active",
+    "fg": "#258f7a",
+    "bg": "#1f242e",
+    "value": 3.92,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-partner Ring/Kern auf col+active",
+    "fg": "#1f8ba7",
+    "bg": "#1f242e",
+    "value": 3.93,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-sponsoren Ring/Kern auf col+active",
+    "fg": "#bc6c83",
+    "bg": "#1f242e",
+    "value": 4.16,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-jury Ring/Kern auf col+active",
+    "fg": "#a29547",
+    "bg": "#1f242e",
+    "value": 5.13,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-marketing Ring/Kern auf col+active",
+    "fg": "#b6703f",
+    "bg": "#1f242e",
+    "value": 3.98,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-gesamtleitung Ring/Kern auf col+active",
+    "fg": "#7d8087",
+    "bg": "#1f242e",
+    "value": 3.93,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "field (Eingaberand) auf bg",
+    "fg": "#687284",
+    "bg": "#0e121b",
+    "value": 3.86,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine Linie/Icon/Fokus auf bg",
+    "fg": "#7fb2ee",
+    "bg": "#0e121b",
+    "value": 8.48,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "field (Eingaberand) auf panel",
+    "fg": "#687284",
+    "bg": "#131824",
+    "value": 3.66,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine Linie/Icon/Fokus auf panel",
+    "fg": "#7fb2ee",
+    "bg": "#131824",
+    "value": 8.03,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "field (Eingaberand) auf card",
+    "fg": "#687284",
+    "bg": "#181e2a",
+    "value": 3.44,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine Linie/Icon/Fokus auf card",
+    "fg": "#7fb2ee",
+    "bg": "#181e2a",
+    "value": 7.56,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "field (Eingaberand) auf card2",
+    "fg": "#687284",
+    "bg": "#1e2532",
+    "value": 3.17,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine Linie/Icon/Fokus auf card2",
+    "fg": "#7fb2ee",
+    "bg": "#1e2532",
+    "value": 6.96,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "field (Eingaberand) auf col",
+    "fg": "#687284",
+    "bg": "#10151f",
+    "value": 3.77,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine Linie/Icon/Fokus auf col",
+    "fg": "#7fb2ee",
+    "bg": "#10151f",
+    "value": 8.27,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accText auf acc (Primaerknopf)",
+    "fg": "#ffffff",
+    "bg": "#0f5ba5",
+    "value": 6.86,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "card (Haken) auf st-green (erledigt-Kreis)",
+    "fg": "#181e2a",
+    "bg": "#7dbf87",
+    "value": 7.69,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip gray: st-gray auf 12 % Toenung ueber panel",
+    "fg": "#adb1b8",
+    "bg": "#252a36",
+    "value": 6.67,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip gray: st-gray auf 12 % Toenung ueber panel+hover",
+    "fg": "#adb1b8",
+    "bg": "#2d313d",
+    "value": 6.03,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip gray: st-gray auf 12 % Toenung ueber card",
+    "fg": "#adb1b8",
+    "bg": "#2a303b",
+    "value": 6.16,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip gray: st-gray auf 12 % Toenung ueber card+hover",
+    "fg": "#adb1b8",
+    "bg": "#313742",
+    "value": 5.56,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip gray: st-gray auf 12 % Toenung ueber card2",
+    "fg": "#adb1b8",
+    "bg": "#2f3642",
+    "value": 5.65,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip gray: st-gray auf 12 % Toenung ueber card2+hover",
+    "fg": "#adb1b8",
+    "bg": "#363d49",
+    "value": 5.08,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip gray: st-gray auf 12 % Toenung ueber col",
+    "fg": "#adb1b8",
+    "bg": "#232831",
+    "value": 6.87,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip gray: st-gray auf 12 % Toenung ueber col+hover",
+    "fg": "#adb1b8",
+    "bg": "#2b3038",
+    "value": 6.17,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip blue: st-blue auf 12 % Toenung ueber panel",
+    "fg": "#c79be4",
+    "bg": "#29283b",
+    "value": 6.32,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip blue: st-blue auf 12 % Toenung ueber panel+hover",
+    "fg": "#c79be4",
+    "bg": "#302f42",
+    "value": 5.73,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip blue: st-blue auf 12 % Toenung ueber card",
+    "fg": "#c79be4",
+    "bg": "#2d2d40",
+    "value": 5.92,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip blue: st-blue auf 12 % Toenung ueber card+hover",
+    "fg": "#c79be4",
+    "bg": "#343447",
+    "value": 5.35,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip blue: st-blue auf 12 % Toenung ueber card2",
+    "fg": "#c79be4",
+    "bg": "#323347",
+    "value": 5.43,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip blue: st-blue auf 12 % Toenung ueber card2+hover",
+    "fg": "#c79be4",
+    "bg": "#393a4e",
+    "value": 4.89,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip blue: st-blue auf 12 % Toenung ueber col",
+    "fg": "#c79be4",
+    "bg": "#262537",
+    "value": 6.59,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip blue: st-blue auf 12 % Toenung ueber col+hover",
+    "fg": "#c79be4",
+    "bg": "#2e2d3e",
+    "value": 5.92,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip amber: st-amber auf 14 % Toenung ueber panel",
+    "fg": "#f4b067",
+    "bg": "#332d2d",
+    "value": 7.24,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip amber: st-amber auf 14 % Toenung ueber panel+hover",
+    "fg": "#f4b067",
+    "bg": "#393434",
+    "value": 6.56,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip amber: st-amber auf 14 % Toenung ueber card",
+    "fg": "#f4b067",
+    "bg": "#373233",
+    "value": 6.75,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip amber: st-amber auf 14 % Toenung ueber card+hover",
+    "fg": "#f4b067",
+    "bg": "#3e3939",
+    "value": 6.09,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip amber: st-amber auf 14 % Toenung ueber card2",
+    "fg": "#f4b067",
+    "bg": "#3c3839",
+    "value": 6.19,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip amber: st-amber auf 14 % Toenung ueber card2+hover",
+    "fg": "#f4b067",
+    "bg": "#433f40",
+    "value": 5.56,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip amber: st-amber auf 14 % Toenung ueber col",
+    "fg": "#f4b067",
+    "bg": "#302b29",
+    "value": 7.49,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip amber: st-amber auf 14 % Toenung ueber col+hover",
+    "fg": "#f4b067",
+    "bg": "#383230",
+    "value": 6.75,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip green: st-green auf 12 % Toenung ueber panel",
+    "fg": "#7dbf87",
+    "bg": "#202c30",
+    "value": 6.61,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip green: st-green auf 12 % Toenung ueber panel+hover",
+    "fg": "#7dbf87",
+    "bg": "#273337",
+    "value": 5.99,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip green: st-green auf 12 % Toenung ueber card",
+    "fg": "#7dbf87",
+    "bg": "#243135",
+    "value": 6.18,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip green: st-green auf 12 % Toenung ueber card+hover",
+    "fg": "#7dbf87",
+    "bg": "#2b383c",
+    "value": 5.58,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip green: st-green auf 12 % Toenung ueber card2",
+    "fg": "#7dbf87",
+    "bg": "#29373c",
+    "value": 5.67,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip green: st-green auf 12 % Toenung ueber card2+hover",
+    "fg": "#7dbf87",
+    "bg": "#303f43",
+    "value": 5.04,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip green: st-green auf 12 % Toenung ueber col",
+    "fg": "#7dbf87",
+    "bg": "#1d292b",
+    "value": 6.89,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip green: st-green auf 12 % Toenung ueber col+hover",
+    "fg": "#7dbf87",
+    "bg": "#253133",
+    "value": 6.18,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip ueberfaellig: st-red auf 10 % + Streifen 8 % ueber panel (Spitze)",
+    "fg": "#fc9382",
+    "bg": "#3b2d34",
+    "value": 5.98,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip ueberfaellig: st-red auf 10 % + Streifen 8 % ueber panel+hover (Spitze)",
+    "fg": "#fc9382",
+    "bg": "#42343b",
+    "value": 5.39,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip ueberfaellig: st-red auf 10 % + Streifen 8 % ueber card (Spitze)",
+    "fg": "#fc9382",
+    "bg": "#3f3239",
+    "value": 5.58,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip ueberfaellig: st-red auf 10 % + Streifen 8 % ueber card+hover (Spitze)",
+    "fg": "#fc9382",
+    "bg": "#463940",
+    "value": 5.02,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip ueberfaellig: st-red auf 10 % + Streifen 8 % ueber card2 (Spitze)",
+    "fg": "#fc9382",
+    "bg": "#443840",
+    "value": 5.11,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip ueberfaellig: st-red auf 10 % + Streifen 8 % ueber card2+hover (Spitze)",
+    "fg": "#fc9382",
+    "bg": "#4a3e46",
+    "value": 4.66,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip ueberfaellig: st-red auf 10 % + Streifen 8 % ueber col (Spitze)",
+    "fg": "#fc9382",
+    "bg": "#392b30",
+    "value": 6.17,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip ueberfaellig: st-red auf 10 % + Streifen 8 % ueber col+hover (Spitze)",
+    "fg": "#fc9382",
+    "bg": "#403237",
+    "value": 5.57,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip heute: accText auf acc (ohne Streifen)",
+    "fg": "#ffffff",
+    "bg": "#0f5ba5",
+    "value": 6.86,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip heute: accText auf acc + 16 % Streifen (Spitze)",
+    "fg": "#ffffff",
+    "bg": "#3575b3",
+    "value": 4.83,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Blendung: text auf panel (Ziel 13-15)",
+    "fg": "#e2e7ef",
+    "bg": "#131824",
+    "value": 14.28,
+    "min": 13,
+    "max": 15,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Blendung: text auf bg (max 15,5)",
+    "fg": "#e2e7ef",
+    "bg": "#0e121b",
+    "value": 15.08,
+    "min": 4.5,
+    "max": 15.5,
+    "ok": true
+   },
+   {
+    "mode": "beide",
+    "what": "Initialen #111111 auf Avatar Maxi S",
+    "fg": "#111111",
+    "bg": "#dbd6ff",
+    "value": 13.56,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "beide",
+    "what": "Initialen #111111 auf Avatar Maxi D",
+    "fg": "#111111",
+    "bg": "#ffddd4",
+    "value": 14.88,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "beide",
+    "what": "Initialen #111111 auf Avatar Manu",
+    "fg": "#111111",
+    "bg": "#c4ffe4",
+    "value": 16.88,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "beide",
+    "what": "Initialen #111111 auf Avatar Tim",
+    "fg": "#111111",
+    "bg": "#fff2bc",
+    "value": 16.8,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "beide",
+    "what": "Initialen #111111 auf Avatar Kilian",
+    "fg": "#111111",
+    "bg": "#bbeaff",
+    "value": 14.68,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "login",
+    "what": "text auf Schimmer-Spitze + Mausschein",
+    "fg": "#e2e7ef",
+    "bg": "#122132",
+    "value": 13.12,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "login",
+    "what": "text3 auf Schimmer-Spitze + Mausschein",
+    "fg": "#97a2b5",
+    "bg": "#122132",
+    "value": 6.32,
+    "min": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "icon",
+    "what": "Strich auf Icon-Hintergrund (Grafik)",
+    "fg": "#4f8fd9",
+    "bg": "#0e121b",
+    "value": 5.59,
+    "min": 3,
+    "ok": true
+   },
+   {
+    "mode": "icon",
+    "what": "Schrift auf Icon-Hintergrund",
+    "fg": "#e2e7ef",
+    "bg": "#0e121b",
+    "value": 15.08,
+    "min": 4.5,
+    "ok": true
+   }
+  ],
+  "apca": [
+   {
+    "mode": "light",
+    "what": "text (Fliesstext 13,5-14px/400) auf bg",
+    "fg": "#161d2b",
+    "bg": "#edf0f5",
+    "Lc": 94.7,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf bg",
+    "fg": "#465063",
+    "bg": "#edf0f5",
+    "Lc": 79,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3/Label auf bg",
+    "fg": "#5a6477",
+    "bg": "#edf0f5",
+    "Lc": 70.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Label auf bg",
+    "fg": "#474a52",
+    "bg": "#edf0f5",
+    "Lc": 81.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Label auf bg",
+    "fg": "#643b9b",
+    "bg": "#edf0f5",
+    "Lc": 78.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Label auf bg",
+    "fg": "#7e4801",
+    "bg": "#edf0f5",
+    "Lc": 76.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Label auf bg",
+    "fg": "#206734",
+    "bg": "#edf0f5",
+    "Lc": 74.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Label auf bg",
+    "fg": "#a32730",
+    "bg": "#edf0f5",
+    "Lc": 74.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Label (@, heute) auf bg",
+    "fg": "#0f5ba5",
+    "bg": "#edf0f5",
+    "Lc": 74.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text (Fliesstext 13,5-14px/400) auf bg+hover",
+    "fg": "#161d2b",
+    "bg": "#e5e8ed",
+    "Lc": 90,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf bg+hover",
+    "fg": "#465063",
+    "bg": "#e5e8ed",
+    "Lc": 74.3,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3/Label auf bg+hover",
+    "fg": "#5a6477",
+    "bg": "#e5e8ed",
+    "Lc": 66,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Label auf bg+hover",
+    "fg": "#474a52",
+    "bg": "#e5e8ed",
+    "Lc": 76.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Label auf bg+hover",
+    "fg": "#643b9b",
+    "bg": "#e5e8ed",
+    "Lc": 73.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Label auf bg+hover",
+    "fg": "#7e4801",
+    "bg": "#e5e8ed",
+    "Lc": 71.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Label auf bg+hover",
+    "fg": "#206734",
+    "bg": "#e5e8ed",
+    "Lc": 69.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Label auf bg+hover",
+    "fg": "#a32730",
+    "bg": "#e5e8ed",
+    "Lc": 70.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Label (@, heute) auf bg+hover",
+    "fg": "#0f5ba5",
+    "bg": "#e5e8ed",
+    "Lc": 69.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text (Fliesstext 13,5-14px/400) auf bg+active",
+    "fg": "#161d2b",
+    "bg": "#e0e3e8",
+    "Lc": 87.1,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf bg+active",
+    "fg": "#465063",
+    "bg": "#e0e3e8",
+    "Lc": 71.4,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3/Label auf bg+active",
+    "fg": "#5a6477",
+    "bg": "#e0e3e8",
+    "Lc": 63.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Label auf bg+active",
+    "fg": "#474a52",
+    "bg": "#e0e3e8",
+    "Lc": 73.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Label auf bg+active",
+    "fg": "#643b9b",
+    "bg": "#e0e3e8",
+    "Lc": 70.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Label auf bg+active",
+    "fg": "#7e4801",
+    "bg": "#e0e3e8",
+    "Lc": 68.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Label auf bg+active",
+    "fg": "#206734",
+    "bg": "#e0e3e8",
+    "Lc": 66.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Label auf bg+active",
+    "fg": "#a32730",
+    "bg": "#e0e3e8",
+    "Lc": 67.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Label (@, heute) auf bg+active",
+    "fg": "#0f5ba5",
+    "bg": "#e0e3e8",
+    "Lc": 66.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text (Fliesstext 13,5-14px/400) auf panel",
+    "fg": "#161d2b",
+    "bg": "#f7f8fb",
+    "Lc": 99.6,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf panel",
+    "fg": "#465063",
+    "bg": "#f7f8fb",
+    "Lc": 83.9,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3/Label auf panel",
+    "fg": "#5a6477",
+    "bg": "#f7f8fb",
+    "Lc": 75.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Label auf panel",
+    "fg": "#474a52",
+    "bg": "#f7f8fb",
+    "Lc": 86.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Label auf panel",
+    "fg": "#643b9b",
+    "bg": "#f7f8fb",
+    "Lc": 83,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Label auf panel",
+    "fg": "#7e4801",
+    "bg": "#f7f8fb",
+    "Lc": 81.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Label auf panel",
+    "fg": "#206734",
+    "bg": "#f7f8fb",
+    "Lc": 79.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Label auf panel",
+    "fg": "#a32730",
+    "bg": "#f7f8fb",
+    "Lc": 79.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Label (@, heute) auf panel",
+    "fg": "#0f5ba5",
+    "bg": "#f7f8fb",
+    "Lc": 79,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text (Fliesstext 13,5-14px/400) auf panel+hover",
+    "fg": "#161d2b",
+    "bg": "#eff0f3",
+    "Lc": 94.9,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf panel+hover",
+    "fg": "#465063",
+    "bg": "#eff0f3",
+    "Lc": 79.2,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3/Label auf panel+hover",
+    "fg": "#5a6477",
+    "bg": "#eff0f3",
+    "Lc": 70.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Label auf panel+hover",
+    "fg": "#474a52",
+    "bg": "#eff0f3",
+    "Lc": 81.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Label auf panel+hover",
+    "fg": "#643b9b",
+    "bg": "#eff0f3",
+    "Lc": 78.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Label auf panel+hover",
+    "fg": "#7e4801",
+    "bg": "#eff0f3",
+    "Lc": 76.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Label auf panel+hover",
+    "fg": "#206734",
+    "bg": "#eff0f3",
+    "Lc": 74.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Label auf panel+hover",
+    "fg": "#a32730",
+    "bg": "#eff0f3",
+    "Lc": 75,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Label (@, heute) auf panel+hover",
+    "fg": "#0f5ba5",
+    "bg": "#eff0f3",
+    "Lc": 74.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text (Fliesstext 13,5-14px/400) auf panel+active",
+    "fg": "#161d2b",
+    "bg": "#e9eaee",
+    "Lc": 91.4,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf panel+active",
+    "fg": "#465063",
+    "bg": "#e9eaee",
+    "Lc": 75.7,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3/Label auf panel+active",
+    "fg": "#5a6477",
+    "bg": "#e9eaee",
+    "Lc": 67.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Label auf panel+active",
+    "fg": "#474a52",
+    "bg": "#e9eaee",
+    "Lc": 77.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Label auf panel+active",
+    "fg": "#643b9b",
+    "bg": "#e9eaee",
+    "Lc": 74.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Label auf panel+active",
+    "fg": "#7e4801",
+    "bg": "#e9eaee",
+    "Lc": 73.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Label auf panel+active",
+    "fg": "#206734",
+    "bg": "#e9eaee",
+    "Lc": 71.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Label auf panel+active",
+    "fg": "#a32730",
+    "bg": "#e9eaee",
+    "Lc": 71.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Label (@, heute) auf panel+active",
+    "fg": "#0f5ba5",
+    "bg": "#e9eaee",
+    "Lc": 70.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text (Fliesstext 13,5-14px/400) auf card",
+    "fg": "#161d2b",
+    "bg": "#ffffff",
+    "Lc": 103.8,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf card",
+    "fg": "#465063",
+    "bg": "#ffffff",
+    "Lc": 88.1,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3/Label auf card",
+    "fg": "#5a6477",
+    "bg": "#ffffff",
+    "Lc": 79.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Label auf card",
+    "fg": "#474a52",
+    "bg": "#ffffff",
+    "Lc": 90.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Label auf card",
+    "fg": "#643b9b",
+    "bg": "#ffffff",
+    "Lc": 87.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Label auf card",
+    "fg": "#7e4801",
+    "bg": "#ffffff",
+    "Lc": 85.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Label auf card",
+    "fg": "#206734",
+    "bg": "#ffffff",
+    "Lc": 83.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Label auf card",
+    "fg": "#a32730",
+    "bg": "#ffffff",
+    "Lc": 83.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Label (@, heute) auf card",
+    "fg": "#0f5ba5",
+    "bg": "#ffffff",
+    "Lc": 83.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text (Fliesstext 13,5-14px/400) auf card+hover",
+    "fg": "#161d2b",
+    "bg": "#f7f7f7",
+    "Lc": 99,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf card+hover",
+    "fg": "#465063",
+    "bg": "#f7f7f7",
+    "Lc": 83.3,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3/Label auf card+hover",
+    "fg": "#5a6477",
+    "bg": "#f7f7f7",
+    "Lc": 75,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Label auf card+hover",
+    "fg": "#474a52",
+    "bg": "#f7f7f7",
+    "Lc": 85.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Label auf card+hover",
+    "fg": "#643b9b",
+    "bg": "#f7f7f7",
+    "Lc": 82.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Label auf card+hover",
+    "fg": "#7e4801",
+    "bg": "#f7f7f7",
+    "Lc": 80.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Label auf card+hover",
+    "fg": "#206734",
+    "bg": "#f7f7f7",
+    "Lc": 78.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Label auf card+hover",
+    "fg": "#a32730",
+    "bg": "#f7f7f7",
+    "Lc": 79.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Label (@, heute) auf card+hover",
+    "fg": "#0f5ba5",
+    "bg": "#f7f7f7",
+    "Lc": 78.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text (Fliesstext 13,5-14px/400) auf card+active",
+    "fg": "#161d2b",
+    "bg": "#f1f1f1",
+    "Lc": 95.4,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf card+active",
+    "fg": "#465063",
+    "bg": "#f1f1f1",
+    "Lc": 79.8,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3/Label auf card+active",
+    "fg": "#5a6477",
+    "bg": "#f1f1f1",
+    "Lc": 71.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Label auf card+active",
+    "fg": "#474a52",
+    "bg": "#f1f1f1",
+    "Lc": 82,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Label auf card+active",
+    "fg": "#643b9b",
+    "bg": "#f1f1f1",
+    "Lc": 78.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Label auf card+active",
+    "fg": "#7e4801",
+    "bg": "#f1f1f1",
+    "Lc": 77.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Label auf card+active",
+    "fg": "#206734",
+    "bg": "#f1f1f1",
+    "Lc": 75.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Label auf card+active",
+    "fg": "#a32730",
+    "bg": "#f1f1f1",
+    "Lc": 75.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Label (@, heute) auf card+active",
+    "fg": "#0f5ba5",
+    "bg": "#f1f1f1",
+    "Lc": 74.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text (Fliesstext 13,5-14px/400) auf card2",
+    "fg": "#161d2b",
+    "bg": "#f3f5f9",
+    "Lc": 97.7,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf card2",
+    "fg": "#465063",
+    "bg": "#f3f5f9",
+    "Lc": 82,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3/Label auf card2",
+    "fg": "#5a6477",
+    "bg": "#f3f5f9",
+    "Lc": 73.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Label auf card2",
+    "fg": "#474a52",
+    "bg": "#f3f5f9",
+    "Lc": 84.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Label auf card2",
+    "fg": "#643b9b",
+    "bg": "#f3f5f9",
+    "Lc": 81.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Label auf card2",
+    "fg": "#7e4801",
+    "bg": "#f3f5f9",
+    "Lc": 79.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Label auf card2",
+    "fg": "#206734",
+    "bg": "#f3f5f9",
+    "Lc": 77.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Label auf card2",
+    "fg": "#a32730",
+    "bg": "#f3f5f9",
+    "Lc": 77.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Label (@, heute) auf card2",
+    "fg": "#0f5ba5",
+    "bg": "#f3f5f9",
+    "Lc": 77.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text (Fliesstext 13,5-14px/400) auf card2+hover",
+    "fg": "#161d2b",
+    "bg": "#ebedf1",
+    "Lc": 93,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf card2+hover",
+    "fg": "#465063",
+    "bg": "#ebedf1",
+    "Lc": 77.3,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3/Label auf card2+hover",
+    "fg": "#5a6477",
+    "bg": "#ebedf1",
+    "Lc": 69,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Label auf card2+hover",
+    "fg": "#474a52",
+    "bg": "#ebedf1",
+    "Lc": 79.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Label auf card2+hover",
+    "fg": "#643b9b",
+    "bg": "#ebedf1",
+    "Lc": 76.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Label auf card2+hover",
+    "fg": "#7e4801",
+    "bg": "#ebedf1",
+    "Lc": 74.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Label auf card2+hover",
+    "fg": "#206734",
+    "bg": "#ebedf1",
+    "Lc": 72.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Label auf card2+hover",
+    "fg": "#a32730",
+    "bg": "#ebedf1",
+    "Lc": 73.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Label (@, heute) auf card2+hover",
+    "fg": "#0f5ba5",
+    "bg": "#ebedf1",
+    "Lc": 72.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text (Fliesstext 13,5-14px/400) auf card2+active",
+    "fg": "#161d2b",
+    "bg": "#e5e7ec",
+    "Lc": 89.6,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf card2+active",
+    "fg": "#465063",
+    "bg": "#e5e7ec",
+    "Lc": 73.9,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3/Label auf card2+active",
+    "fg": "#5a6477",
+    "bg": "#e5e7ec",
+    "Lc": 65.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Label auf card2+active",
+    "fg": "#474a52",
+    "bg": "#e5e7ec",
+    "Lc": 76.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Label auf card2+active",
+    "fg": "#643b9b",
+    "bg": "#e5e7ec",
+    "Lc": 72.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Label auf card2+active",
+    "fg": "#7e4801",
+    "bg": "#e5e7ec",
+    "Lc": 71.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Label auf card2+active",
+    "fg": "#206734",
+    "bg": "#e5e7ec",
+    "Lc": 69.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Label auf card2+active",
+    "fg": "#a32730",
+    "bg": "#e5e7ec",
+    "Lc": 69.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Label (@, heute) auf card2+active",
+    "fg": "#0f5ba5",
+    "bg": "#e5e7ec",
+    "Lc": 68.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text (Fliesstext 13,5-14px/400) auf col",
+    "fg": "#161d2b",
+    "bg": "#eef1f6",
+    "Lc": 95.3,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf col",
+    "fg": "#465063",
+    "bg": "#eef1f6",
+    "Lc": 79.6,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3/Label auf col",
+    "fg": "#5a6477",
+    "bg": "#eef1f6",
+    "Lc": 71.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Label auf col",
+    "fg": "#474a52",
+    "bg": "#eef1f6",
+    "Lc": 81.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Label auf col",
+    "fg": "#643b9b",
+    "bg": "#eef1f6",
+    "Lc": 78.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Label auf col",
+    "fg": "#7e4801",
+    "bg": "#eef1f6",
+    "Lc": 77.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Label auf col",
+    "fg": "#206734",
+    "bg": "#eef1f6",
+    "Lc": 75,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Label auf col",
+    "fg": "#a32730",
+    "bg": "#eef1f6",
+    "Lc": 75.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Label (@, heute) auf col",
+    "fg": "#0f5ba5",
+    "bg": "#eef1f6",
+    "Lc": 74.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text (Fliesstext 13,5-14px/400) auf col+hover",
+    "fg": "#161d2b",
+    "bg": "#e6e9ee",
+    "Lc": 90.6,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf col+hover",
+    "fg": "#465063",
+    "bg": "#e6e9ee",
+    "Lc": 74.9,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3/Label auf col+hover",
+    "fg": "#5a6477",
+    "bg": "#e6e9ee",
+    "Lc": 66.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Label auf col+hover",
+    "fg": "#474a52",
+    "bg": "#e6e9ee",
+    "Lc": 77.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Label auf col+hover",
+    "fg": "#643b9b",
+    "bg": "#e6e9ee",
+    "Lc": 74,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Label auf col+hover",
+    "fg": "#7e4801",
+    "bg": "#e6e9ee",
+    "Lc": 72.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Label auf col+hover",
+    "fg": "#206734",
+    "bg": "#e6e9ee",
+    "Lc": 70.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Label auf col+hover",
+    "fg": "#a32730",
+    "bg": "#e6e9ee",
+    "Lc": 70.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Label (@, heute) auf col+hover",
+    "fg": "#0f5ba5",
+    "bg": "#e6e9ee",
+    "Lc": 70,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text (Fliesstext 13,5-14px/400) auf col+active",
+    "fg": "#161d2b",
+    "bg": "#e1e4e9",
+    "Lc": 87.7,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text2 auf col+active",
+    "fg": "#465063",
+    "bg": "#e1e4e9",
+    "Lc": 72,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text3/Label auf col+active",
+    "fg": "#5a6477",
+    "bg": "#e1e4e9",
+    "Lc": 63.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-gray als Label auf col+active",
+    "fg": "#474a52",
+    "bg": "#e1e4e9",
+    "Lc": 74.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-blue als Label auf col+active",
+    "fg": "#643b9b",
+    "bg": "#e1e4e9",
+    "Lc": 71.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-amber als Label auf col+active",
+    "fg": "#7e4801",
+    "bg": "#e1e4e9",
+    "Lc": 69.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-green als Label auf col+active",
+    "fg": "#206734",
+    "bg": "#e1e4e9",
+    "Lc": 67.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "st-red als Label auf col+active",
+    "fg": "#a32730",
+    "bg": "#e1e4e9",
+    "Lc": 67.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accLine als Label (@, heute) auf col+active",
+    "fg": "#0f5ba5",
+    "bg": "#e1e4e9",
+    "Lc": 67.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "accText auf acc (Knopftext)",
+    "fg": "#ffffff",
+    "bg": "#0f5ba5",
+    "Lc": -88.2,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip gray: st-gray auf 8 % Toenung ueber panel",
+    "fg": "#474a52",
+    "bg": "#e9eaed",
+    "Lc": 77.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip gray: st-gray auf 8 % Toenung ueber panel+hover",
+    "fg": "#474a52",
+    "bg": "#e2e3e6",
+    "Lc": 73.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip gray: st-gray auf 8 % Toenung ueber card",
+    "fg": "#474a52",
+    "bg": "#f0f1f1",
+    "Lc": 81.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip gray: st-gray auf 8 % Toenung ueber card+hover",
+    "fg": "#474a52",
+    "bg": "#e9e9ea",
+    "Lc": 77.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip gray: st-gray auf 8 % Toenung ueber card2",
+    "fg": "#474a52",
+    "bg": "#e5e7ec",
+    "Lc": 76.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip gray: st-gray auf 8 % Toenung ueber card2+hover",
+    "fg": "#474a52",
+    "bg": "#dee0e4",
+    "Lc": 72,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip gray: st-gray auf 8 % Toenung ueber col",
+    "fg": "#474a52",
+    "bg": "#e1e4e9",
+    "Lc": 74.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip gray: st-gray auf 8 % Toenung ueber col+hover",
+    "fg": "#474a52",
+    "bg": "#d9dce2",
+    "Lc": 69.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip blue: st-blue auf 8 % Toenung ueber panel",
+    "fg": "#643b9b",
+    "bg": "#ebe9f3",
+    "Lc": 74.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip blue: st-blue auf 8 % Toenung ueber panel+hover",
+    "fg": "#643b9b",
+    "bg": "#e4e2ec",
+    "Lc": 70.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip blue: st-blue auf 8 % Toenung ueber card",
+    "fg": "#643b9b",
+    "bg": "#f3eff7",
+    "Lc": 78.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip blue: st-blue auf 8 % Toenung ueber card+hover",
+    "fg": "#643b9b",
+    "bg": "#ebe8f0",
+    "Lc": 74.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip blue: st-blue auf 8 % Toenung ueber card2",
+    "fg": "#643b9b",
+    "bg": "#e8e6f1",
+    "Lc": 73.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip blue: st-blue auf 8 % Toenung ueber card2+hover",
+    "fg": "#643b9b",
+    "bg": "#e0dfea",
+    "Lc": 69,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip blue: st-blue auf 8 % Toenung ueber col",
+    "fg": "#643b9b",
+    "bg": "#e3e2ef",
+    "Lc": 70.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip blue: st-blue auf 8 % Toenung ueber col+hover",
+    "fg": "#643b9b",
+    "bg": "#dcdbe7",
+    "Lc": 66.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip amber: st-amber auf 8 % Toenung ueber panel",
+    "fg": "#7e4801",
+    "bg": "#edeae7",
+    "Lc": 73.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip amber: st-amber auf 8 % Toenung ueber panel+hover",
+    "fg": "#7e4801",
+    "bg": "#e6e3e0",
+    "Lc": 69.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip amber: st-amber auf 8 % Toenung ueber card",
+    "fg": "#7e4801",
+    "bg": "#f5f0eb",
+    "Lc": 77.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip amber: st-amber auf 8 % Toenung ueber card+hover",
+    "fg": "#7e4801",
+    "bg": "#ede9e3",
+    "Lc": 72.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip amber: st-amber auf 8 % Toenung ueber card2",
+    "fg": "#7e4801",
+    "bg": "#eae7e5",
+    "Lc": 71.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip amber: st-amber auf 8 % Toenung ueber card2+hover",
+    "fg": "#7e4801",
+    "bg": "#e2e0de",
+    "Lc": 67.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip amber: st-amber auf 8 % Toenung ueber col",
+    "fg": "#7e4801",
+    "bg": "#e5e3e2",
+    "Lc": 69.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip amber: st-amber auf 8 % Toenung ueber col+hover",
+    "fg": "#7e4801",
+    "bg": "#dedcdb",
+    "Lc": 65.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip green: st-green auf 8 % Toenung ueber panel",
+    "fg": "#206734",
+    "bg": "#e6eceb",
+    "Lc": 71.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip green: st-green auf 8 % Toenung ueber panel+hover",
+    "fg": "#206734",
+    "bg": "#dee5e4",
+    "Lc": 67.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip green: st-green auf 8 % Toenung ueber card",
+    "fg": "#206734",
+    "bg": "#edf3ef",
+    "Lc": 75.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip green: st-green auf 8 % Toenung ueber card+hover",
+    "fg": "#206734",
+    "bg": "#e6ebe7",
+    "Lc": 70.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip green: st-green auf 8 % Toenung ueber card2",
+    "fg": "#206734",
+    "bg": "#e2eae9",
+    "Lc": 70,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip green: st-green auf 8 % Toenung ueber card2+hover",
+    "fg": "#206734",
+    "bg": "#dbe2e2",
+    "Lc": 65.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip green: st-green auf 8 % Toenung ueber col",
+    "fg": "#206734",
+    "bg": "#dee6e6",
+    "Lc": 67.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip green: st-green auf 8 % Toenung ueber col+hover",
+    "fg": "#206734",
+    "bg": "#d6dfdf",
+    "Lc": 63.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip ueberfaellig: st-red auf 6 % + Streifen 10 % ueber panel (Spitze)",
+    "fg": "#a32730",
+    "bg": "#ead7dc",
+    "Lc": 63.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip ueberfaellig: st-red auf 6 % + Streifen 10 % ueber panel+hover (Spitze)",
+    "fg": "#a32730",
+    "bg": "#e3d1d5",
+    "Lc": 59.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip ueberfaellig: st-red auf 6 % + Streifen 10 % ueber card (Spitze)",
+    "fg": "#a32730",
+    "bg": "#f0dee0",
+    "Lc": 66.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip ueberfaellig: st-red auf 6 % + Streifen 10 % ueber card+hover (Spitze)",
+    "fg": "#a32730",
+    "bg": "#ead7d8",
+    "Lc": 63,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip ueberfaellig: st-red auf 6 % + Streifen 10 % ueber card2 (Spitze)",
+    "fg": "#a32730",
+    "bg": "#e7d6da",
+    "Lc": 62.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip ueberfaellig: st-red auf 6 % + Streifen 10 % ueber card2+hover (Spitze)",
+    "fg": "#a32730",
+    "bg": "#e0ced3",
+    "Lc": 57.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip ueberfaellig: st-red auf 6 % + Streifen 10 % ueber col (Spitze)",
+    "fg": "#a32730",
+    "bg": "#e3d2d7",
+    "Lc": 60.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip ueberfaellig: st-red auf 6 % + Streifen 10 % ueber col+hover (Spitze)",
+    "fg": "#a32730",
+    "bg": "#dccbd1",
+    "Lc": 56.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Chip heute: accText auf Streifen-Spitze",
+    "fg": "#ffffff",
+    "bg": "#3575b3",
+    "Lc": -78.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text (Fliesstext 13,5-14px/400) auf bg",
+    "fg": "#e2e7ef",
+    "bg": "#0e121b",
+    "Lc": -91.4,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf bg",
+    "fg": "#b5bece",
+    "bg": "#0e121b",
+    "Lc": -66.5,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3/Label auf bg",
+    "fg": "#97a2b5",
+    "bg": "#0e121b",
+    "Lc": -50.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Label auf bg",
+    "fg": "#adb1b8",
+    "bg": "#0e121b",
+    "Lc": -59.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Label auf bg",
+    "fg": "#c79be4",
+    "bg": "#0e121b",
+    "Lc": -56.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Label auf bg",
+    "fg": "#f4b067",
+    "bg": "#0e121b",
+    "Lc": -66.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Label auf bg",
+    "fg": "#7dbf87",
+    "bg": "#0e121b",
+    "Lc": -59,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Label auf bg",
+    "fg": "#fc9382",
+    "bg": "#0e121b",
+    "Lc": -59.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Label (@, heute) auf bg",
+    "fg": "#7fb2ee",
+    "bg": "#0e121b",
+    "Lc": -58.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text (Fliesstext 13,5-14px/400) auf bg+hover",
+    "fg": "#e2e7ef",
+    "bg": "#171b24",
+    "Lc": -90.5,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf bg+hover",
+    "fg": "#b5bece",
+    "bg": "#171b24",
+    "Lc": -65.6,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3/Label auf bg+hover",
+    "fg": "#97a2b5",
+    "bg": "#171b24",
+    "Lc": -50.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Label auf bg+hover",
+    "fg": "#adb1b8",
+    "bg": "#171b24",
+    "Lc": -58.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Label auf bg+hover",
+    "fg": "#c79be4",
+    "bg": "#171b24",
+    "Lc": -55.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Label auf bg+hover",
+    "fg": "#f4b067",
+    "bg": "#171b24",
+    "Lc": -66,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Label auf bg+hover",
+    "fg": "#7dbf87",
+    "bg": "#171b24",
+    "Lc": -58.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Label auf bg+hover",
+    "fg": "#fc9382",
+    "bg": "#171b24",
+    "Lc": -58.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Label (@, heute) auf bg+hover",
+    "fg": "#7fb2ee",
+    "bg": "#171b24",
+    "Lc": -57.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text (Fliesstext 13,5-14px/400) auf bg+active",
+    "fg": "#e2e7ef",
+    "bg": "#1d212a",
+    "Lc": -89.7,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf bg+active",
+    "fg": "#b5bece",
+    "bg": "#1d212a",
+    "Lc": -64.8,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3/Label auf bg+active",
+    "fg": "#97a2b5",
+    "bg": "#1d212a",
+    "Lc": -49.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Label auf bg+active",
+    "fg": "#adb1b8",
+    "bg": "#1d212a",
+    "Lc": -57.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Label auf bg+active",
+    "fg": "#c79be4",
+    "bg": "#1d212a",
+    "Lc": -55.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Label auf bg+active",
+    "fg": "#f4b067",
+    "bg": "#1d212a",
+    "Lc": -65.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Label auf bg+active",
+    "fg": "#7dbf87",
+    "bg": "#1d212a",
+    "Lc": -57.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Label auf bg+active",
+    "fg": "#fc9382",
+    "bg": "#1d212a",
+    "Lc": -57.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Label (@, heute) auf bg+active",
+    "fg": "#7fb2ee",
+    "bg": "#1d212a",
+    "Lc": -56.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text (Fliesstext 13,5-14px/400) auf panel",
+    "fg": "#e2e7ef",
+    "bg": "#131824",
+    "Lc": -90.9,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf panel",
+    "fg": "#b5bece",
+    "bg": "#131824",
+    "Lc": -66,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3/Label auf panel",
+    "fg": "#97a2b5",
+    "bg": "#131824",
+    "Lc": -50.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Label auf panel",
+    "fg": "#adb1b8",
+    "bg": "#131824",
+    "Lc": -58.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Label auf panel",
+    "fg": "#c79be4",
+    "bg": "#131824",
+    "Lc": -56.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Label auf panel",
+    "fg": "#f4b067",
+    "bg": "#131824",
+    "Lc": -66.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Label auf panel",
+    "fg": "#7dbf87",
+    "bg": "#131824",
+    "Lc": -58.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Label auf panel",
+    "fg": "#fc9382",
+    "bg": "#131824",
+    "Lc": -58.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Label (@, heute) auf panel",
+    "fg": "#7fb2ee",
+    "bg": "#131824",
+    "Lc": -57.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text (Fliesstext 13,5-14px/400) auf panel+hover",
+    "fg": "#e2e7ef",
+    "bg": "#1b202c",
+    "Lc": -89.9,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf panel+hover",
+    "fg": "#b5bece",
+    "bg": "#1b202c",
+    "Lc": -65,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3/Label auf panel+hover",
+    "fg": "#97a2b5",
+    "bg": "#1b202c",
+    "Lc": -49.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Label auf panel+hover",
+    "fg": "#adb1b8",
+    "bg": "#1b202c",
+    "Lc": -57.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Label auf panel+hover",
+    "fg": "#c79be4",
+    "bg": "#1b202c",
+    "Lc": -55.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Label auf panel+hover",
+    "fg": "#f4b067",
+    "bg": "#1b202c",
+    "Lc": -65.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Label auf panel+hover",
+    "fg": "#7dbf87",
+    "bg": "#1b202c",
+    "Lc": -57.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Label auf panel+hover",
+    "fg": "#fc9382",
+    "bg": "#1b202c",
+    "Lc": -57.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Label (@, heute) auf panel+hover",
+    "fg": "#7fb2ee",
+    "bg": "#1b202c",
+    "Lc": -56.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text (Fliesstext 13,5-14px/400) auf panel+active",
+    "fg": "#e2e7ef",
+    "bg": "#222732",
+    "Lc": -88.7,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf panel+active",
+    "fg": "#b5bece",
+    "bg": "#222732",
+    "Lc": -63.8,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3/Label auf panel+active",
+    "fg": "#97a2b5",
+    "bg": "#222732",
+    "Lc": -48.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Label auf panel+active",
+    "fg": "#adb1b8",
+    "bg": "#222732",
+    "Lc": -56.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Label auf panel+active",
+    "fg": "#c79be4",
+    "bg": "#222732",
+    "Lc": -54.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Label auf panel+active",
+    "fg": "#f4b067",
+    "bg": "#222732",
+    "Lc": -64.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Label auf panel+active",
+    "fg": "#7dbf87",
+    "bg": "#222732",
+    "Lc": -56.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Label auf panel+active",
+    "fg": "#fc9382",
+    "bg": "#222732",
+    "Lc": -56.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Label (@, heute) auf panel+active",
+    "fg": "#7fb2ee",
+    "bg": "#222732",
+    "Lc": -55.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text (Fliesstext 13,5-14px/400) auf card",
+    "fg": "#e2e7ef",
+    "bg": "#181e2a",
+    "Lc": -90.2,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf card",
+    "fg": "#b5bece",
+    "bg": "#181e2a",
+    "Lc": -65.3,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3/Label auf card",
+    "fg": "#97a2b5",
+    "bg": "#181e2a",
+    "Lc": -49.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Label auf card",
+    "fg": "#adb1b8",
+    "bg": "#181e2a",
+    "Lc": -58.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Label auf card",
+    "fg": "#c79be4",
+    "bg": "#181e2a",
+    "Lc": -55.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Label auf card",
+    "fg": "#f4b067",
+    "bg": "#181e2a",
+    "Lc": -65.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Label auf card",
+    "fg": "#7dbf87",
+    "bg": "#181e2a",
+    "Lc": -57.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Label auf card",
+    "fg": "#fc9382",
+    "bg": "#181e2a",
+    "Lc": -57.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Label (@, heute) auf card",
+    "fg": "#7fb2ee",
+    "bg": "#181e2a",
+    "Lc": -56.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text (Fliesstext 13,5-14px/400) auf card+hover",
+    "fg": "#e2e7ef",
+    "bg": "#202632",
+    "Lc": -88.9,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf card+hover",
+    "fg": "#b5bece",
+    "bg": "#202632",
+    "Lc": -64,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3/Label auf card+hover",
+    "fg": "#97a2b5",
+    "bg": "#202632",
+    "Lc": -48.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Label auf card+hover",
+    "fg": "#adb1b8",
+    "bg": "#202632",
+    "Lc": -56.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Label auf card+hover",
+    "fg": "#c79be4",
+    "bg": "#202632",
+    "Lc": -54.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Label auf card+hover",
+    "fg": "#f4b067",
+    "bg": "#202632",
+    "Lc": -64.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Label auf card+hover",
+    "fg": "#7dbf87",
+    "bg": "#202632",
+    "Lc": -56.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Label auf card+hover",
+    "fg": "#fc9382",
+    "bg": "#202632",
+    "Lc": -56.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Label (@, heute) auf card+hover",
+    "fg": "#7fb2ee",
+    "bg": "#202632",
+    "Lc": -55.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text (Fliesstext 13,5-14px/400) auf card+active",
+    "fg": "#e2e7ef",
+    "bg": "#262c38",
+    "Lc": -87.8,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf card+active",
+    "fg": "#b5bece",
+    "bg": "#262c38",
+    "Lc": -62.9,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3/Label auf card+active",
+    "fg": "#97a2b5",
+    "bg": "#262c38",
+    "Lc": -47.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Label auf card+active",
+    "fg": "#adb1b8",
+    "bg": "#262c38",
+    "Lc": -55.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Label auf card+active",
+    "fg": "#c79be4",
+    "bg": "#262c38",
+    "Lc": -53.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Label auf card+active",
+    "fg": "#f4b067",
+    "bg": "#262c38",
+    "Lc": -63.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Label auf card+active",
+    "fg": "#7dbf87",
+    "bg": "#262c38",
+    "Lc": -55.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Label auf card+active",
+    "fg": "#fc9382",
+    "bg": "#262c38",
+    "Lc": -55.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Label (@, heute) auf card+active",
+    "fg": "#7fb2ee",
+    "bg": "#262c38",
+    "Lc": -54.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text (Fliesstext 13,5-14px/400) auf card2",
+    "fg": "#e2e7ef",
+    "bg": "#1e2532",
+    "Lc": -89.1,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf card2",
+    "fg": "#b5bece",
+    "bg": "#1e2532",
+    "Lc": -64.2,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3/Label auf card2",
+    "fg": "#97a2b5",
+    "bg": "#1e2532",
+    "Lc": -48.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Label auf card2",
+    "fg": "#adb1b8",
+    "bg": "#1e2532",
+    "Lc": -57,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Label auf card2",
+    "fg": "#c79be4",
+    "bg": "#1e2532",
+    "Lc": -54.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Label auf card2",
+    "fg": "#f4b067",
+    "bg": "#1e2532",
+    "Lc": -64.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Label auf card2",
+    "fg": "#7dbf87",
+    "bg": "#1e2532",
+    "Lc": -56.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Label auf card2",
+    "fg": "#fc9382",
+    "bg": "#1e2532",
+    "Lc": -56.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Label (@, heute) auf card2",
+    "fg": "#7fb2ee",
+    "bg": "#1e2532",
+    "Lc": -55.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text (Fliesstext 13,5-14px/400) auf card2+hover",
+    "fg": "#e2e7ef",
+    "bg": "#262d3a",
+    "Lc": -87.6,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf card2+hover",
+    "fg": "#b5bece",
+    "bg": "#262d3a",
+    "Lc": -62.7,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3/Label auf card2+hover",
+    "fg": "#97a2b5",
+    "bg": "#262d3a",
+    "Lc": -47.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Label auf card2+hover",
+    "fg": "#adb1b8",
+    "bg": "#262d3a",
+    "Lc": -55.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Label auf card2+hover",
+    "fg": "#c79be4",
+    "bg": "#262d3a",
+    "Lc": -53,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Label auf card2+hover",
+    "fg": "#f4b067",
+    "bg": "#262d3a",
+    "Lc": -63,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Label auf card2+hover",
+    "fg": "#7dbf87",
+    "bg": "#262d3a",
+    "Lc": -55.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Label auf card2+hover",
+    "fg": "#fc9382",
+    "bg": "#262d3a",
+    "Lc": -55.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Label (@, heute) auf card2+hover",
+    "fg": "#7fb2ee",
+    "bg": "#262d3a",
+    "Lc": -54.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text (Fliesstext 13,5-14px/400) auf card2+active",
+    "fg": "#e2e7ef",
+    "bg": "#2c333f",
+    "Lc": -86.2,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf card2+active",
+    "fg": "#b5bece",
+    "bg": "#2c333f",
+    "Lc": -61.3,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3/Label auf card2+active",
+    "fg": "#97a2b5",
+    "bg": "#2c333f",
+    "Lc": -45.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Label auf card2+active",
+    "fg": "#adb1b8",
+    "bg": "#2c333f",
+    "Lc": -54.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Label auf card2+active",
+    "fg": "#c79be4",
+    "bg": "#2c333f",
+    "Lc": -51.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Label auf card2+active",
+    "fg": "#f4b067",
+    "bg": "#2c333f",
+    "Lc": -61.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Label auf card2+active",
+    "fg": "#7dbf87",
+    "bg": "#2c333f",
+    "Lc": -53.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Label auf card2+active",
+    "fg": "#fc9382",
+    "bg": "#2c333f",
+    "Lc": -53.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Label (@, heute) auf card2+active",
+    "fg": "#7fb2ee",
+    "bg": "#2c333f",
+    "Lc": -53,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text (Fliesstext 13,5-14px/400) auf col",
+    "fg": "#e2e7ef",
+    "bg": "#10151f",
+    "Lc": -91.2,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf col",
+    "fg": "#b5bece",
+    "bg": "#10151f",
+    "Lc": -66.3,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3/Label auf col",
+    "fg": "#97a2b5",
+    "bg": "#10151f",
+    "Lc": -50.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Label auf col",
+    "fg": "#adb1b8",
+    "bg": "#10151f",
+    "Lc": -59.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Label auf col",
+    "fg": "#c79be4",
+    "bg": "#10151f",
+    "Lc": -56.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Label auf col",
+    "fg": "#f4b067",
+    "bg": "#10151f",
+    "Lc": -66.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Label auf col",
+    "fg": "#7dbf87",
+    "bg": "#10151f",
+    "Lc": -58.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Label auf col",
+    "fg": "#fc9382",
+    "bg": "#10151f",
+    "Lc": -58.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Label (@, heute) auf col",
+    "fg": "#7fb2ee",
+    "bg": "#10151f",
+    "Lc": -57.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text (Fliesstext 13,5-14px/400) auf col+hover",
+    "fg": "#e2e7ef",
+    "bg": "#191e27",
+    "Lc": -90.2,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf col+hover",
+    "fg": "#b5bece",
+    "bg": "#191e27",
+    "Lc": -65.3,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3/Label auf col+hover",
+    "fg": "#97a2b5",
+    "bg": "#191e27",
+    "Lc": -49.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Label auf col+hover",
+    "fg": "#adb1b8",
+    "bg": "#191e27",
+    "Lc": -58.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Label auf col+hover",
+    "fg": "#c79be4",
+    "bg": "#191e27",
+    "Lc": -55.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Label auf col+hover",
+    "fg": "#f4b067",
+    "bg": "#191e27",
+    "Lc": -65.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Label auf col+hover",
+    "fg": "#7dbf87",
+    "bg": "#191e27",
+    "Lc": -57.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Label auf col+hover",
+    "fg": "#fc9382",
+    "bg": "#191e27",
+    "Lc": -57.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Label (@, heute) auf col+hover",
+    "fg": "#7fb2ee",
+    "bg": "#191e27",
+    "Lc": -56.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text (Fliesstext 13,5-14px/400) auf col+active",
+    "fg": "#e2e7ef",
+    "bg": "#1f242e",
+    "Lc": -89.3,
+    "min": 75,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text2 auf col+active",
+    "fg": "#b5bece",
+    "bg": "#1f242e",
+    "Lc": -64.4,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "text3/Label auf col+active",
+    "fg": "#97a2b5",
+    "bg": "#1f242e",
+    "Lc": -48.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray als Label auf col+active",
+    "fg": "#adb1b8",
+    "bg": "#1f242e",
+    "Lc": -57.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue als Label auf col+active",
+    "fg": "#c79be4",
+    "bg": "#1f242e",
+    "Lc": -54.6,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber als Label auf col+active",
+    "fg": "#f4b067",
+    "bg": "#1f242e",
+    "Lc": -64.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green als Label auf col+active",
+    "fg": "#7dbf87",
+    "bg": "#1f242e",
+    "Lc": -56.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red als Label auf col+active",
+    "fg": "#fc9382",
+    "bg": "#1f242e",
+    "Lc": -56.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine als Label (@, heute) auf col+active",
+    "fg": "#7fb2ee",
+    "bg": "#1f242e",
+    "Lc": -56,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accText auf acc (Knopftext)",
+    "fg": "#ffffff",
+    "bg": "#0f5ba5",
+    "Lc": -88.2,
+    "min": 60,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip gray: st-gray auf 12 % Toenung ueber panel",
+    "fg": "#adb1b8",
+    "bg": "#252a36",
+    "Lc": -56.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip gray: st-gray auf 12 % Toenung ueber panel+hover",
+    "fg": "#adb1b8",
+    "bg": "#2d313d",
+    "Lc": -54.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip gray: st-gray auf 12 % Toenung ueber card",
+    "fg": "#adb1b8",
+    "bg": "#2a303b",
+    "Lc": -54.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip gray: st-gray auf 12 % Toenung ueber card+hover",
+    "fg": "#adb1b8",
+    "bg": "#313742",
+    "Lc": -53,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip gray: st-gray auf 12 % Toenung ueber card2",
+    "fg": "#adb1b8",
+    "bg": "#2f3642",
+    "Lc": -53.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip gray: st-gray auf 12 % Toenung ueber card2+hover",
+    "fg": "#adb1b8",
+    "bg": "#363d49",
+    "Lc": -51.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip gray: st-gray auf 12 % Toenung ueber col",
+    "fg": "#adb1b8",
+    "bg": "#232831",
+    "Lc": -56.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip gray: st-gray auf 12 % Toenung ueber col+hover",
+    "fg": "#adb1b8",
+    "bg": "#2b3038",
+    "Lc": -54.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip blue: st-blue auf 12 % Toenung ueber panel",
+    "fg": "#c79be4",
+    "bg": "#29283b",
+    "Lc": -53.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip blue: st-blue auf 12 % Toenung ueber panel+hover",
+    "fg": "#c79be4",
+    "bg": "#302f42",
+    "Lc": -52,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip blue: st-blue auf 12 % Toenung ueber card",
+    "fg": "#c79be4",
+    "bg": "#2d2d40",
+    "Lc": -52.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip blue: st-blue auf 12 % Toenung ueber card+hover",
+    "fg": "#c79be4",
+    "bg": "#343447",
+    "Lc": -50.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip blue: st-blue auf 12 % Toenung ueber card2",
+    "fg": "#c79be4",
+    "bg": "#323347",
+    "Lc": -51.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip blue: st-blue auf 12 % Toenung ueber card2+hover",
+    "fg": "#c79be4",
+    "bg": "#393a4e",
+    "Lc": -49,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip blue: st-blue auf 12 % Toenung ueber col",
+    "fg": "#c79be4",
+    "bg": "#262537",
+    "Lc": -54.1,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip blue: st-blue auf 12 % Toenung ueber col+hover",
+    "fg": "#c79be4",
+    "bg": "#2e2d3e",
+    "Lc": -52.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip amber: st-amber auf 14 % Toenung ueber panel",
+    "fg": "#f4b067",
+    "bg": "#332d2d",
+    "Lc": -62.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip amber: st-amber auf 14 % Toenung ueber panel+hover",
+    "fg": "#f4b067",
+    "bg": "#393434",
+    "Lc": -61,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip amber: st-amber auf 14 % Toenung ueber card",
+    "fg": "#f4b067",
+    "bg": "#373233",
+    "Lc": -61.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip amber: st-amber auf 14 % Toenung ueber card+hover",
+    "fg": "#f4b067",
+    "bg": "#3e3939",
+    "Lc": -59.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip amber: st-amber auf 14 % Toenung ueber card2",
+    "fg": "#f4b067",
+    "bg": "#3c3839",
+    "Lc": -59.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip amber: st-amber auf 14 % Toenung ueber card2+hover",
+    "fg": "#f4b067",
+    "bg": "#433f40",
+    "Lc": -57.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip amber: st-amber auf 14 % Toenung ueber col",
+    "fg": "#f4b067",
+    "bg": "#302b29",
+    "Lc": -63.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip amber: st-amber auf 14 % Toenung ueber col+hover",
+    "fg": "#f4b067",
+    "bg": "#383230",
+    "Lc": -61.5,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip green: st-green auf 12 % Toenung ueber panel",
+    "fg": "#7dbf87",
+    "bg": "#202c30",
+    "Lc": -55.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip green: st-green auf 12 % Toenung ueber panel+hover",
+    "fg": "#7dbf87",
+    "bg": "#273337",
+    "Lc": -54.2,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip green: st-green auf 12 % Toenung ueber card",
+    "fg": "#7dbf87",
+    "bg": "#243135",
+    "Lc": -54.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip green: st-green auf 12 % Toenung ueber card+hover",
+    "fg": "#7dbf87",
+    "bg": "#2b383c",
+    "Lc": -52.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip green: st-green auf 12 % Toenung ueber card2",
+    "fg": "#7dbf87",
+    "bg": "#29373c",
+    "Lc": -53.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip green: st-green auf 12 % Toenung ueber card2+hover",
+    "fg": "#7dbf87",
+    "bg": "#303f43",
+    "Lc": -50.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip green: st-green auf 12 % Toenung ueber col",
+    "fg": "#7dbf87",
+    "bg": "#1d292b",
+    "Lc": -56.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip green: st-green auf 12 % Toenung ueber col+hover",
+    "fg": "#7dbf87",
+    "bg": "#253133",
+    "Lc": -54.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip ueberfaellig: st-red auf 10 % + Streifen 8 % ueber panel (Spitze)",
+    "fg": "#fc9382",
+    "bg": "#3b2d34",
+    "Lc": -54.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip ueberfaellig: st-red auf 10 % + Streifen 8 % ueber panel+hover (Spitze)",
+    "fg": "#fc9382",
+    "bg": "#42343b",
+    "Lc": -52.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip ueberfaellig: st-red auf 10 % + Streifen 8 % ueber card (Spitze)",
+    "fg": "#fc9382",
+    "bg": "#3f3239",
+    "Lc": -53,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip ueberfaellig: st-red auf 10 % + Streifen 8 % ueber card+hover (Spitze)",
+    "fg": "#fc9382",
+    "bg": "#463940",
+    "Lc": -50.9,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip ueberfaellig: st-red auf 10 % + Streifen 8 % ueber card2 (Spitze)",
+    "fg": "#fc9382",
+    "bg": "#443840",
+    "Lc": -51.3,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip ueberfaellig: st-red auf 10 % + Streifen 8 % ueber card2+hover (Spitze)",
+    "fg": "#fc9382",
+    "bg": "#4a3e46",
+    "Lc": -49.4,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip ueberfaellig: st-red auf 10 % + Streifen 8 % ueber col (Spitze)",
+    "fg": "#fc9382",
+    "bg": "#392b30",
+    "Lc": -54.8,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip ueberfaellig: st-red auf 10 % + Streifen 8 % ueber col+hover (Spitze)",
+    "fg": "#fc9382",
+    "bg": "#403237",
+    "Lc": -53,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Chip heute: accText auf Streifen-Spitze",
+    "fg": "#ffffff",
+    "bg": "#3575b3",
+    "Lc": -78.7,
+    "min": 45,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Blendung: text auf panel (Ziel Lc -90 bis -95)",
+    "fg": "#e2e7ef",
+    "bg": "#131824",
+    "Lc": -90.9,
+    "range": [
+     90,
+     95
+    ],
+    "ok": true
+   }
+  ],
+  "deltaE_min_matrix": [
+   {
+    "mode": "light",
+    "color": "Akzent/heute (acc)",
+    "hex": "#0f5ba5",
+    "nearest": "Bereich partner",
+    "dE00": 18.6,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "color": "Recherche (st-gray)",
+    "hex": "#474a52",
+    "nearest": "Kontaktiert (st-blue)",
+    "dE00": 19.6,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "color": "Kontaktiert (st-blue)",
+    "hex": "#643b9b",
+    "nearest": "Recherche (st-gray)",
+    "dE00": 19.6,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "color": "Im Gespraech (st-amber)",
+    "hex": "#7e4801",
+    "nearest": "Bereich marketing",
+    "dE00": 20,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "color": "Zugesagt/Fix (st-green)",
+    "hex": "#206734",
+    "nearest": "Bereich venue",
+    "dE00": 20,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "color": "Abgesagt/ueberfaellig (st-red)",
+    "hex": "#a32730",
+    "nearest": "Bereich marketing",
+    "dE00": 20,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "color": "Bereich venue",
+    "hex": "#2b8c81",
+    "nearest": "Bereich partner",
+    "dE00": 20,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "color": "Bereich partner",
+    "hex": "#0088b3",
+    "nearest": "Akzent/heute (acc)",
+    "dE00": 18.6,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "color": "Bereich sponsoren",
+    "hex": "#c25485",
+    "nearest": "Abgesagt/ueberfaellig (st-red)",
+    "dE00": 21.1,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "color": "Bereich jury",
+    "hex": "#9b7a01",
+    "nearest": "Im Gespraech (st-amber)",
+    "dE00": 20,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "color": "Bereich marketing",
+    "hex": "#ca5e30",
+    "nearest": "Im Gespraech (st-amber)",
+    "dE00": 20,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "color": "Bereich gesamtleitung",
+    "hex": "#7b7f88",
+    "nearest": "Bereich partner",
+    "dE00": 19.1,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "color": "Avatar Maxi S",
+    "hex": "#dbd6ff",
+    "nearest": "Avatar Maxi D",
+    "dE00": 19.5,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "color": "Avatar Maxi D",
+    "hex": "#ffddd4",
+    "nearest": "Avatar Maxi S",
+    "dE00": 19.5,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "color": "Avatar Manu",
+    "hex": "#c4ffe4",
+    "nearest": "Avatar Kilian",
+    "dE00": 19.4,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "color": "Avatar Tim",
+    "hex": "#fff2bc",
+    "nearest": "Avatar Manu",
+    "dE00": 19.8,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "color": "Avatar Kilian",
+    "hex": "#bbeaff",
+    "nearest": "Avatar Manu",
+    "dE00": 19.4,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Akzent/heute (acc)",
+    "hex": "#0f5ba5",
+    "nearest": "Bereich partner",
+    "dE00": 21.8,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Akzent-Linie (accLine)",
+    "hex": "#7fb2ee",
+    "nearest": "Recherche (st-gray)",
+    "dE00": 16.6,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Recherche (st-gray)",
+    "hex": "#adb1b8",
+    "nearest": "Bereich gesamtleitung",
+    "dE00": 15.7,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Kontaktiert (st-blue)",
+    "hex": "#c79be4",
+    "nearest": "Avatar Maxi S",
+    "dE00": 15.7,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Im Gespraech (st-amber)",
+    "hex": "#f4b067",
+    "nearest": "Avatar Tim",
+    "dE00": 19.8,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Zugesagt/Fix (st-green)",
+    "hex": "#7dbf87",
+    "nearest": "Avatar Manu",
+    "dE00": 17.8,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Abgesagt/ueberfaellig (st-red)",
+    "hex": "#fc9382",
+    "nearest": "Avatar Maxi D",
+    "dE00": 19.3,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Bereich venue",
+    "hex": "#258f7a",
+    "nearest": "Zugesagt/Fix (st-green)",
+    "dE00": 19.1,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Bereich partner",
+    "hex": "#1f8ba7",
+    "nearest": "Bereich gesamtleitung",
+    "dE00": 19.2,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Bereich sponsoren",
+    "hex": "#bc6c83",
+    "nearest": "Abgesagt/ueberfaellig (st-red)",
+    "dE00": 20.1,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Bereich jury",
+    "hex": "#a29547",
+    "nearest": "Im Gespraech (st-amber)",
+    "dE00": 20,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Bereich marketing",
+    "hex": "#b6703f",
+    "nearest": "Im Gespraech (st-amber)",
+    "dE00": 19.9,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Bereich gesamtleitung",
+    "hex": "#7d8087",
+    "nearest": "Recherche (st-gray)",
+    "dE00": 15.7,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Avatar Maxi S",
+    "hex": "#dbd6ff",
+    "nearest": "Kontaktiert (st-blue)",
+    "dE00": 15.7,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Avatar Maxi D",
+    "hex": "#ffddd4",
+    "nearest": "Abgesagt/ueberfaellig (st-red)",
+    "dE00": 19.3,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Avatar Manu",
+    "hex": "#c4ffe4",
+    "nearest": "Zugesagt/Fix (st-green)",
+    "dE00": 17.8,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Avatar Tim",
+    "hex": "#fff2bc",
+    "nearest": "Im Gespraech (st-amber)",
+    "dE00": 19.8,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "color": "Avatar Kilian",
+    "hex": "#bbeaff",
+    "nearest": "Akzent-Linie (accLine)",
+    "dE00": 16.8,
+    "min": 15,
+    "target": 20,
+    "ok": true
+   }
+  ],
+  "layers": [
+   {
+    "mode": "light",
+    "pair": "bg/panel",
+    "dE00": 2.07,
+    "dL_oklch": 0.03,
+    "min": 1.2,
+    "max": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "pair": "panel/card",
+    "dE00": 2.07,
+    "dL_oklch": 0.02,
+    "min": 1.2,
+    "max": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "pair": "card/card2",
+    "dE00": 2.89,
+    "dL_oklch": -0.03,
+    "min": 1.2,
+    "max": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "pair": "panel/col",
+    "dE00": 1.91,
+    "dL_oklch": -0.02,
+    "min": 1.2,
+    "max": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "pair": "col/card",
+    "dE00": 3.89,
+    "dL_oklch": 0.04,
+    "min": 1.2,
+    "max": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "pair": "bg/panel",
+    "dE00": 2.68,
+    "dL_oklch": 0.03,
+    "min": 1.2,
+    "max": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "pair": "panel/card",
+    "dE00": 1.96,
+    "dL_oklch": 0.02,
+    "min": 1.2,
+    "max": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "pair": "card/card2",
+    "dE00": 2.22,
+    "dL_oklch": 0.03,
+    "min": 1.2,
+    "max": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "pair": "panel/col",
+    "dE00": 1.64,
+    "dL_oklch": -0.01,
+    "min": 1.2,
+    "max": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "pair": "col/card",
+    "dE00": 2.93,
+    "dL_oklch": 0.04,
+    "min": 1.2,
+    "max": 4.5,
+    "ok": true
+   },
+   {
+    "mode": "hell vs dunkel",
+    "pair": "bg/panel",
+    "ratio_dark_to_light": 1.29,
+    "min": 0.67,
+    "max": 1.5,
+    "ok": true
+   },
+   {
+    "mode": "hell vs dunkel",
+    "pair": "panel/card",
+    "ratio_dark_to_light": 0.95,
+    "min": 0.67,
+    "max": 1.5,
+    "ok": true
+   },
+   {
+    "mode": "hell vs dunkel",
+    "pair": "card/card2",
+    "ratio_dark_to_light": 0.77,
+    "min": 0.67,
+    "max": 1.5,
+    "ok": true
+   },
+   {
+    "mode": "hell vs dunkel",
+    "pair": "panel/col",
+    "ratio_dark_to_light": 0.86,
+    "min": 0.67,
+    "max": 1.5,
+    "ok": true
+   },
+   {
+    "mode": "hell vs dunkel",
+    "pair": "col/card",
+    "ratio_dark_to_light": 0.75,
+    "min": 0.67,
+    "max": 1.5,
+    "ok": true
+   }
+  ],
+  "misc": [
+   {
+    "mode": "light",
+    "what": "Streifen heute sichtbar (dE00 acc vs Spitze, Ziel >= 5)",
+    "value": 9.2,
+    "min": 5,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "Streifen ueberfaellig sichtbar (dE00 Chip vs Spitze auf card, Ziel >= 2)",
+    "value": 5.9,
+    "min": 2,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "text nicht reinschwarz",
+    "value": "#161d2b",
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "grosse Flaeche bg nicht reinweiss (OKLCH L <= 0.985)",
+    "value": 0.954,
+    "max": 0.985,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "grosse Flaeche panel nicht reinweiss (OKLCH L <= 0.985)",
+    "value": 0.979,
+    "max": 0.985,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "grosse Flaeche col nicht reinweiss (OKLCH L <= 0.985)",
+    "value": 0.957,
+    "max": 0.985,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "grosse Flaeche card2 nicht reinweiss (OKLCH L <= 0.985)",
+    "value": 0.97,
+    "max": 0.985,
+    "ok": true
+   },
+   {
+    "mode": "light",
+    "what": "kleinste 8 Paare (dE00)",
+    "value": [
+     "Akzent/heute (acc) ~ Bereich partner: 18.6",
+     "Bereich partner ~ Bereich gesamtleitung: 19.1",
+     "Avatar Manu ~ Avatar Kilian: 19.4",
+     "Avatar Maxi S ~ Avatar Maxi D: 19.5",
+     "Recherche (st-gray) ~ Kontaktiert (st-blue): 19.6",
+     "Akzent/heute (acc) ~ Recherche (st-gray): 19.7",
+     "Recherche (st-gray) ~ Bereich gesamtleitung: 19.7",
+     "Avatar Manu ~ Avatar Tim: 19.8"
+    ],
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Streifen heute sichtbar (dE00 acc vs Spitze, Ziel >= 5)",
+    "value": 9.2,
+    "min": 5,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Streifen ueberfaellig sichtbar (dE00 Chip vs Spitze auf card, Ziel >= 2)",
+    "value": 5.1,
+    "min": 2,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Flaeche bg nicht reinschwarz (OKLCH L >= 0.15)",
+    "value": 0.183,
+    "min": 0.15,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Flaeche panel nicht reinschwarz (OKLCH L >= 0.15)",
+    "value": 0.21,
+    "min": 0.15,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Flaeche card nicht reinschwarz (OKLCH L >= 0.15)",
+    "value": 0.235,
+    "min": 0.15,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Flaeche card2 nicht reinschwarz (OKLCH L >= 0.15)",
+    "value": 0.264,
+    "min": 0.15,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Flaeche col nicht reinschwarz (OKLCH L >= 0.15)",
+    "value": 0.196,
+    "min": 0.15,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Akzentflaeche nicht leuchtend (OKLCH C <= 0.14)",
+    "value": 0.137,
+    "max": 0.14,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "Akzentflaeche nicht leuchtend (OKLCH L <= 0.55)",
+    "value": 0.47,
+    "max": 0.55,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-gray gedaempft (OKLCH C <= 0.13)",
+    "value": 0.011,
+    "max": 0.13,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-blue gedaempft (OKLCH C <= 0.13)",
+    "value": 0.112,
+    "max": 0.13,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-amber gedaempft (OKLCH C <= 0.13)",
+    "value": 0.12,
+    "max": 0.13,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-green gedaempft (OKLCH C <= 0.13)",
+    "value": 0.105,
+    "max": 0.13,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "st-red gedaempft (OKLCH C <= 0.13)",
+    "value": 0.13,
+    "max": 0.13,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-venue gedaempft (OKLCH C <= 0.13)",
+    "value": 0.099,
+    "max": 0.13,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-partner gedaempft (OKLCH C <= 0.13)",
+    "value": 0.1,
+    "max": 0.13,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-sponsoren gedaempft (OKLCH C <= 0.13)",
+    "value": 0.105,
+    "max": 0.13,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-jury gedaempft (OKLCH C <= 0.13)",
+    "value": 0.1,
+    "max": 0.13,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-marketing gedaempft (OKLCH C <= 0.13)",
+    "value": 0.11,
+    "max": 0.13,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "area-gesamtleitung gedaempft (OKLCH C <= 0.13)",
+    "value": 0.011,
+    "max": 0.13,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "accLine gedaempft (OKLCH C <= 0.13)",
+    "value": 0.103,
+    "max": 0.13,
+    "ok": true
+   },
+   {
+    "mode": "dark",
+    "what": "kleinste 8 Paare (dE00)",
+    "value": [
+     "Kontaktiert (st-blue) ~ Avatar Maxi S: 15.7",
+     "Recherche (st-gray) ~ Bereich gesamtleitung: 15.7",
+     "Akzent-Linie (accLine) ~ Recherche (st-gray): 16.6",
+     "Recherche (st-gray) ~ Avatar Maxi S: 16.7",
+     "Akzent-Linie (accLine) ~ Avatar Kilian: 16.8",
+     "Recherche (st-gray) ~ Avatar Kilian: 17.6",
+     "Zugesagt/Fix (st-green) ~ Avatar Manu: 17.8",
+     "Recherche (st-gray) ~ Kontaktiert (st-blue): 18.4"
+    ],
+    "ok": true
+   },
+   {
+    "mode": "login",
+    "what": "Schimmer dezent (OKLCH L der Spitze <= 0.26, website bg-3 = 0.25)",
+    "value": 0.214,
+    "max": 0.26,
+    "ok": true
+   }
+  ]
+ },
+ "checksSummary": {
+  "total": 1005,
+  "fails": 0
+ }
+}

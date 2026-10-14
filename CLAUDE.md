@@ -22,7 +22,7 @@ Auftraggeber ist Maxi S (kein Entwickler): Deutsch, Ergebnis zuerst, einfache Sp
 - shadcn-Skill bzw. -MCP nutzen. **Keinen beUI-MCP**, keine beUI-Bausteine.
 
 ## Design (Kurzfassung, Details in `docs/design/Design-System.md`)
-- Palette **„Tinte“** (14.10.): Navy + Kobalt der Event-Website. Hell und dunkel gleichwertig, Standard ist die Systemeinstellung. Werte und Prüfergebnisse in `docs/design/palette-tinte.json`.
+- **Graphit + Kobalt** (14.10.): Graphit-Flächen (dunkel = schwarz), Akzent Kobalt #0f5ba5 aus der Event-Website statt Lime. Hell und dunkel gleichwertig, Standard ist die Systemeinstellung. Werte und Prüfergebnisse in `docs/design/palette.json`.
 - Alle Farben nur über die Tokens in `src/app/globals.css`, keine frei erfundenen Werte. Tailwind-Namen: `bg-bg`, `bg-panel`, `bg-card`, `bg-card-2`, `bg-col`, `border-line`, `border-line-2`, `border-field`, `text-fg` / `text-fg-2` / `text-fg-3`, `bg-hover`, `bg-active`, `bg-acc` + `text-acc-text`, `text-acc-line`, Status `*-st-gray|blue|amber|green|red`, Bereiche `bg-area-*`. Schrift `font-display` = Michroma, Hilfsklassen `tabular` und `label-mono`.
 - Hell/Dunkel über die Klasse `.dark` auf `<html>` (Inline-Skript in `src/app/layout.tsx`, Wahl im Cookie `theme`, sonst Systemeinstellung).
 - Daten-Hilfen in `src/lib/dates.ts` (`todayInVienna`, `daysUntil`) statt eigener Datumsrechnung.
