@@ -61,7 +61,7 @@ export function DecisionDetail({
           <label htmlFor={f("reason")} className="text-[13px] text-fg-3">
             Warum
           </label>
-          <EditText id={f("reason")} value={d.reason} placeholder="Begründung, Alternativen, was dagegen sprach …" onSave={(v) => onUpdate({ reason: v })} multiline />
+          <EditText id={f("reason")} value={d.reason} placeholder="–" onSave={(v) => onUpdate({ reason: v })} multiline />
         </div>
         <PropRow label="Wann" htmlFor={f("date")}>
           <input

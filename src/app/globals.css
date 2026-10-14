@@ -344,8 +344,7 @@
 }
 
 /* Status-Chips (Maxi, 14.10.): ruhiger Farbverlauf statt „Oval mit Punkt“. Status steht immer als Wort im Chip.
-   Tönung hell schwächer, weil Amber-Text sonst unter 4,5:1 fällt (nachgerechnet 14.10.: Amber max. 7 %, Grün 10 %, Rot 12 %).
-   Nur „heute“ und „überfällig“ bewegen sich (Verlauf wandert langsam), alles andere steht still. */
+   Tönung hell schwächer, weil Amber-Text sonst unter 4,5:1 fällt (nachgerechnet 14.10.: Amber max. 7 %, Grün 10 %, Rot 12 %). */
 .chip-tone {
   --t1: 2%;
   --t2: 7%;
@@ -356,7 +355,6 @@
     color-mix(in srgb, var(--c) var(--t2), transparent) 50%,
     color-mix(in srgb, var(--c) var(--t1), transparent)
   );
-  background-size: 200% 100%;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 24%, transparent);
 }
 .chip-amber {
@@ -364,8 +362,8 @@
 }
 .chip-red {
   --c: var(--st-red);
-  --t1: 4%;
-  --t2: 12%;
+  --t1: 6%;
+  --t2: 6%;
 }
 .chip-green {
   --c: var(--st-green);
@@ -376,19 +374,41 @@
   --t1: 6%;
   --t2: 16%;
 }
+.dark .chip-red {
+  --t1: 10%;
+  --t2: 10%;
+}
 .chip-today {
   color: var(--accText);
-  background-image: linear-gradient(100deg, var(--acc), color-mix(in srgb, var(--acc) 62%, #ffffff) 50%, var(--acc));
-  background-size: 200% 100%;
+  background: var(--acc);
 }
+
+/* „heute“ und „überfällig“: ein Lichtstreifen läuft alle 3,2 s einmal durch (hinter dem Text).
+   Rot: Streifen +14 %, Text bleibt über 4,5:1 (hell 4,64, dunkel 4,57, nachgerechnet 14.10.). */
 .chip-live {
-  animation: chip-drift 3.6s ease-in-out infinite alternate;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  --sheen: color-mix(in srgb, var(--c) 14%, transparent);
 }
-@keyframes chip-drift {
-  from {
-    background-position: 0% 50%;
+.chip-today.chip-live {
+  --sheen: rgb(255 255 255 / 0.55);
+}
+.chip-live::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(100deg, transparent 25%, var(--sheen) 50%, transparent 75%);
+  transform: translateX(-100%);
+  animation: chip-sheen 3.2s ease-in-out infinite;
+}
+@keyframes chip-sheen {
+  0% {
+    transform: translateX(-100%);
   }
-  to {
-    background-position: 100% 50%;
+  45%,
+  100% {
+    transform: translateX(100%);
   }
 }

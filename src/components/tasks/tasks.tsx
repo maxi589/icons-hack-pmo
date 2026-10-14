@@ -157,6 +157,9 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
           ]}
         />
       </PageHeader>
+      {/* Links Filter und Inhalt; rechts das Detail über die volle Höhe unter der Kopfzeile */}
+      <div className="flex min-h-0 flex-1">
+        <div className="flex min-w-0 flex-1 flex-col">
       <h1 className="px-3.5 pt-2 pb-2 text-[21px] font-semibold tracking-[-0.025em] md:sr-only">{title}</h1>
 
       {/* Filter */}
@@ -209,8 +212,7 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
       {all.length === 0 ? (
         <EmptyState onNew={() => setParams({ neu: "1" })} />
       ) : (
-        <div className="flex min-h-0 flex-1">
-          <div className="min-w-0 flex-1 md:overflow-auto">
+          <div className="min-h-0 min-w-0 flex-1 md:overflow-auto">
             {view === "board" && (
               <div className="hidden p-3.5 pb-5 md:block">
                 <KanbanProvider
@@ -273,14 +275,15 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
               <p className="px-5 py-8 text-center text-[13.5px] text-fg-2">{mine && !filtered ? "Dir ist gerade nichts zugewiesen." : "Keine Treffer. Filter anpassen."}</p>
             )}
           </div>
-
-          {selected && !isMobile && (
-            <aside aria-label="Aufgaben-Detail" className="w-[400px] shrink-0 overflow-y-auto border-l border-line bg-card">
-              {detail}
-            </aside>
-          )}
-        </div>
       )}
+        </div>
+
+        {selected && !isMobile && (
+          <aside aria-label="Aufgaben-Detail" className="w-[400px] shrink-0 overflow-y-auto border-l border-line bg-card">
+            {detail}
+          </aside>
+        )}
+      </div>
 
       <MobileSheet open={!!selected && isMobile} onClose={close} title={selected?.title ?? ""}>
         {detail}

@@ -194,7 +194,7 @@ export function TaskDetail({
           <EditText
             id={f("desc")}
             value={task.description}
-            placeholder="Was genau ist zu tun? Links, Absprachen …"
+            placeholder="–"
             onSave={(v) => onUpdate({ description: v })}
             multiline
           />

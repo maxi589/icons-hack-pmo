@@ -1,12 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { ChevronDown, ExternalLink, X } from "lucide-react";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { EditText, miniButton as mini, PropRow, SelectBox } from "@/components/detail-fields";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
-import { Chip } from "@/components/chip";
 import { Feed } from "@/components/feed";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { notifyAssignment } from "@/lib/data/use-feed";
@@ -21,7 +19,6 @@ import {
   STAGES,
   stageName,
   type Organization,
-  type Role,
   type Stage,
 } from "@/lib/pipeline";
 
@@ -47,23 +44,17 @@ export function OrgDetail({
   const stage = STAGES.find((s) => s.id === org.stage)!;
   const isVenue = org.roles.includes("venue");
   const hasUrl = !!org.url && /^https?:\/\//.test(org.url);
-  const [more, setMore] = useState(false);
   const f = (name: string) => `org-${org.id}-${name}`;
 
   // Warmer Kontakt = wer aus icons jemanden dort kennt; eine bestehende Verbindung (TE, Coop) steht klein darunter.
   const warmRow = (
     <PropRow label="Warm über" htmlFor={f("warm")}>
       <span className="flex flex-col">
-        <EditText id={f("warm")} value={org.warm_via} placeholder="Wer kennt jemanden dort?" onSave={(v) => onUpdate({ warm_via: v })} />
+        <EditText id={f("warm")} value={org.warm_via} placeholder="–" onSave={(v) => onUpdate({ warm_via: v })} />
         {org.existing_contact && <span className="px-2 pb-1 text-[12px] text-fg-3">Bestehend: {org.existing_contact}</span>}
       </span>
     </PropRow>
   );
-
-  const toggleRole = (r: Role) => {
-    const roles = org.roles.includes(r) ? org.roles.filter((x) => x !== r) : [...org.roles, r];
-    if (roles.length) onUpdate({ roles });
-  };
 
   return (
     <div className="flex flex-col">
@@ -175,21 +166,31 @@ export function OrgDetail({
           </span>
         </PropRow>
         <PropRow label="Nachfassen" htmlFor={f("follow")}>
-          <span className="flex flex-wrap items-center gap-1.5">
-            {follow && <Chip tone={follow.tone}>{follow.label}</Chip>}
+          <span className="flex items-center gap-1">
             <input
               id={f("follow")}
               type="date"
               value={org.next_follow_up ?? ""}
               onChange={(e) => onUpdate({ next_follow_up: e.target.value || null })}
-              className="h-8 rounded-lg bg-transparent px-2 text-[13px] text-fg tabular hover:bg-hover"
+              aria-describedby={follow && follow.tone !== "gray" ? f("follow-state") : undefined}
+              className={cn(
+                "h-8 rounded-lg bg-transparent px-2 text-[13px] tabular hover:bg-hover",
+                follow?.tone === "red" ? "font-medium text-st-red" : follow?.tone === "today" ? "font-medium text-acc-line" : "text-fg"
+              )}
             />
-            <button type="button" className={mini} onClick={() => onUpdate({ next_follow_up: shiftFollowUp(org.next_follow_up, today, 2) })}>
-              +2 Tage
-            </button>
-            <button type="button" className={mini} onClick={() => onUpdate({ next_follow_up: shiftFollowUp(org.next_follow_up, today, 7) })}>
-              +1 Woche
-            </button>
+            {follow && follow.tone !== "gray" && (
+              <span id={f("follow-state")} className="sr-only">
+                {follow.label}
+              </span>
+            )}
+            <span className="ml-auto flex shrink-0 gap-1">
+              <button type="button" className={mini} title="Um 2 Tage verschieben" onClick={() => onUpdate({ next_follow_up: shiftFollowUp(org.next_follow_up, today, 2) })}>
+                +2 T
+              </button>
+              <button type="button" className={mini} title="Um 1 Woche verschieben" onClick={() => onUpdate({ next_follow_up: shiftFollowUp(org.next_follow_up, today, 7) })}>
+                +1 W
+              </button>
+            </span>
           </span>
         </PropRow>
         <PropRow label="Prio" htmlFor={f("prio")}>
@@ -201,18 +202,18 @@ export function OrgDetail({
           </SelectBox>
         </PropRow>
         {!isVenue && warmRow}
-        <PropRow label="Kontakt" htmlFor={f("contact")}>
-          <span className="flex flex-col">
-            <EditText id={f("contact")} value={org.contact_person} placeholder="Name, Rolle" onSave={(v) => onUpdate({ contact_person: v })} />
-            <span className="sr-only">
-              <label htmlFor={f("info")}>Mail oder Telefon</label>
-            </span>
-            <EditText id={f("info")} value={org.contact_info} placeholder="Mail oder Telefon" onSave={(v) => onUpdate({ contact_info: v })} />
-          </span>
+        <PropRow label="Ansprechperson" htmlFor={f("contact")}>
+          <EditText id={f("contact")} value={org.contact_person} placeholder="–" onSave={(v) => onUpdate({ contact_person: v })} />
+        </PropRow>
+        <PropRow label="E-Mail / Tel." htmlFor={f("info")}>
+          <EditText id={f("info")} value={org.contact_info} placeholder="–" onSave={(v) => onUpdate({ contact_info: v })} />
+        </PropRow>
+        <PropRow label="Website" htmlFor={f("url")}>
+          <EditText id={f("url")} value={org.url} placeholder="–" onSave={(v) => onUpdate({ url: v })} />
         </PropRow>
         {org.stage === "abgesagt" && (
           <PropRow label="Grund" htmlFor={f("lost")}>
-            <EditText id={f("lost")} value={org.lost_reason} placeholder="Warum abgesagt?" onSave={(v) => onUpdate({ lost_reason: v })} />
+            <EditText id={f("lost")} value={org.lost_reason} placeholder="–" onSave={(v) => onUpdate({ lost_reason: v })} />
           </PropRow>
         )}
       </div>
@@ -222,16 +223,16 @@ export function OrgDetail({
         <div className="flex flex-col border-b border-line px-[18px] py-2.5">
           <h3 className="label-mono pt-1 pb-1.5">Eckdaten</h3>
           <PropRow label="Kapazität" htmlFor={f("cap")}>
-            <EditText id={f("cap")} value={org.capacity} placeholder="z. B. 120 Personen" onSave={(v) => onUpdate({ capacity: v })} />
+            <EditText id={f("cap")} value={org.capacity} placeholder="–" onSave={(v) => onUpdate({ capacity: v })} />
           </PropRow>
           <PropRow label="Übernachtung" htmlFor={f("night")}>
-            <EditText id={f("night")} value={org.overnight} placeholder="z. B. Ja (24h offen)" onSave={(v) => onUpdate({ overnight: v })} />
+            <EditText id={f("night")} value={org.overnight} placeholder="–" onSave={(v) => onUpdate({ overnight: v })} />
           </PropRow>
           <PropRow label="Preis / Deal" htmlFor={f("price")}>
-            <EditText id={f("price")} value={org.price} placeholder="z. B. kostenlos" onSave={(v) => onUpdate({ price: v })} />
+            <EditText id={f("price")} value={org.price} placeholder="–" onSave={(v) => onUpdate({ price: v })} />
           </PropRow>
           <PropRow label="Lage" htmlFor={f("loc")}>
-            <EditText id={f("loc")} value={org.location} placeholder="Adresse" onSave={(v) => onUpdate({ location: v })} />
+            <EditText id={f("loc")} value={org.location} placeholder="–" onSave={(v) => onUpdate({ location: v })} />
           </PropRow>
         </div>
       )}
@@ -241,62 +242,8 @@ export function OrgDetail({
           <label htmlFor={f("notes")} className="text-[13px] text-fg-3">
             Notizen
           </label>
-          <EditText id={f("notes")} value={org.notes} placeholder="Was sollte das Team wissen?" onSave={(v) => onUpdate({ notes: v })} multiline />
+          <EditText id={f("notes")} value={org.notes} placeholder="–" onSave={(v) => onUpdate({ notes: v })} multiline />
         </div>
-
-        {/* Selten gebraucht: eingeklappt */}
-        <button
-          type="button"
-          aria-expanded={more}
-          onClick={() => setMore((v) => !v)}
-          className="-mx-2 flex min-h-9 items-center gap-1.5 rounded-lg px-2 text-[13px] text-fg-3 hover:bg-hover hover:text-fg max-md:min-h-11"
-        >
-          <ChevronDown className={cn("size-3.5 transition-transform duration-200", !more && "-rotate-90")} aria-hidden />
-          Mehr
-          <span className="truncate text-[12px]">· Website, {isVenue ? "warmer Kontakt, " : ""}Welle, Rollen</span>
-        </button>
-        {more && (
-          <div className="flex flex-col pb-1">
-            <PropRow label="Website" htmlFor={f("url")}>
-              <EditText id={f("url")} value={org.url} placeholder="https://…" onSave={(v) => onUpdate({ url: v })} />
-            </PropRow>
-            {isVenue && warmRow}
-            <PropRow label="Bestehend" htmlFor={f("existing")}>
-              <EditText
-                id={f("existing")}
-                value={org.existing_contact}
-                placeholder="z. B. Talent Elevator, Coop"
-                onSave={(v) => onUpdate({ existing_contact: v })}
-              />
-            </PropRow>
-            <PropRow label="Welle" htmlFor={f("wave")}>
-              <SelectBox id={f("wave")} value={org.wave ? String(org.wave) : ""} onChange={(v) => onUpdate({ wave: v ? Number(v) : null })}>
-                <option value="">Keine</option>
-                <option value="1">Welle 1 (ab 19.10.)</option>
-                <option value="2">Welle 2 (ab 2.11.)</option>
-                <option value="3">Welle 3 (ab 16.11.)</option>
-              </SelectBox>
-            </PropRow>
-            <PropRow label="Rollen">
-              <span className="flex flex-wrap gap-1 py-1">
-                {(Object.keys(ROLE_NAMES) as Role[]).map((r) => (
-                  <button
-                    key={r}
-                    type="button"
-                    aria-pressed={org.roles.includes(r)}
-                    onClick={() => toggleRole(r)}
-                    className={cn(
-                      "h-[26px] rounded-full px-2.5 text-[12px] transition-colors duration-150",
-                      org.roles.includes(r) ? "bg-active text-fg shadow-[inset_0_0_0_1px_var(--line2)]" : "text-fg-3 hover:text-fg-2"
-                    )}
-                  >
-                    {ROLE_NAMES[r]}
-                  </button>
-                ))}
-              </span>
-            </PropRow>
-          </div>
-        )}
       </div>
 
       {/* Verlauf und Kommentare */}

@@ -10,7 +10,9 @@ import { followState, initials, STAGES, type Organization, type Stage } from "@/
 
 // Pipeline als CRM-Tabelle (nur Desktop, Maxi 14.10.: Variante „D“ nach Prüfschleife).
 // Standard: sortiert nach Nachfassen, Überfälliges oben. Jeder Spaltenkopf sortiert per Klick.
-// Kopf und Firmenspalte kleben beim Scrollen, unten Zähler. Bewusst ohne Rasterlinien und Pills.
+// Kopf klebt beim Scrollen, unten Zähler. Bewusst ohne Rasterlinien und Pills.
+// Kein seitliches Scrollen: Die Tabelle misst ihre eigene Breite (Container-Abfrage) und blendet bei wenig Platz
+// (z. B. Detail offen) zuerst „Warmer Kontakt“/„Kapazität“ aus, danach „Prio“.
 // Venues zeigen nur die Kapazität kurz; Übernachtung, Preis und Lage stehen im Detail.
 
 type SortKey = "name" | "stage" | "prio" | "follow" | "owner" | "extra";
@@ -86,20 +88,21 @@ export function OrgTable({
     );
   };
 
-  // Firmenspalte klebt links; Hover/Auswahl dort als feste Farbe, weil darunter Inhalt durchscrollt.
-  const stickyCell = "sticky left-0 z-[1] bg-panel";
+  // Spalten, die bei wenig Platz verschwinden bzw. schrumpfen (Breite der Tabelle, nicht des Fensters)
+  const hideExtra = "@max-[900px]:hidden";
+  const hidePrio = "@max-[700px]:hidden";
 
   return (
-    <div className="flex min-h-full flex-col">
-      <table className="w-full min-w-[920px] border-separate border-spacing-0 text-[13px]">
+    <div className="@container flex min-h-full flex-col">
+      <table className="w-full table-fixed border-separate border-spacing-0 text-[13px]">
         <thead className="text-[12px] text-fg-3">
           <tr>
-            {head("name", venue ? "Venue" : "Firma", cn(stickyCell, "z-[3] w-[34%] pl-[18px]"))}
-            {head("stage", "Stufe", "w-[150px]")}
-            {head("prio", "Prio", "w-[64px]")}
-            {head("follow", "Nachfassen", "w-[180px]")}
+            {head("name", venue ? "Venue" : "Firma", "z-[3] pl-[18px]")}
+            {head("stage", "Stufe", "w-[132px]")}
+            {head("prio", "Prio", cn("w-[60px]", hidePrio))}
+            {head("follow", "Nachfassen", "w-[176px]")}
             {head("owner", "Zuständig", "w-[150px]")}
-            {head("extra", venue ? "Kapazität" : "Warmer Kontakt", "w-[220px]")}
+            {head("extra", venue ? "Kapazität" : "Warmer Kontakt", cn("w-[210px]", hideExtra))}
           </tr>
         </thead>
         <tbody>
@@ -109,16 +112,14 @@ export function OrgTable({
             const f = follow[i];
             const owner = personById(o.owner_id);
             const sub = [o.category, o.location].filter(Boolean).join(" · ");
-            const cell = cn("h-11 max-w-0 truncate border-b border-line px-3 transition-colors duration-150", sel ? "bg-active" : "group-hover:bg-hover");
+            const cell = "h-11 overflow-hidden border-b border-line px-3 whitespace-nowrap";
             return (
-              <tr key={o.id} onClick={() => onOpen(o.id)} className="group cursor-pointer">
-                <td
-                  className={cn(
-                    stickyCell,
-                    "h-11 max-w-0 border-b border-line pr-3 pl-[18px] transition-colors duration-150",
-                    sel ? "bg-[color-mix(in_srgb,var(--text)_6%,var(--panel))]" : "group-hover:bg-[color-mix(in_srgb,var(--text)_3.5%,var(--panel))]"
-                  )}
-                >
+              <tr
+                key={o.id}
+                onClick={() => onOpen(o.id)}
+                className={cn("cursor-pointer transition-colors duration-150", sel ? "bg-active" : "hover:bg-hover")}
+              >
+                <td className="h-11 overflow-hidden border-b border-line pr-3 pl-[18px]">
                   <span className="flex min-w-0 items-center gap-2.5">
                     <span className="grid size-[26px] shrink-0 place-items-center rounded-md bg-active text-[10.5px] font-semibold text-fg-2" aria-hidden>
                       {initials(o.name)}
@@ -146,7 +147,7 @@ export function OrgTable({
                     {st.name}
                   </span>
                 </td>
-                <td className={cell}>
+                <td className={cn(cell, hidePrio)}>
                   {o.prio && (
                     <span className="rounded-[5px] px-[5px] py-px font-mono text-[11px] font-medium text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)]">
                       <span className="sr-only">Prio </span>
@@ -159,7 +160,7 @@ export function OrgTable({
                 </td>
                 <td className={cell}>
                   {owner ? (
-                    <span className="inline-flex min-w-0 items-center gap-2">
+                    <span className="flex min-w-0 items-center gap-2" title={owner.name}>
                       <Avatar person={owner} size={20} />
                       <span className="truncate">{owner.name}</span>
                     </span>
@@ -167,8 +168,8 @@ export function OrgTable({
                     <span className="text-fg-3">–</span>
                   )}
                 </td>
-                <td className={cn(cell, "text-fg-2")} title={venue ? (o.capacity ?? undefined) : undefined}>
-                  {venue ? shortCap(o.capacity) : warmText(o)}
+                <td className={cn(cell, hideExtra, "text-fg-2")} title={(venue ? o.capacity : warmText(o)) || undefined}>
+                  <span className="block truncate">{venue ? shortCap(o.capacity) : warmText(o)}</span>
                 </td>
               </tr>
             );

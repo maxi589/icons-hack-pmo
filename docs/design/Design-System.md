@@ -49,7 +49,7 @@ Wichtig: Dünne Lime-Linien auf Weiß sind unsichtbar. Im Hellmodus deshalb imme
 
 **Avatar-Farben** (Initialen #111): Maxi S #c4b5fd (MS) · Maxi D #fda4af (MD) · Manu #99f6e4 (MA) · Tim #fde68a (TI) · Kilian #bfdbfe (KI).
 
-**Status-Chips (Maxi, 14.10.):** kein „Oval mit Punkt“ mehr. Chips sind Pillen mit Wort und einem ruhigen Farbverlauf in der Statusfarbe (Klassen `chip-tone`/`chip-amber|red|green`, `chip-today` in `globals.css`). Nur „heute“ (Lime) und „überfällig“ (rot) bewegen sich: Der Verlauf wandert langsam (3,6 s, hin und her). Tönung im Hellmodus höchstens Amber 7 %, Grün 10 %, Rot 12 % (sonst Text unter 4,5:1, nachgerechnet 14.10.).
+**Status-Chips (Maxi, 14.10.):** kein „Oval mit Punkt“ mehr. Chips sind Pillen mit Wort und einem ruhigen Farbverlauf in der Statusfarbe (Klassen `chip-tone`/`chip-amber|red|green`, `chip-today` in `globals.css`). Nur „heute“ (Lime) und „überfällig“ (rot) bewegen sich: Ein Lichtstreifen läuft alle 3,2 s einmal durch (Rot +14 %, Text bleibt über 4,5:1). Legenden-Chips mit 0 Einträgen bleiben still (`still`). Bei „Bewegung reduzieren“ im System steht alles still. Tönung im Hellmodus höchstens Amber 7 %, Grün 10 %, Rot 12 % (sonst Text unter 4,5:1, nachgerechnet 14.10.).
 
 **Bereichs-Zeichen (14.10.):** statt Punkt ein kleiner Ring in Bereichsfarbe mit Kern (`AreaGlyph`). Der Ring füllt sich mit dem Anteil erledigter Meilensteine des Bereichs, zeichnet sich beim Erscheinen (300 ms) und wächst beim Drüberfahren leicht.
 
@@ -89,13 +89,14 @@ Wichtig: Dünne Lime-Linien auf Weiß sind unsichtbar. Im Hellmodus deshalb imme
    - Umschalter Zeitstrahl/Liste. Am Handy nur die Liste.
 3. **Pipeline** (`Graphit-Pipeline.dc.html`)
    - Tabs je Typ, Umschalter Board/Liste, Zielbalken, Zähler „heute“ und „überfällig“.
-   - **Liste = CRM-Tabelle** (Maxi, 14.10., Variante D nach Prüfschleife, nur Desktop; am Handy bleibt die Liste): Firma (Kürzel, Name, darunter Kategorie · Ort) · Stufe · Prio · Nachfassen · Zuständig · Warmer Kontakt bzw. bei Venues Kapazität (kurz). 44px-Zeilen, keine Rasterlinien, keine Pills. Standard-Sortierung Nachfassen (Überfälliges oben), jeder Spaltenkopf sortiert. Kopf und Firmenspalte kleben, unten Zähler je Stufe.
+   - **Liste = CRM-Tabelle** (Maxi, 14.10., Variante D nach Prüfschleife, nur Desktop; am Handy bleibt die Liste): Firma (Kürzel, Name, darunter Kategorie · Ort) · Stufe · Prio · Nachfassen · Zuständig · Warmer Kontakt bzw. bei Venues Kapazität (kurz). 44px-Zeilen, keine Rasterlinien, keine Pills, nie seitliches Scrollen: Bei wenig Platz (Container unter 900px, z. B. Detail offen) fällt die letzte Spalte weg, unter 700px auch Prio. Standard-Sortierung Nachfassen (Überfälliges oben), jeder Spaltenkopf sortiert. Kopf und Firmenspalte kleben, unten Zähler je Stufe.
    - „Sponsor/Jury“ aus der Excel wird beim Import zu zwei Einträgen (Sponsoren und Jury), weil jede Anfrage eine eigene Stufe braucht.
    - Spalten: Recherche → Kontaktiert → Im Gespräch → Zugesagt → Fix · Abgesagt (schmal).
    - Karte: Initialen, Name, Prio, „warm über X · Welle n“, Nachfass-Chip (heute = Akzent, überfällig = rot), Avatar.
    - Detail-Sheet:
      - Stufe plus Primärknopf „Weiter zu ‚…‘“
-     - Eigenschaften (entschlackt 14.10.): Zuständig, Nachfassen mit +2 Tage und +1 Woche, Prio, Warm über (bestehende Verbindung klein darunter), Kontakt (Name und Mail/Telefon in einer Zeile). Venues zusätzlich Block „Eckdaten“: Kapazität, Übernachtung, Preis/Deal, Lage. Dann Notizen. Unter „Mehr“ (eingeklappt): Website, Bestehend, Welle, Rollen. Website-Symbol im Kopf, wenn gesetzt.
+     - Eigenschaften (entschlackt 14.10.): Zuständig, Nachfassen (Datum rot/Lime je nach Status, +2 T und +1 W in einer Zeile), Prio, Warm über (bestehende Verbindung klein darunter, nicht bei Venues), Ansprechperson, E-Mail / Tel., Website. Venues zusätzlich Block „Eckdaten“: Kapazität, Übernachtung, Preis/Deal, Lage. Dann Notizen. Kein „Mehr“, keine Welle, keine Rollen im Detail (Maxi: nicht overengineeren). Leere Felder zeigen „–“, keine Beispieltexte. Website-Symbol im Kopf, wenn gesetzt.
+     - Das Detail-Panel steht rechts über die volle Höhe unter der Kopfzeile; Tabs und Filter stehen nur über der Liste (gilt auch für Aufgaben und Wissen).
      - „Link kopieren“ überall nur als Link-Symbol in der Ecke.
      - Verlauf aus Systemereignissen und Kommentaren
      - Kommentarfeld mit @

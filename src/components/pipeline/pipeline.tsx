@@ -151,6 +151,9 @@ export function Pipeline() {
           ]}
         />
       </PageHeader>
+      {/* Links Tabs, Filter und Inhalt; rechts das Detail über die volle Höhe unter der Kopfzeile (wie Linear/Attio) */}
+      <div className="flex min-h-0 flex-1">
+        <div className="flex min-w-0 flex-1 flex-col">
       <h1 className="px-3.5 pt-2 pb-2 text-[21px] font-semibold tracking-[-0.025em] md:sr-only">Pipeline</h1>
 
       {/* Tabs, Suche, Filter */}
@@ -218,11 +221,13 @@ export function Pipeline() {
           {tabDef.goal ? (tab === "venues" ? "plus Backup" : "zugesagt") : "zugesagt · Ziel offen"}
         </span>
         <span className="flex items-center gap-2">
-          <Chip tone="today">heute</Chip>
+          <Chip tone="today" still={dueToday === 0}>
+            heute
+          </Chip>
           <span className="tabular">{dueToday}</span> nachfassen
         </span>
         <span className="flex items-center gap-2">
-          <Chip tone="red">
+          <Chip tone="red" still={overdue === 0}>
             überfällig
           </Chip>
           <span className="tabular">{overdue}</span>
@@ -233,8 +238,7 @@ export function Pipeline() {
       {inThisTab.length === 0 ? (
         <EmptyTab tabName={tabDef.name} onNew={() => setParams({ neu: "1" })} />
       ) : (
-        <div className="flex min-h-0 flex-1">
-          <div className="min-w-0 flex-1 md:overflow-auto">
+          <div className="min-h-0 min-w-0 flex-1 md:overflow-auto">
             {view === "board" && (
               <div className="hidden p-3.5 pb-5 md:block">
                 <KanbanProvider
@@ -294,15 +298,16 @@ export function Pipeline() {
             </div>
             {visible.length === 0 && <p className="px-5 py-8 text-center text-[13.5px] text-fg-2">Keine Treffer. Suche oder Filter anpassen.</p>}
           </div>
-
-          {/* Detail: Desktop rechts, Handy als Bottom Sheet */}
-          {selected && !isMobile && (
-            <aside aria-label="Firmen-Detail" className="w-[400px] shrink-0 overflow-y-auto border-l border-line bg-card">
-              {detail}
-            </aside>
-          )}
-        </div>
       )}
+        </div>
+
+        {/* Detail: Desktop rechts, Handy als Bottom Sheet */}
+        {selected && !isMobile && (
+          <aside aria-label="Firmen-Detail" className="w-[400px] shrink-0 overflow-y-auto border-l border-line bg-card">
+            {detail}
+          </aside>
+        )}
+      </div>
 
       <MobileSheet open={!!selected && isMobile} onClose={close} title={selected?.name ?? ""}>
         {detail}

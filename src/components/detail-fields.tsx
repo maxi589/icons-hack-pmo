@@ -13,15 +13,16 @@ const selectCls =
 export const miniButton =
   "inline-flex h-[26px] items-center rounded-[7px] px-2.5 text-[12px] text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)] transition-colors duration-150 hover:bg-hover hover:text-fg";
 
+// Beschriftung steht auf Höhe der ersten Zeile (leading-8 = Höhe der Felder), auch wenn der Inhalt umbricht.
 export function PropRow({ label, htmlFor, children }: { label: string; htmlFor?: string; children: React.ReactNode }) {
   return (
-    <div className="grid min-h-9 grid-cols-[112px_minmax(0,1fr)] items-center gap-2.5 text-[13px]">
+    <div className="grid min-h-9 grid-cols-[112px_minmax(0,1fr)] items-start gap-2.5 py-0.5 text-[13px]">
       {htmlFor ? (
-        <label htmlFor={htmlFor} className="text-fg-3">
+        <label htmlFor={htmlFor} className="leading-8 text-fg-3">
           {label}
         </label>
       ) : (
-        <span className="text-fg-3">{label}</span>
+        <span className="leading-8 text-fg-3">{label}</span>
       )}
       <div className="min-w-0">{children}</div>
     </div>
