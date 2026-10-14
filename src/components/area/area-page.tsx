@@ -1,6 +1,5 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, ChevronDown } from "lucide-react";
@@ -9,19 +8,19 @@ import { Avatar } from "@/components/avatar";
 import { AreaGlyph } from "@/components/area-glyph";
 import { Chip, DueChip } from "@/components/chip";
 import { useToast } from "@/components/toast";
+import { NotesCard } from "@/components/editor/notes-card";
+import { useTaskActions } from "@/components/tasks/use-task-actions";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { StatusCheck } from "@/components/tasks/status-check";
-import { play } from "@/lib/sounds";
 import { useToday } from "@/lib/use-today";
-import { daysBetween, formatShort, TIME_ZONE, todayInVienna } from "@/lib/dates";
+import { daysBetween, formatShort } from "@/lib/dates";
 import { useMilestones, type Milestone } from "@/lib/data/use-milestones";
 import { useTasks } from "@/lib/data/use-tasks";
 import { useOrganizations } from "@/lib/data/use-organizations";
 import { useAreaNotes } from "@/lib/data/use-area-notes";
-import { logActivity } from "@/lib/data/use-feed";
 import { followState, inTab, STAGES, TABS, type Organization, type TabId } from "@/lib/pipeline";
-import { sortTasks, taskStatusName, type Task, type TaskStatus } from "@/lib/tasks";
+import { sortTasks, type Task } from "@/lib/tasks";
 
 // Bereichs-Seite (Umfang v1): verantwortliche Person, Fortschritt, Notizen, Meilensteine und Aufgaben eines Teilprojekts.
 // Bereiche mit Pipeline (Partner, Sponsoren, Jury, Venue) zeigen dazu ihr Ziel aus der Pipeline.
@@ -38,10 +37,11 @@ const PIPELINE_TAB: Record<string, TabId> = {
 export function AreaPage({ id }: { id: string }) {
   const today = useToday();
   const router = useRouter();
-  const toast = useToast();
-  const { me, areaById } = useTeam();
+  const { areaById } = useTeam();
   const { milestones, setMilestoneDone } = useMilestones();
-  const { tasks, update } = useTasks();
+  const tasksApi = useTasks();
+  const { tasks } = tasksApi;
+  const { toggleDone, createTask } = useTaskActions(tasksApi);
   const { orgs } = useOrganizations();
 
   const area = areaById(id);
@@ -54,23 +54,6 @@ export function AreaPage({ id }: { id: string }) {
 
   const own = milestones.filter((m) => m.area_id === id);
   const areaTasks = tasks.filter((t) => t.area_id === id);
-
-  /** Abhaken wie auf der Aufgaben-Seite: sofort speichern, 5 s „Rückgängig“, danach Eintrag im Verlauf. */
-  const toggleTask = (task: Task) => {
-    const from = task.status;
-    const to: TaskStatus = from === "erledigt" ? "offen" : "erledigt";
-    update(task.id, { status: to });
-    if (to === "erledigt") play("taskDone");
-    toast({
-      text: to === "erledigt" ? `„${task.title}“ erledigt` : `„${task.title}“ → ${taskStatusName(to)}`,
-      onAction: () => update(task.id, { status: from }),
-      onExpire: () =>
-        logActivity("task", task.id, me?.id ?? null, "status_changed", {
-          from,
-          to,
-        }),
-    });
-  };
 
   return (
     <>
@@ -88,10 +71,14 @@ export function AreaPage({ id }: { id: string }) {
 
         {/* Links die Notizen als Ablage, rechts was zu tun ist. Am Handy erst Meilensteine/Aufgaben, Notizen unten. */}
         <div className="grid gap-4 md:gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
-          <NotesCard areaId={id} areaName={area.name} />
+          <AreaNotes
+            areaId={id}
+            areaName={area.name}
+            onCreateTask={(title) => createTask({ title, area_id: id }, (taskId) => `/aufgaben?bereich=${id}&aufgabe=${taskId}`)}
+          />
           <div className="flex min-w-0 flex-col items-stretch gap-4 self-start max-lg:order-first md:gap-5">
             <MilestonesCard milestones={milestones} own={own} today={today} onToggle={setMilestoneDone} />
-            <TasksCard areaId={id} tasks={areaTasks} milestones={milestones} today={today} onToggle={toggleTask} onNew={newTask} />
+            <TasksCard areaId={id} tasks={areaTasks} milestones={milestones} today={today} onToggle={toggleDone} onNew={newTask} />
           </div>
         </div>
       </div>
@@ -255,82 +242,21 @@ function PipelineField({ tab, orgs, today }: { tab: TabId; orgs: Organization[];
 }
 
 // ---------------------------------------------------------------
-// Notizen: freies Textfeld als Ablage (Maxi, 14.10.), speichert von selbst
+// Notizen: Ablage fürs Teilprojekt (Maxi, 14.10.) im gemeinsamen Editor, speichert von selbst
 // ---------------------------------------------------------------
-const timeFmt = new Intl.DateTimeFormat("de-AT", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
-
-function NotesCard({ areaId, areaName }: { areaId: string; areaName: string }) {
-  const { me, personById } = useTeam();
-  const today = useToday();
+function AreaNotes({ areaId, areaName, onCreateTask }: { areaId: string; areaName: string; onCreateTask: (title: string) => Promise<string | null> }) {
+  const { me } = useTeam();
   const { data, save } = useAreaNotes(areaId);
-  const [draft, setDraft] = useState<string | null>(null);
-  const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
-  const pending = useRef<string | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const flush = useCallback(async () => {
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = null;
-    const value = pending.current;
-    if (value === null) return;
-    pending.current = null;
-    setState("saving");
-    const ok = await save(value, me?.id ?? null);
-    setState(ok ? "saved" : "error");
-  }, [save, me]);
-
-  // Beim Verlassen der Seite nichts verlieren.
-  useEffect(() => () => void flush(), [flush]);
-
-  if (data === false) return null;
-
-  // Solange man schreibt (draft gesetzt), gilt der eigene Text; sonst der gespeicherte (auch fremde Änderungen live).
-  const value = draft ?? data?.notes ?? "";
-
-  const onChange = (next: string) => {
-    setDraft(next);
-    pending.current = next;
-    setState("idle");
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(flush, 800);
-  };
-
-  let meta = "";
-  if (state === "saving") meta = "Speichert …";
-  else if (state === "saved" && draft !== null) meta = "Gespeichert";
-  else if (state === "error") meta = "Nicht gespeichert";
-  else if (data?.updatedAt) {
-    const day = todayInVienna(new Date(data.updatedAt));
-    const when = day === today ? `heute, ${timeFmt.format(new Date(data.updatedAt))}` : formatShort(day);
-    const who = personById(data.updatedBy)?.name;
-    meta = who ? `${who} · ${when}` : when;
-  }
-
   return (
-    <section className={cn(card, "flex min-w-0 flex-col overflow-hidden transition-shadow duration-150 has-[textarea:focus-visible]:shadow-[0_0_0_2px_var(--accLine)]")}>
-      <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3">
-        <h2 className="text-[14px] font-semibold">Notizen</h2>
-        <span className={cn("text-[12px] text-fg-3 tabular", state === "error" && "text-st-red")} aria-live="polite">
-          {meta}
-        </span>
-      </div>
-      <label className="sr-only" htmlFor={`notes-${areaId}`}>
-        Notizen zu {areaName}
-      </label>
-      <textarea
-        id={`notes-${areaId}`}
-        value={value}
-        disabled={data === null}
-        onChange={(e) => onChange(e.target.value)}
-        onBlur={async () => {
-          await flush();
-          // Nach dem Speichern wieder dem gespeicherten Stand folgen (fremde Änderungen erscheinen live).
-          if (pending.current === null) setDraft(null);
-        }}
-        placeholder="Absprachen, Kontakte, Links, Ideen …"
-        className="min-h-[320px] w-full flex-1 resize-none border-t border-line bg-transparent px-4 py-3.5 text-[14px] leading-relaxed text-fg [field-sizing:content] placeholder:text-fg-3 focus-visible:outline-none max-md:text-base lg:min-h-[460px]"
-      />
-    </section>
+    <NotesCard
+      title="Notizen"
+      label={`Notizen zu ${areaName}`}
+      data={data}
+      save={(md) => save(md, me?.id ?? null)}
+      placeholder="Absprachen, Kontakte, Links, Ideen …"
+      presenceKey={`area-${areaId}`}
+      onCreateTask={onCreateTask}
+    />
   );
 }
 

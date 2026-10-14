@@ -67,7 +67,7 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
 
 ## 5. Layout
 - **Desktop:** Sidebar 220px (Maxi, 14.10.: enger), auf ein 60px-Icon-Band einklappbar. Der Knopf zum Ein-/Ausklappen sitzt in beiden Zuständen an exakt derselben Stelle oben links. Hauptpanel eingerückt (8px), Radius 14, Ring. Inhalt von Übersicht, Bereichen und Wissen max. 1440px breit, mittig (Maxi, 14.10.: Breite besser nutzen; vorher 1080px). Pipeline über die volle Breite, rechts Detail-Sheet mit 400px.
-- **Sidebar:** Einklapp-Knopf + Logo · Suche (Strg K) · Übersicht, Inbox, Meine Aufgaben · HACKATHON: Roadmap, Pipeline, Aufgaben, Wissen · BEREICHE: 5 mit Bereichs-Zeichen (Ring = Fortschritt) und rechts der verantwortlichen Person als Mini-Avatar (gestrichelter Kreis = noch offen) · unten Avatar, Hell/Dunkel, Abmelden. **Klick auf den eigenen Avatar öffnet „Profil“** (auch Strg+K und Handy-Menü oben): Passwort ändern (aktuelles + neues zweimal) und Team mit „Einladen“ (Name + Mail = Eintrag in der Team-Liste, Anmeldung wie beim ersten Mal; „eingeladen“ = noch kein Konto) und Link zum Tool kopieren. Ohne Erklärtexte. Eingeklappt erscheinen die Bereichs-Zeichen ebenfalls. Kein Sound-Schalter (Maxi, 14.10.: Sounds sind immer an, auch kein Schalter in Strg+K oder im Handy-Menü).
+- **Sidebar:** Einklapp-Knopf + Logo · Suche (Strg K) · Übersicht, Inbox, Für mich · HACKATHON: Roadmap, Pipeline, Aufgaben, Wissen · BEREICHE: 5 mit Bereichs-Zeichen (Ring = Fortschritt) und rechts der verantwortlichen Person als Mini-Avatar (gestrichelter Kreis = noch offen) · unten Avatar, Hell/Dunkel, Abmelden. **Klick auf den eigenen Avatar öffnet „Profil“** (auch Strg+K und Handy-Menü oben): Passwort ändern (aktuelles + neues zweimal) und Team mit „Einladen“ (Name + Mail = Eintrag in der Team-Liste, Anmeldung wie beim ersten Mal; „eingeladen“ = noch kein Konto) und Link zum Tool kopieren. Ohne Erklärtexte. Eingeklappt erscheinen die Bereichs-Zeichen ebenfalls. Kein Sound-Schalter (Maxi, 14.10.: Sounds sind immer an, auch kein Schalter in Strg+K oder im Handy-Menü).
 - **Handy:** Tab-Leiste: Heute · Pipeline · **+** (Akzent-Kreis 52px) · Aufgaben · Inbox. Bottom Sheets, `env(safe-area-inset-bottom)`, Tippflächen mind. 44px, **kein Ziehen & Ablegen** (Status per Sheet).
 
 ## 6. Seiten (siehe Boards)
@@ -104,9 +104,17 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
    - Tastenkürzel stehen rechts in Kästchen.
 5. **Bereichs-Seite** (Maxi, 14.10.)
    - Oben eine Kopf-Leiste wie die Eigenschaften eines Projekts in Linear: Verantwortlich (Auswahl direkt im Feld) · Pipeline-Ziel (falls vorhanden, mit Stufen und heute/überfällig) · Meilensteine x/n · Aufgaben x/n.
-   - Darunter links **Notizen** (freies Textfeld als Ablage, speichert von selbst nach 0,8 s bzw. beim Verlassen, zeigt „wer · wann“), rechts Meilensteine und Aufgaben. Am Handy Notizen unten.
-   - Gleichzeitiges Schreiben: Wer zuletzt speichert, gewinnt. Fremde Änderungen erscheinen live, solange man selbst nicht tippt.
-6. **Handy** (`Graphit-Handy.dc.html`)
+   - Darunter links **Notizen** im gemeinsamen Editor (siehe 6.7; speichert von selbst nach 0,8 s bzw. beim Verlassen, zeigt „wer · wann“), rechts Meilensteine und Aufgaben. Am Handy Notizen unten.
+   - Gleichzeitiges Schreiben: Wer zuletzt speichert, gewinnt. Fremde Änderungen erscheinen live, solange man selbst nicht tippt. Tippt jemand anderes, steht oben „Tim schreibt gerade …“ (Live-Anwesenheit, nichts wird gespeichert).
+6. **Für mich** (Welle 1, 15.10., ersetzt „Meine Aufgaben“; `/meine-aufgaben` leitet weiter)
+   - Aufbau wie die Bereichs-Seite: links der **Notizblock** (privat, Schloss + „privat“ im Kopf, nur die eigene Zeile per RLS), rechts „Meine Aufgaben“ nach Fälligkeit (Überfällig · Heute · Nächste 7 Tage · Später · Ohne Frist, Erledigte eingeklappt). Am Handy Aufgaben zuerst.
+   - Klick auf eine Aufgabe öffnet das Detail rechts über die volle Höhe (wie Aufgaben-Seite), zweiter Klick schließt. „+ Aufgabe“ ist mit dir vorbelegt. Taste G M.
+7. **Gemeinsamer Editor** (Tiptap, gespeichert als Markdown; `src/components/editor/`)
+   - Kann Überschriften, Listen, Checklisten, Links, fett, kursiv, Zitat, Trennlinie. Kürzel wie Notion/Linear: `# `, `- `, `[ ] `, `**fett**`, `> `, `---`. Text aus Google Docs behält beim Einfügen die Struktur.
+   - Markieren öffnet ein kleines Menü: Fett · Kursiv · Überschrift · Liste · Checkliste · Link · **Aufgabe** (legt die Auswahl als Aufgabe an, dir zugewiesen, im Bereich vorbelegt; der Text wird zum Link auf die Aufgabe).
+   - Links öffnen per Klick (Tool-Seiten im selben Tab, alles andere im neuen Tab). Schrift 14px, am Handy 16px, Menü-Knöpfe am Handy 40px.
+   - Eingesetzt in Notizblock und Bereichs-Notizen, später in Terminen und Text-Dokumenten.
+8. **Handy** (`Graphit-Handy.dc.html`)
    - „Heute für dich“ zum Abhaken, mit +2 T.
    - Status-Sheet: Stufen als 48px-Zeilen, Nachfass-Chips, Knopf „Speichern“.
    - Firmen-Detail mit Kommentaren, @-Vorschlagsliste und unten fixiertem Eingabefeld.

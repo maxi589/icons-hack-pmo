@@ -24,7 +24,7 @@ import { StatusCheck } from "./status-check";
 import { TaskDetail } from "./task-detail";
 
 // Aufgaben (Umfang v1): Board und Liste, Filter nach Bereich, Person und Meilenstein.
-// „Meine Aufgaben“ ist dieselbe Seite, fest auf die angemeldete Person und nach Fälligkeit gruppiert.
+// Die eigenen Aufgaben stehen zusätzlich auf „Für mich“ (nutzt die Liste unten, nach Fälligkeit gruppiert).
 // Zustand in der Adresse (teilbar): ?aufgabe=<id>, ?bereich=, ?person= (id oder „offen“), ?meilenstein=, ?neu=1.
 
 type View = "board" | "list";
@@ -56,7 +56,7 @@ function FilterSelect({
   );
 }
 
-export function Tasks({ mine = false }: { mine?: boolean }) {
+export function Tasks() {
   const today = useToday();
   const router = useRouter();
   const pathname = usePathname();
@@ -73,9 +73,9 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
   const selectedId = params.get("aufgabe");
   const newOpen = params.get("neu") === "1";
   const fArea = params.get("bereich") ?? "";
-  const fPerson = mine ? (me?.id ?? "") : (params.get("person") ?? "");
+  const fPerson = params.get("person") ?? "";
   const fMs = params.get("meilenstein") ?? "";
-  const title = mine ? "Meine Aufgaben" : "Aufgaben";
+  const title = "Aufgaben";
 
   const setParams = (patch: Record<string, string | null>) => {
     const next = new URLSearchParams(params.toString());
@@ -98,7 +98,7 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
     .filter((t) => !fPerson || (fPerson === "offen" ? !t.assignee_id : t.assignee_id === fPerson))
     .filter(msMatch)
     .sort(sortTasks);
-  const filtered = !!(fArea || (!mine && fPerson) || fMs);
+  const filtered = !!(fArea || fPerson || fMs);
 
   /** Status ändern: sofort speichern, 5 s „Rückgängig“, danach Eintrag im Verlauf. */
   const changeStatus = (task: Task, to: TaskStatus) => {
@@ -124,7 +124,7 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
   const toggle = (id: string) => setParams({ aufgabe: id === selectedId ? null : id });
   const close = () => setParams({ aufgabe: null });
 
-  if (!tasks || !milestones || !today || (mine && !me)) {
+  if (!tasks || !milestones || !today) {
     return (
       <>
         <PageHeader title={title} />
@@ -174,8 +174,7 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
             </option>
           ))}
         </FilterSelect>
-        {!mine && (
-          <FilterSelect label="Person" value={fPerson} onChange={(v) => setParams({ person: v })}>
+        <FilterSelect label="Person" value={fPerson} onChange={(v) => setParams({ person: v })}>
             <option value="">Alle Personen</option>
             {people.map((p) => (
               <option key={p.id} value={p.id}>
@@ -184,7 +183,6 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
             ))}
             <option value="offen">Noch niemand</option>
           </FilterSelect>
-        )}
         <FilterSelect wide label="Meilenstein" value={fMs} onChange={(v) => setParams({ meilenstein: v })}>
           <option value="">Alle Meilensteine</option>
           {milestoneOptions(msList).map((m) => (
@@ -265,7 +263,7 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
                 tasks={visible}
                 milestones={msList}
                 today={today}
-                byDue={mine}
+                byDue={false}
                 showDone={showDone}
                 onShowDone={() => setShowDone((v) => !v)}
                 selectedId={selectedId}
@@ -274,7 +272,7 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
               />
             </div>
             {visible.length === 0 && (
-              <p className="px-5 py-8 text-center text-[13.5px] text-fg-2">{mine && !filtered ? "Dir ist gerade nichts zugewiesen." : "Keine Treffer."}</p>
+              <p className="px-5 py-8 text-center text-[13.5px] text-fg-2">Keine Treffer.</p>
             )}
           </div>
       )}
@@ -298,7 +296,7 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
         defaults={{
           area_id: fArea || null,
           milestone_id: fMs || null,
-          ...(mine ? {} : fPerson ? { assignee_id: fPerson === "offen" ? null : fPerson } : {}),
+          ...(fPerson ? { assignee_id: fPerson === "offen" ? null : fPerson } : {}),
         }}
         onCreate={async (input) => {
           const task = await create({ ...input, created_by: me?.id ?? null });
@@ -367,10 +365,11 @@ function TaskCard({ task, today, milestones, selected, onOpen }: { task: Task; t
 }
 
 // ---------------------------------------------------------------
-// Liste (Handy immer, Desktop Standard). Gruppen nach Status bzw. bei „Meine Aufgaben“ nach Fälligkeit.
+// Liste (Handy immer, Desktop Standard). Gruppen nach Status bzw. auf „Für mich“ nach Fälligkeit.
 // Erledigte sind eingeklappt.
 // ---------------------------------------------------------------
-function TaskList({
+export function TaskList({
+  className,
   tasks,
   milestones: msList,
   today,
@@ -381,6 +380,7 @@ function TaskList({
   onOpen,
   onToggle,
 }: {
+  className?: string;
   tasks: Task[];
   milestones: Milestone[];
   today: string;
@@ -407,7 +407,7 @@ function TaskList({
   );
 
   return (
-    <div className="flex flex-col gap-4 px-3.5 pb-8 md:px-[18px] md:py-4">
+    <div className={cn("flex flex-col gap-4", className ?? "px-3.5 pb-8 md:px-[18px] md:py-4")}>
       {groups
         .filter((g) => g.items.length)
         .map((g) => (

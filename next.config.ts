@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   cacheComponents: true,
   partialPrefetching: true,
+  // „Meine Aufgaben“ heißt seit Welle 1 „Für mich“ (alte Links und Lesezeichen funktionieren weiter).
+  async redirects() {
+    return [{ source: "/meine-aufgaben", destination: "/fuer-mich", permanent: false }];
+  },
   turbopack: {
     rules: {
       "*.css": {

@@ -1,4 +1,4 @@
-import { BookOpen, CircleCheck, Flag, House, Inbox, Kanban, List, type LucideIcon } from "lucide-react";
+import { BookOpen, Flag, House, Inbox, Kanban, List, NotebookPen, type LucideIcon } from "lucide-react";
 
 // Hauptnavigation. `key` ist das Tastenkürzel nach „G“ (z. B. G R = Roadmap).
 
@@ -7,7 +7,7 @@ export type NavItem = { href: string; label: string; Icon: LucideIcon; key: stri
 export const NAV_MAIN: NavItem[] = [
   { href: "/", label: "Übersicht", Icon: House, key: "U" },
   { href: "/inbox", label: "Inbox", Icon: Inbox, key: "I" },
-  { href: "/meine-aufgaben", label: "Meine Aufgaben", Icon: CircleCheck, key: "M" },
+  { href: "/fuer-mich", label: "Für mich", Icon: NotebookPen, key: "M" },
 ];
 
 export const NAV_HACKATHON: NavItem[] = [
