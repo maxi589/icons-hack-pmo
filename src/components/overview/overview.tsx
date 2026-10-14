@@ -10,6 +10,7 @@ import { Avatar } from "@/components/avatar";
 import { AreaGlyph } from "@/components/area-glyph";
 import { Chip, DueChip } from "@/components/chip";
 import { Countdown } from "@/components/countdown";
+import { RasterField } from "@/components/raster-field";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { useToday } from "@/lib/use-today";
 import { daysBetween, EVENT_START, EVENT_START_UTC, formatDayMonth, formatLong, formatShort, relativeDays, TIME_ZONE } from "@/lib/dates";
@@ -73,7 +74,8 @@ export function Overview() {
 // ---------------------------------------------------------------
 function CountdownCard({ today, phase }: { today: string; phase: number }) {
   return (
-    <section className={cn(card, "flex min-w-0 flex-[1.45_1_440px] flex-col justify-between gap-[22px] px-5 py-[18px] md:px-6 md:py-[22px]")}>
+    <section className={cn(card, "relative isolate flex min-w-0 flex-[1.45_1_440px] flex-col justify-between gap-[22px] overflow-hidden px-5 py-[18px] md:px-6 md:py-[22px]")}>
+      <RasterField />
       <h2 className="label-mono">Countdown</h2>
       <Countdown />
       <p className="-mt-2 text-[13px] text-fg-2">{EVENT_UNTIL}</p>
@@ -81,10 +83,10 @@ function CountdownCard({ today, phase }: { today: string; phase: number }) {
         {PHASES.map((p, i) => (
           <li key={p.name} className="flex flex-col gap-2" aria-current={i === phase ? "step" : undefined}>
             <div className="h-1 overflow-hidden rounded-sm bg-line-2">
-              <div className="h-full rounded-sm bg-acc-line" style={{ width: `${Math.round(phaseFill(i, today) * 100)}%` }} />
+              <div className={cn("h-full rounded-sm bg-acc-line", i === phase && "bar-sheen")} style={{ width: `${Math.round(phaseFill(i, today) * 100)}%` }} />
             </div>
             <div className="hidden flex-col gap-0.5 sm:flex">
-              <span className={cn("text-[12.5px] font-medium", i === phase ? "text-fg" : "text-fg-3")}>{p.name}</span>
+              <span className={cn("text-[12.5px] font-medium", i === phase ? "text-fg" : "text-fg-3")}>{i === phase ? <span className="phase-sweep">{p.name}</span> : p.name}</span>
               <span className={cn("text-[11.5px] text-fg-3 tabular", i !== phase && "sr-only")}>{p.label}</span>
             </div>
             <span className="sr-only sm:hidden">

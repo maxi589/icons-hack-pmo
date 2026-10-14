@@ -404,40 +404,101 @@
   --t2: 10%;
 }
 .chip-today {
-  color: var(--accText);
-  background: var(--acc);
+  --c: var(--accLine);
 }
 
-/* „heute“ und „überfällig“: Lichtstreifen hinter dem Text. Stärke so, dass der Text an der hellsten Stelle ≥ 4,5:1 bleibt
-   (Palette 14.10.: heute Weiß 16 % → 4,83:1; überfällig Rot 10 % hell / 8 % dunkel → mind. 4,66:1). */
-.chip-live {
+/* Tinten-Sweep (Maxi, 14.10., Option 2): Ein Band läuft durch das Wort und macht es kurz KRÄFTIGER
+   (Richtung --text), nie blasser – der Kontrast steigt im Band, bleibt also immer ≥ 4,5:1.
+   Läuft nur beim Erscheinen: „heute“ zweimal, „überfällig“ einmal, aktive Phase einmal (WCAG 2.2.2: nichts über 5 s ohne Pause).
+   Ladezustände dürfen dauerhaft schimmern (Ausnahme für Ladeanzeigen). Bei „Bewegung reduzieren“ steht alles still. */
+.chip-sweep,
+.phase-sweep {
+  --band: color-mix(in srgb, var(--c) 35%, var(--text));
+  background-image: linear-gradient(110deg, var(--c) 0%, var(--c) 40%, var(--band) 50%, var(--c) 60%, var(--c) 100%);
+  background-size: 260% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: ink-sweep 2.8s ease-in-out 1 both;
+}
+.chip-today .chip-sweep {
+  animation-iteration-count: 2;
+}
+.phase-sweep {
+  --c: var(--text);
+  --band: var(--accLine);
+  animation-duration: 3.2s;
+  animation-delay: 0.3s;
+}
+@keyframes ink-sweep {
+  0% {
+    background-position: 100% 0;
+  }
+  57%,
+  100% {
+    background-position: 0% 0;
+  }
+}
+/* Glanz einmal über den Balken der aktiven Phase */
+.bar-sheen {
   position: relative;
   overflow: hidden;
-  isolation: isolate;
-  --sheen: color-mix(in srgb, var(--c) 10%, transparent);
 }
-.dark .chip-live {
-  --sheen: color-mix(in srgb, var(--c) 8%, transparent);
-}
-.chip-today.chip-live,
-.dark .chip-today.chip-live {
-  --sheen: rgb(255 255 255 / 0.16);
-}
-.chip-live::after {
+.bar-sheen::after {
   content: "";
   position: absolute;
   inset: 0;
-  z-index: -1;
-  background: linear-gradient(100deg, transparent 25%, var(--sheen) 50%, transparent 75%);
+  background: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--card) 45%, transparent) 50%, transparent 70%);
   transform: translateX(-100%);
-  animation: chip-sheen 3.2s ease-in-out infinite;
+  animation: bar-sheen 2.4s cubic-bezier(0.22, 1, 0.36, 1) 0.4s 1 both;
 }
-@keyframes chip-sheen {
-  0% {
-    transform: translateX(-100%);
-  }
-  45%,
-  100% {
+@keyframes bar-sheen {
+  to {
     transform: translateX(100%);
+  }
+}
+/* Ladezustände: Platzhalter schimmern ruhig, solange geladen wird */
+[aria-busy="true"] .bg-card-2,
+[aria-busy="true"].bg-card-2 {
+  background-image: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--text) 5%, transparent) 50%, transparent 70%);
+  background-size: 250% 100%;
+  background-repeat: no-repeat;
+  animation: skeleton-sweep 2.4s ease-in-out infinite;
+}
+@keyframes skeleton-sweep {
+  0% {
+    background-position: 120% 0;
+  }
+  100% {
+    background-position: -20% 0;
+  }
+}
+/* Primärknopf: ein schräger Glanz beim Drüberfahren (Weiß 16 %, Text bleibt ≥ 4,5:1) */
+:is(button, a):is(.bg-acc, .bg-primary) {
+  background-image: linear-gradient(115deg, transparent 35%, rgb(255 255 255 / 0.16) 50%, transparent 65%);
+  background-size: 250% 100%;
+  background-repeat: no-repeat;
+  background-position: 120% 0;
+}
+@media (hover: hover) {
+  :is(button, a):is(.bg-acc, .bg-primary):hover {
+    background-position: -20% 0;
+    transition: background-position 0.75s ease-out;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chip-sweep,
+  .phase-sweep,
+  .bar-sheen::after,
+  [aria-busy="true"] .bg-card-2,
+  [aria-busy="true"].bg-card-2 {
+    animation: none;
+  }
+  .bar-sheen::after {
+    display: none;
+  }
+  :is(button, a):is(.bg-acc, .bg-primary):hover {
+    transition: none;
   }
 }

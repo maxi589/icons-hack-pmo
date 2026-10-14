@@ -2,14 +2,14 @@ import { cn } from "@/lib/utils";
 import { daysBetween, relativeDays } from "@/lib/dates";
 
 // Chips (Maxi, 14.10.): kein Punkt mehr, stattdessen ein ruhiger Farbverlauf in der Statusfarbe (Stile in globals.css).
-// „heute“ (Kobalt) und „überfällig“ (rot) bekommen einen durchlaufenden Lichtstreifen, damit sie auffallen;
-// der Rest steht still. `still` schaltet den Streifen ab (z. B. Legende mit 0 Einträgen).
+// „heute“ (Kobalt) und „überfällig“ (rot) bekommen beim Erscheinen den Tinten-Sweep (globals.css, .chip-sweep):
+// Ein Band läuft durchs Wort und macht es kurz kräftiger. Der Rest steht still. `still` schaltet den Sweep ab.
 const TONES = {
   gray: "text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)]",
   amber: "chip-tone chip-amber",
-  red: "chip-tone chip-red chip-live",
+  red: "chip-tone chip-red",
   green: "chip-tone chip-green",
-  today: "chip-today chip-live",
+  today: "chip-tone chip-today",
 } as const;
 
 export type ChipTone = keyof typeof TONES;
@@ -30,11 +30,10 @@ export function Chip({
       className={cn(
         "inline-flex h-[22px] shrink-0 items-center gap-1.5 rounded-full px-2.5 text-[11.5px] font-medium whitespace-nowrap tabular",
         TONES[tone],
-        still && "after:hidden!",
         className
       )}
     >
-      {children}
+      {!still && (tone === "red" || tone === "today") ? <span className="chip-sweep">{children}</span> : children}
     </span>
   );
 }

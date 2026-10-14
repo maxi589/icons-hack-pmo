@@ -41,7 +41,7 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
 
 **Avatar-Farben** (`--avatar-<initialen>`, Initialen #111, ≥ 13,6:1): Maxi S #dbd6ff · Maxi D #ffddd4 · Manu #c4ffe4 · Tim #fff2bc · Kilian #bbeaff.
 
-**Lichtstreifen in Chips:** „heute“ Weiß 16 % (Text an der hellsten Stelle 4,83:1), „überfällig“ Statusrot 10 % hell / 8 % dunkel. Nie stärker, sonst fällt der Text unter 4,5:1 (früher 55 % = 2,14:1).
+**Bewegung „Tinten-Sweep“ (Maxi, 14.10., Option 2):** Ein Band läuft durch das Wort und macht es kurz **kräftiger** (Richtung Haupttext), nie blasser. „heute“ 2 Durchläufe, „überfällig“ 1, Wort der aktiven Phase 1 (+ einmal Glanz über den Balken), je 2,8–3,2 s, danach Ruhe (WCAG 2.2.2). Ladeplatzhalter schimmern dauerhaft (Ausnahme Ladeanzeige). Primärknöpfe: ein schräger Glanz (Weiß 16 %) beim Drüberfahren. Countdown: feines Punktraster mit langsamer Welle (≈ 11 s), reagiert auf die Maus (`raster-field.tsx`). Chip „heute“ ist jetzt getönt (Kobalt-Text auf 3–8 % Kobalt) statt gefüllt, ≥ 5,4:1. Der alte Dauer-Lichtstreifen ist entfernt. Bei „Bewegung reduzieren“ steht alles still.
 
 **Login:** Schimmer in #4f8fd9 (0,18 Mitte, 0,06 bei 45 %), Schein unterm Mauszeiger 0,06. **App-Icons:** Schwarz #0c0c0d, Schrift #e4e4e8, Strich #4f8fd9.
 
