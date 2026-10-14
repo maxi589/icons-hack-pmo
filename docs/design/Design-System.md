@@ -11,8 +11,8 @@
 - **Farbe nur für Bedeutung:** Pipeline-Stufen, Bereichs-Punkte, Fälligkeit. Alles andere ist neutral. Dazu kommt **ein** Signatur-Akzent (Lime).
 - Hell und dunkel sind gleichwertig. **Standard = Systemeinstellung** des Geräts. Umschalter in der Sidebar unten.
 - Genau zwei Wow-Momente: der Countdown als Live-Uhr (Michroma, Ziffern rollen) und „Meilenstein erledigt“ (Animation + Sound).
-- Keine icons-Farben (Wunsch von Maxi). Das Logo erscheint nur als einfarbiger Schriftzug „icons“ in Michroma.
-- **Eventname „hackvienna“** (Team, 14.10.): immer klein und zusammen. Steht nur als Text (Sidebar-Label „hackvienna 27“, Seitentitel „… · hackvienna PMO“, App-Name), zentral in `src/lib/brand.ts`.
+- Keine icons-Farben (Wunsch von Maxi). Das Logo ist der einfarbige Schriftzug „hack-vienna“ in Michroma (vorher „icons“).
+- **Eventname und Logo „hack-vienna“** (Team, 14.10.): klein, mit Bindestrich wie die Domain. Logo = einfarbiger Schriftzug „hack-vienna“ in Michroma, darunter klein „by icons“ (Sidebar „by icons · 2027“). Seitentitel „… · hack-vienna PMO“, App-Name, App-Icons „hack / vienna“ mit Lime-Strich, Favicon „hv“. Name zentral in `src/lib/brand.ts`.
 - **Wenig Text (Maxi, 14.10.):** keine Erklärsätze unter Überschriften, in Dialogen oder Leerzuständen. Leerzustand = ein kurzer Satz („Keine Treffer.“, „Noch keine Kommentare.“). Begriffe erklären sich über die Oberfläche, nicht über Hinweistexte.
 - **Ausnahme Login-Seite (Maxi, 13.10.):** immer dunkel, Hintergrund schwarz, oben mittig ein leichter Lime-Schimmer (atmet langsam) und ein weicher Lime-Schein unter dem Mauszeiger. Login-Karte mittig und schlicht. Gilt nur dort.
 - **Nicht verwenden:** Glas-Effekte, Glow (Ausnahme oben), animierte Sidebar, Kipp- und Magnet-Effekte, eigener Mauszeiger, WebGL. Außerdem keine Werte oder Code von uimaxx.ing und aicss.dev (beide untersagen KI-Nutzung).
@@ -58,7 +58,7 @@ Wichtig: Dünne Lime-Linien auf Weiß sind unsichtbar. Im Hellmodus deshalb imme
 ## 3. Schrift
 - **Geist** über das npm-Paket `geist`, lokal ausgeliefert (kein Google-Fonts-Abruf, DSGVO; volle Zeichensätze, Ziffern gleicher Breite). Für Zahlen `font-variant-numeric: tabular-nums`.
 - **Geist Mono:** IDs (M1.2), Daten, Abschnitts-Labels. Label-Stil: 10,5px, Großbuchstaben, Laufweite .12em, `--text3`.
-- **Michroma** (Google Font, über next/font lokal einbinden): nur für den Schriftzug „icons“ und die Countdown-Zahl (Desktop 72px, Handy 46px, Laufweite 0,01em).
+- **Michroma** (Google Font, über next/font lokal einbinden): nur für den Schriftzug „hack-vienna“ und die Countdown-Zahl (Desktop 72px, Handy 46px, Laufweite 0,01em).
 - Größen Desktop: Listen 13,5px · Fließtext 14px · Kartentitel 14px/600 · Seitentitel 26px/600/−0,025em · Kennzahlen 34px/500.
 - Größen Handy: Text 15px · **Eingabefelder 16px** (sonst zoomt das iPhone) · Titel 21–22px.
 

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { login, type LoginState } from "./actions";
+import { EVENT_NAME } from "@/lib/brand";
 
 export function LoginCard() {
   const params = useSearchParams();
@@ -17,7 +18,8 @@ export function LoginCard() {
   return (
     <div className="flex w-full max-w-[360px] flex-col gap-6 rounded-2xl bg-card p-7 shadow-card">
       <div className="flex flex-col gap-1">
-        <span className="font-display text-[17px] tracking-[0.01em]">icons</span>
+        <span className="font-display text-[17px] tracking-[0.01em]">{EVENT_NAME}</span>
+        <span className="label-mono">by icons</span>
         <h1 className="mt-3 text-[21px] font-semibold tracking-[-0.025em]">Anmelden</h1>
         <p className="text-fg-2">Steuerung für das Orga-Team.</p>
       </div>

@@ -15,6 +15,7 @@ import { signOut, usePalette } from "./command-palette";
 import { useTeam } from "./team-provider";
 import { useToday } from "@/lib/use-today";
 import { formatHeaderDate } from "@/lib/dates";
+import { EVENT_NAME } from "@/lib/brand";
 
 // Handy (unter 768px): Kopfzeile mit Logo, Datum und Avatar (öffnet das Menü),
 // unten die Tab-Leiste Heute · Pipeline · + · Aufgaben · Inbox. Tippflächen mind. 44px.
@@ -31,8 +32,8 @@ export function MobileHeader() {
 
   return (
     <header className="flex items-center justify-between px-[18px] pt-[max(12px,env(safe-area-inset-top))] pb-2 md:hidden">
-      <Link href="/" className="flex min-h-11 items-center font-display text-[15px] tracking-[0.05em]">
-        icons
+      <Link href="/" className="flex min-h-11 items-center font-display text-[14px] tracking-[0.02em]">
+        {EVENT_NAME}
       </Link>
       <div className="flex items-center gap-1">
         <span className="text-[13px] text-fg-2">

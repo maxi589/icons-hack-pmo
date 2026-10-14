@@ -1,4 +1,4 @@
-// Name des Events an einer Stelle (Team, 14.10.: „hackvienna“, immer klein und zusammen).
-// Umbenennen = diese Zeile ändern. Das Logo bleibt der Schriftzug „icons“ (Design-System).
-export const EVENT_NAME = "hackvienna";
+// Name des Events an einer Stelle (Team, 14.10.: „hack-vienna“, klein, mit Bindestrich wie die Domain).
+// Umbenennen = diese Zeile ändern. Logo = Schriftzug in Michroma, „by icons“ klein daneben (Design-System).
+export const EVENT_NAME = "hack-vienna";
 export const APP_NAME = `${EVENT_NAME} PMO`;

@@ -112,9 +112,9 @@ export function Sidebar() {
           <button type="button" onClick={toggleSidebar} className={cn(iconBtn, "size-9")} aria-label="Sidebar einklappen" title="Sidebar einklappen">
             <PanelLeftClose className="size-4" strokeWidth={1.8} aria-hidden />
           </button>
-          <Link href="/" className="flex items-baseline gap-2.5 rounded-md">
-            <span className="font-display text-base tracking-[0.05em]">icons</span>
-            <span className="label-mono text-[10px]!">{EVENT_NAME} 27</span>
+          <Link href="/" className="flex min-w-0 flex-col rounded-md leading-none">
+            <span className="font-display text-[13px] tracking-[0.02em] whitespace-nowrap">{EVENT_NAME}</span>
+            <span className="label-mono mt-1 text-[9.5px]!">by icons · 2027</span>
           </Link>
         </div>
 
