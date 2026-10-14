@@ -345,8 +345,6 @@ try {
   else console.error(e.message);
   process.exit(1);
 }
-const all = [...partners.rows, ...venues.rows];
-
 // Doppelte Namen innerhalb der Partner-Liste und gegenüber bestehenden Einträgen (ohne frühere Importe)
 const seen = new Map();
 for (const o of partners.rows) {
@@ -354,6 +352,18 @@ for (const o of partners.rows) {
   if (seen.has(k)) problems.push(`Partner.xlsx: „${o.name}“ steht doppelt (${seen.get(k)} und ${o.source})`);
   else seen.set(k, o.source);
 }
+
+// Jury ist eine eigene Anfrage mit eigener Stufe (Maxi, 14.10.): Eine Sponsor-Zusage ist keine Jury-Zusage.
+// „Sponsor/Jury“ wird deshalb zu zwei Einträgen, einer im Tab Sponsoren und einer im Tab Jury.
+const SRC_JURY = " · Jury";
+const splitCount = partners.rows.filter((o) => o.roles.includes("jury") && o.roles.length > 1).length;
+partners.rows = partners.rows.flatMap((o) =>
+  o.roles.includes("jury") && o.roles.length > 1
+    ? [{ ...o, roles: o.roles.filter((r) => r !== "jury") }, { ...o, roles: ["jury"], source: o.source + SRC_JURY }]
+    : [o]
+);
+if (splitCount) hints.push(`${splitCount} Firmen mit Jury und weiterer Rolle als zwei Einträge angelegt (eigene Stufe für die Jury-Anfrage)`);
+const all = [...partners.rows, ...venues.rows];
 const { data: existing } = await db.from("organizations").select("name, source");
 const existingOther = existing.filter((e) => !e.source?.startsWith(SRC_PARTNER) && !e.source?.startsWith(SRC_VENUE));
 for (const o of all) {

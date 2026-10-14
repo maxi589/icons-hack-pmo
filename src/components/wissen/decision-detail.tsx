@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Link2, Trash2, X } from "lucide-react";
+import { ArrowUpRight, Trash2, X } from "lucide-react";
+import { CopyLinkButton } from "@/components/copy-link-button";
 import { Feed } from "@/components/feed";
-import { EditText, miniButton, PropRow, SelectBox } from "@/components/detail-fields";
+import { EditText, PropRow, SelectBox } from "@/components/detail-fields";
 import { useTeam } from "@/components/app-shell/team-provider";
-import { cn } from "@/lib/utils";
 import { targetHref } from "@/lib/links";
 import type { Decision, DecisionPatch } from "@/lib/data/use-knowledge";
 import { parseTopic, PeoplePicker, TopicOptions, topicValue, type Topic } from "./pickers";
@@ -27,15 +26,8 @@ export function DecisionDetail({
   onClose: () => void;
 }) {
   const { allAreas } = useTeam();
-  const [copied, setCopied] = useState(false);
   const f = (name: string) => `dec-${d.id}-${name}`;
   const area = allAreas.find((a) => a.id === d.area_id);
-
-  const copyLink = async () => {
-    await navigator.clipboard.writeText(`${window.location.origin}/wissen?entscheidung=${d.id}`);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   return (
     <div className="flex flex-col">
@@ -53,10 +45,7 @@ export function DecisionDetail({
             className="text-base font-semibold tracking-[-0.01em] md:text-base"
           />
         </h2>
-        <button type="button" onClick={copyLink} className={cn(miniButton, "mt-5")} aria-label="Link zu dieser Entscheidung kopieren">
-          <Link2 className="mr-1 size-3.5" aria-hidden />
-          <span aria-live="polite">{copied ? "Kopiert" : "Link"}</span>
-        </button>
+        <CopyLinkButton path={`/wissen?entscheidung=${d.id}`} label="Link zu dieser Entscheidung kopieren" className="mt-4" />
         <button
           type="button"
           onClick={onClose}

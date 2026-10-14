@@ -14,7 +14,7 @@ export const NAV_HACKATHON: NavItem[] = [
   { href: "/roadmap", label: "Roadmap", Icon: Flag, key: "R" },
   { href: "/pipeline", label: "Pipeline", Icon: Kanban, key: "P" },
   { href: "/aufgaben", label: "Aufgaben", Icon: List, key: "A" },
-  { href: "/wissen", label: "Wissen & Entscheidungen", Icon: BookOpen, key: "W" },
+  { href: "/wissen", label: "Wissen", Icon: BookOpen, key: "W" },
 ];
 
 export const NAV_ALL = [...NAV_MAIN, ...NAV_HACKATHON];

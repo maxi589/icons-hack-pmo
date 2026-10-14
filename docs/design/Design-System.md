@@ -10,7 +10,7 @@
 - Ruhig, dicht und schnell wie Linear. Jede Seite beantwortet in 5 Sekunden: Wo stehen wir? Was ist als Nächstes dran? Wer ist zuständig?
 - **Farbe nur für Bedeutung:** Pipeline-Stufen, Bereichs-Punkte, Fälligkeit. Alles andere ist neutral. Dazu kommt **ein** Signatur-Akzent (Lime).
 - Hell und dunkel sind gleichwertig. **Standard = Systemeinstellung** des Geräts. Umschalter in der Sidebar unten.
-- Genau zwei Wow-Momente: die große Countdown-Zahl (Michroma) und „Meilenstein erledigt“ (Animation + Sound).
+- Genau zwei Wow-Momente: der Countdown als Live-Uhr (Michroma, Ziffern rollen) und „Meilenstein erledigt“ (Animation + Sound).
 - Keine icons-Farben (Wunsch von Maxi). Das Logo erscheint nur als einfarbiger Schriftzug „icons“ in Michroma.
 - **Ausnahme Login-Seite (Maxi, 13.10.):** immer dunkel, Hintergrund schwarz, oben mittig ein leichter Lime-Schimmer (atmet langsam) und ein weicher Lime-Schein unter dem Mauszeiger. Login-Karte mittig und schlicht. Gilt nur dort.
 - **Nicht verwenden:** Glas-Effekte, Glow (Ausnahme oben), animierte Sidebar, Kipp- und Magnet-Effekte, eigener Mauszeiger, WebGL. Außerdem keine Werte oder Code von uimaxx.ing und aicss.dev (beide untersagen KI-Nutzung).
@@ -49,6 +49,10 @@ Wichtig: Dünne Lime-Linien auf Weiß sind unsichtbar. Im Hellmodus deshalb imme
 
 **Avatar-Farben** (Initialen #111): Maxi S #c4b5fd (MS) · Maxi D #fda4af (MD) · Manu #99f6e4 (MA) · Tim #fde68a (TI) · Kilian #bfdbfe (KI).
 
+**Status-Chips (Maxi, 14.10.):** kein „Oval mit Punkt“ mehr. Chips sind Pillen mit Wort und einem ruhigen Farbverlauf in der Statusfarbe (Klassen `chip-tone`/`chip-amber|red|green`, `chip-today` in `globals.css`). Nur „heute“ (Lime) und „überfällig“ (rot) bewegen sich: Der Verlauf wandert langsam (3,6 s, hin und her). Tönung im Hellmodus höchstens Amber 7 %, Grün 10 %, Rot 12 % (sonst Text unter 4,5:1, nachgerechnet 14.10.).
+
+**Bereichs-Zeichen (14.10.):** statt Punkt ein kleiner Ring in Bereichsfarbe mit Kern (`AreaGlyph`). Der Ring füllt sich mit dem Anteil erledigter Meilensteine des Bereichs, zeichnet sich beim Erscheinen (300 ms) und wächst beim Drüberfahren leicht.
+
 ## 3. Schrift
 - **Geist** über das npm-Paket `geist`, lokal ausgeliefert (kein Google-Fonts-Abruf, DSGVO; volle Zeichensätze, Ziffern gleicher Breite). Für Zahlen `font-variant-numeric: tabular-nums`.
 - **Geist Mono:** IDs (M1.2), Daten, Abschnitts-Labels. Label-Stil: 10,5px, Großbuchstaben, Laufweite .12em, `--text3`.
@@ -64,14 +68,14 @@ Wichtig: Dünne Lime-Linien auf Weiß sind unsichtbar. Im Hellmodus deshalb imme
 - **Fokus:** `:focus-visible` mit 2px `--accLine` und 2px Abstand.
 
 ## 5. Layout
-- **Desktop:** Sidebar 232–260px, auf ein 60px-Icon-Band einklappbar (wie im Pipeline-Board). Hauptpanel eingerückt (8px), Radius 14, Ring. Übersicht-Inhalt max. 1080px breit, mittig. Pipeline über die volle Breite, rechts Detail-Sheet mit 400px.
-- **Sidebar:** Logo · Suche (Strg K) · Übersicht, Inbox, Meine Aufgaben · HACKATHON: Roadmap, Pipeline, Aufgaben, Wissen & Entscheidungen · BEREICHE: 7 mit Punkt (amber Punkt rechts = Verantwortlich offen) · unten Avatar, Hell/Dunkel, Abmelden. Kein Sound-Schalter (Maxi, 14.10.: Sounds sind Standard; Schalter nur in Strg+K und im Handy-Menü).
+- **Desktop:** Sidebar 220px (Maxi, 14.10.: enger), auf ein 60px-Icon-Band einklappbar. Der Knopf zum Ein-/Ausklappen sitzt in beiden Zuständen an exakt derselben Stelle oben links. Hauptpanel eingerückt (8px), Radius 14, Ring. Übersicht-Inhalt max. 1080px breit, mittig. Pipeline über die volle Breite, rechts Detail-Sheet mit 400px.
+- **Sidebar:** Einklapp-Knopf + Logo · Suche (Strg K) · Übersicht, Inbox, Meine Aufgaben · HACKATHON: Roadmap, Pipeline, Aufgaben, Wissen · BEREICHE: 7 mit Bereichs-Zeichen (Ring = Fortschritt) und rechts der verantwortlichen Person als Mini-Avatar (gestrichelter Kreis = noch offen) · unten Avatar, Hell/Dunkel, Abmelden. Eingeklappt erscheinen die Bereichs-Zeichen ebenfalls. Kein Sound-Schalter (Maxi, 14.10.: Sounds sind Standard; Schalter nur in Strg+K und im Handy-Menü).
 - **Handy:** Tab-Leiste: Heute · Pipeline · **+** (Akzent-Kreis 52px) · Aufgaben · Inbox. Bottom Sheets, `env(safe-area-inset-bottom)`, Tippflächen mind. 44px, **kein Ziehen & Ablegen** (Status per Sheet).
 
 ## 6. Seiten (siehe Boards)
 1. **Übersicht** (`Richtung-A-Graphit.dc.html`)
-   - Begrüßung mit Datum und Phase.
-   - Countdown-Karte: Michroma-Zahl plus Phasen-Stepper mit 5 Segmenten (Vorbereitung bis 18.10., Outreach bis 18.12., Jury bis 15.1., Anmeldung bis 23.2., Event 27.–28.2.); das aktuelle Segment füllt sich in `--accLine`.
+   - Keine Begrüßung (Maxi, 14.10.), stattdessen eine Label-Zeile „Mittwoch, 14. Oktober · Phase 1 von 5 · noch 4 Tage Vorbereitung“.
+   - Countdown-Karte als **Live-Uhr** (Maxi, 14.10., Variante B): Tage groß in Michroma, daneben Std : Min : Sek. Jede Ziffer rollt beim Wechsel (300 ms), die Tage rollen beim Öffnen einmal hoch (0,7 s). Ziel: Sa 27.2.2027, 09:00 Wien. Screenreader hören nur die Tage. Darunter der Phasen-Stepper mit 5 Segmenten (Vorbereitung bis 18.10., Outreach bis 18.12., Jury bis 15.1., Anmeldung bis 23.2., Event 27.–28.2.); das aktuelle Segment füllt sich in `--accLine`.
    - Karte „Nächster Meilenstein“ mit Unterpunkten und „x von n erledigt“.
    - 4 Zielzahl-Kacheln: Challenge-Partner x/4, Jury x/4, Venue x/1 plus Backup, Sponsoren mit Ziel offen.
    - „Als Nächstes fällig“, gruppiert nach Tag.
@@ -85,11 +89,14 @@ Wichtig: Dünne Lime-Linien auf Weiß sind unsichtbar. Im Hellmodus deshalb imme
    - Umschalter Zeitstrahl/Liste. Am Handy nur die Liste.
 3. **Pipeline** (`Graphit-Pipeline.dc.html`)
    - Tabs je Typ, Umschalter Board/Liste, Zielbalken, Zähler „heute“ und „überfällig“.
+   - **Liste = CRM-Tabelle** (Maxi, 14.10., Variante D nach Prüfschleife, nur Desktop; am Handy bleibt die Liste): Firma (Kürzel, Name, darunter Kategorie · Ort) · Stufe · Prio · Nachfassen · Zuständig · Warmer Kontakt bzw. bei Venues Kapazität (kurz). 44px-Zeilen, keine Rasterlinien, keine Pills. Standard-Sortierung Nachfassen (Überfälliges oben), jeder Spaltenkopf sortiert. Kopf und Firmenspalte kleben, unten Zähler je Stufe.
+   - „Sponsor/Jury“ aus der Excel wird beim Import zu zwei Einträgen (Sponsoren und Jury), weil jede Anfrage eine eigene Stufe braucht.
    - Spalten: Recherche → Kontaktiert → Im Gespräch → Zugesagt → Fix · Abgesagt (schmal).
    - Karte: Initialen, Name, Prio, „warm über X · Welle n“, Nachfass-Chip (heute = Akzent, überfällig = rot), Avatar.
    - Detail-Sheet:
      - Stufe plus Primärknopf „Weiter zu ‚…‘“
-     - Eigenschaften: Zuständig, Warmer Kontakt, Ansprechperson, Nachfassen mit +2 Tage und +1 Woche
+     - Eigenschaften (entschlackt 14.10.): Zuständig, Nachfassen mit +2 Tage und +1 Woche, Prio, Warm über (bestehende Verbindung klein darunter), Kontakt (Name und Mail/Telefon in einer Zeile). Venues zusätzlich Block „Eckdaten“: Kapazität, Übernachtung, Preis/Deal, Lage. Dann Notizen. Unter „Mehr“ (eingeklappt): Website, Bestehend, Welle, Rollen. Website-Symbol im Kopf, wenn gesetzt.
+     - „Link kopieren“ überall nur als Link-Symbol in der Ecke.
      - Verlauf aus Systemereignissen und Kommentaren
      - Kommentarfeld mit @
    - Nach einer Änderung erscheint der Hinweis „X → Stufe · Rückgängig“, 5 s, mit Ablauf-Linie. Er ersetzt Sicherheitsfragen.

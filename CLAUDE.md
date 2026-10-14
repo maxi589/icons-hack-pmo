@@ -38,7 +38,7 @@ Auftraggeber ist Maxi S (kein Entwickler): Deutsch, Ergebnis zuerst, einfache Sp
   - Glas-Effekte, Glow, animierte Sidebar, Kipp- und Magnet-Effekte, eigener Mauszeiger, WebGL
   - Werte oder Code von uimaxx.ing und aicss.dev (beide untersagen KI-Nutzung, nicht abrufen)
 - Bewegung: 150 / 200 / 300 ms, `ease-out`, `prefers-reduced-motion` immer respektieren. Fokus: 2px `--accLine` mit 2px Abstand.
-- Barrierefreiheit: echte `<button>`/`<a>`/`<label>`, Icon-Knöpfe mit `aria-label`, Status nie nur über Farbe (Punkt plus Wort).
+- Barrierefreiheit: echte `<button>`/`<a>`/`<label>`, Icon-Knöpfe mit `aria-label`, Status nie nur über Farbe (Stufen: Punkt plus Wort; Chips: Wort im Chip mit Farbverlauf, ohne Punkt).
 
 ## Handy
 - Eingabefelder **16px** (sonst zoomt das iPhone), Tippflächen mind. 44px, `env(safe-area-inset-bottom)`.

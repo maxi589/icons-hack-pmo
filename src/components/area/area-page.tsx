@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
+import { AreaGlyph } from "@/components/area-glyph";
 import { Chip, DueChip } from "@/components/chip";
 import { useToast } from "@/components/toast";
 import { PageHeader } from "@/components/app-shell/page-header";
@@ -77,7 +78,9 @@ export function AreaPage({ id }: { id: string }) {
       <div className="mx-auto flex w-full max-w-[1080px] flex-col gap-4 px-3.5 pt-2 pb-8 md:gap-5 md:px-8 md:pt-8 md:pb-12">
         <div className="flex flex-col gap-1.5 pb-1.5">
           <h1 className="flex items-center gap-2.5 text-[21px] font-semibold tracking-[-0.025em] md:text-[26px]">
-            <span className="size-2.5 shrink-0 rounded-full" style={{ background: area.color }} aria-hidden />
+            <span className="group">
+              <AreaGlyph color={area.color} progress={own.length ? own.filter((m) => m.status === "erledigt").length / own.length : 0} size={22} />
+            </span>
             {area.name}
           </h1>
           <p className="text-[14px] text-fg-2 tabular">
@@ -239,7 +242,7 @@ function PipelineGoal({ tab, orgs, today }: { tab: TabId; orgs: Organization[]; 
           <span className="flex gap-1.5">
             {dueToday > 0 && <Chip tone="today">{dueToday} heute nachfassen</Chip>}
             {overdue > 0 && (
-              <Chip tone="red" dot>
+              <Chip tone="red">
                 {overdue} überfällig
               </Chip>
             )}

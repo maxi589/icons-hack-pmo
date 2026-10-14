@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Link2, Trash2, X } from "lucide-react";
+import { ArrowUpRight, Trash2, X } from "lucide-react";
+import { CopyLinkButton } from "@/components/copy-link-button";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { DueChip } from "@/components/chip";
@@ -36,15 +36,8 @@ export function TaskDetail({
   onClose: () => void;
 }) {
   const { me, people, personById, allAreas } = useTeam();
-  const [copied, setCopied] = useState(false);
   const f = (name: string) => `task-${task.id}-${name}`;
   const done = task.status === "erledigt";
-
-  const copyLink = async () => {
-    await navigator.clipboard.writeText(`${window.location.origin}/aufgaben?aufgabe=${task.id}`);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   return (
     <div className="flex flex-col">
@@ -66,10 +59,7 @@ export function TaskDetail({
               className={cn("text-base font-semibold tracking-[-0.01em] md:text-base", done && "text-fg-2 line-through")}
             />
           </h2>
-          <button type="button" onClick={copyLink} className={cn(miniButton, "mt-1.5")} aria-label="Link zu dieser Aufgabe kopieren">
-            <Link2 className="mr-1 size-3.5" aria-hidden />
-            <span aria-live="polite">{copied ? "Kopiert" : "Link"}</span>
-          </button>
+          <CopyLinkButton path={`/aufgaben?aufgabe=${task.id}`} label="Link zu dieser Aufgabe kopieren" />
           <button
             type="button"
             onClick={onClose}

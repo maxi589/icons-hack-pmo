@@ -34,6 +34,7 @@ import {
 import { NewOrgDialog } from "./new-org-dialog";
 import { OrgCard } from "./org-card";
 import { OrgDetail } from "./org-detail";
+import { OrgTable } from "./org-table";
 
 // Pipeline (Board „Graphit-Pipeline“), das Kernstück: Tabs je Typ, Zielbalken, Board mit Ziehen &
 // Ablegen (nur Desktop) oder Liste, Detail rechts bzw. als Bottom Sheet. Zustand in der Adresse:
@@ -221,7 +222,7 @@ export function Pipeline() {
           <span className="tabular">{dueToday}</span> nachfassen
         </span>
         <span className="flex items-center gap-2">
-          <Chip tone="red" dot>
+          <Chip tone="red">
             überfällig
           </Chip>
           <span className="tabular">{overdue}</span>
@@ -282,7 +283,13 @@ export function Pipeline() {
                 </KanbanProvider>
               </div>
             )}
-            <div className={cn(view === "board" && "md:hidden")}>
+            {view === "list" && visible.length > 0 && (
+              <div className="hidden h-full md:block">
+                <OrgTable orgs={visible} today={today} venue={tab === "venues"} selectedId={selectedId} onOpen={open} />
+              </div>
+            )}
+            {/* Handy: immer die Liste (Tabellen sind dort zu eng) */}
+            <div className="md:hidden">
               <OrgList orgs={visible} today={today} selectedId={selectedId} onOpen={open} />
             </div>
             {visible.length === 0 && <p className="px-5 py-8 text-center text-[13.5px] text-fg-2">Keine Treffer. Suche oder Filter anpassen.</p>}
@@ -321,7 +328,7 @@ export function Pipeline() {
 }
 
 // ---------------------------------------------------------------
-// Liste (Handy immer, Desktop über den Umschalter)
+// Liste fürs Handy (am Desktop zeigt „Liste“ die Tabelle in org-table.tsx)
 // ---------------------------------------------------------------
 function OrgList({ orgs, today, selectedId, onOpen }: { orgs: Organization[]; today: string; selectedId: string | null; onOpen: (id: string) => void }) {
   const { personById } = useTeam();
@@ -365,7 +372,7 @@ function OrgList({ orgs, today, selectedId, onOpen }: { orgs: Organization[]; to
                         </span>
                       )}
                       {follow && (
-                        <Chip tone={follow.tone} dot={follow.tone === "red"} className="max-sm:hidden">
+                        <Chip tone={follow.tone} className="max-sm:hidden">
                           {follow.label}
                         </Chip>
                       )}

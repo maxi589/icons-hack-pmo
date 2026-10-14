@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import { useTeam } from "@/components/app-shell/team-provider";
 import { ROLE_NAMES, type Organization, type Role } from "@/lib/pipeline";
 
-// „+ Firma“: Name, Rollen, Prio, Welle, Zuständig. Warnt bei gleichem Namen (Doppelte vermeiden).
+// „+ Firma“: Name, Rollen, Prio, Zuständig. Warnt bei gleichem Namen (Doppelte vermeiden).
 
 const field =
   "h-10 w-full rounded-[9px] border border-field bg-card px-3 text-[14px] text-fg placeholder:text-fg-3 focus-visible:outline-solid";
@@ -23,14 +23,13 @@ export function NewOrgDialog({
   onOpenChange: (o: boolean) => void;
   defaultRole: Role;
   existing: Organization[];
-  onCreate: (input: { name: string; roles: Role[]; prio: Organization["prio"]; wave: number | null; owner_id: string | null }) => Promise<boolean>;
+  onCreate: (input: { name: string; roles: Role[]; prio: Organization["prio"]; owner_id: string | null }) => Promise<boolean>;
   onOpenExisting: (id: string) => void;
 }) {
   const { me, people } = useTeam();
   const [name, setName] = useState("");
   const [roles, setRoles] = useState<Role[]>([defaultRole]);
   const [prio, setPrio] = useState("");
-  const [wave, setWave] = useState("");
   const [owner, setOwner] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +41,6 @@ export function NewOrgDialog({
     setName("");
     setRoles([defaultRole]);
     setPrio("");
-    setWave("");
     setOwner(null);
     setError(null);
   };
@@ -56,7 +54,6 @@ export function NewOrgDialog({
       name: name.trim(),
       roles,
       prio: (prio || null) as Organization["prio"],
-      wave: wave ? Number(wave) : null,
       owner_id: ownerValue || null,
     });
     setBusy(false);
@@ -118,7 +115,7 @@ export function NewOrgDialog({
               ))}
             </div>
           </fieldset>
-          <div className="grid grid-cols-3 gap-2.5">
+          <div className="grid grid-cols-[1fr_2fr] gap-2.5">
             <label className="flex flex-col gap-1.5">
               <span className="text-[13px] text-fg-2">Prio</span>
               <select value={prio} onChange={(e) => setPrio(e.target.value)} className={field}>
@@ -126,15 +123,6 @@ export function NewOrgDialog({
                 <option>A</option>
                 <option>B</option>
                 <option>C</option>
-              </select>
-            </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="text-[13px] text-fg-2">Welle</span>
-              <select value={wave} onChange={(e) => setWave(e.target.value)} className={field}>
-                <option value="">–</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
               </select>
             </label>
             <label className="flex flex-col gap-1.5">

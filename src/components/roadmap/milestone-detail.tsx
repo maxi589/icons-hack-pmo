@@ -1,17 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { Check, Link2, ListTodo, RotateCcw } from "lucide-react";
+import { Check, ListTodo, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { Chip, DueChip } from "@/components/chip";
 import { MilestoneChecklist } from "@/components/milestone-checklist";
+import { CopyLinkButton } from "@/components/copy-link-button";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { formatShort } from "@/lib/dates";
 import type { Milestone } from "@/lib/data/use-milestones";
 
-// Ein Meilenstein im Detail: Kopf, Beschreibung aus der Excel, Unterpunkte, Status und „Link kopieren“.
+// Ein Meilenstein im Detail: Kopf, Beschreibung aus der Excel, Unterpunkte, Status, Link-Icon in der Ecke.
 // Unter dem Zeitstrahl als Detail-Panel, in der Liste als Karte.
 
 const ghostBtn =
@@ -37,16 +37,9 @@ export function MilestoneDetail({
   as?: "section" | "article";
 }) {
   const { areaById, personById } = useTeam();
-  const [copied, setCopied] = useState(false);
   const area = areaById(m.area_id);
   const owner = personById(area?.owner_id);
   const done = m.status === "erledigt";
-
-  const copyLink = async () => {
-    await navigator.clipboard.writeText(`${window.location.origin}/roadmap?m=${m.id}`);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   return (
     <Tag
@@ -72,6 +65,7 @@ export function MilestoneDetail({
           ) : (
             <DueChip due={m.due_date} today={today} />
           )}
+          <CopyLinkButton path={`/roadmap?m=${m.id}`} label={`Link zu ${m.id} kopieren`} className="-my-1 ml-auto" />
         </div>
         <h2 className={cn("text-[17px] leading-[1.3] font-semibold tracking-[-0.015em] md:text-[19px]", done && "text-fg-2")}>{m.title}</h2>
         {m.description && <p className="text-[14px] leading-[1.55] text-fg-2">{m.description}</p>}
@@ -100,19 +94,11 @@ export function MilestoneDetail({
               Wieder öffnen
             </button>
           ) : (
-            <button
-              type="button"
-              onClick={() => onToggle(m.id, true)}
-              className="inline-flex h-8 items-center gap-1.5 rounded-[9px] bg-acc px-3 text-[13px] font-medium text-acc-text transition-[scale] duration-150 active:scale-[.97]"
-            >
-              <Check className="size-3.5" strokeWidth={2.4} aria-hidden />
-              Als erledigt markieren
+            <button type="button" onClick={() => onToggle(m.id, true)} className={ghostBtn}>
+              <Check className="size-3.5 text-acc-line" strokeWidth={2.4} aria-hidden />
+              Erledigt
             </button>
           )}
-          <button type="button" onClick={copyLink} className={ghostBtn}>
-            <Link2 className="size-3.5" aria-hidden />
-            <span aria-live="polite">{copied ? "Link kopiert" : "Link kopieren"}</span>
-          </button>
           <Link href={`/aufgaben?meilenstein=${m.id}`} className={ghostBtn}>
             <ListTodo className="size-3.5" aria-hidden />
             Aufgaben dazu

@@ -79,7 +79,8 @@ export const TABS: {
 export const inTab = (o: Organization, tab: TabId) => o.roles.some((r) => TABS.find((t) => t.id === tab)!.roles.includes(r));
 
 export function initials(name: string) {
-  const words = name.replace(/^Test · /, "").split(/[\s-]+/).filter(Boolean);
+  // Nur Wörter, die mit Buchstabe oder Ziffer beginnen („Horváth & Partners“ → HP, nicht H&).
+  const words = name.replace(/^Test · /, "").split(/[\s-]+/).filter((w) => /^[\p{L}\p{N}]/u.test(w));
   return (words.length > 1 ? words[0][0] + words[1][0] : name.slice(0, 2)).toUpperCase();
 }
 

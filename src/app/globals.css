@@ -342,3 +342,53 @@
 .celebrate-dot {
   animation: celebrate-burst 750ms cubic-bezier(0.2, 0.7, 0.3, 1) 120ms both;
 }
+
+/* Status-Chips (Maxi, 14.10.): ruhiger Farbverlauf statt „Oval mit Punkt“. Status steht immer als Wort im Chip.
+   Tönung hell schwächer, weil Amber-Text sonst unter 4,5:1 fällt (nachgerechnet 14.10.: Amber max. 7 %, Grün 10 %, Rot 12 %).
+   Nur „heute“ und „überfällig“ bewegen sich (Verlauf wandert langsam), alles andere steht still. */
+.chip-tone {
+  --t1: 2%;
+  --t2: 7%;
+  color: var(--c);
+  background-image: linear-gradient(
+    100deg,
+    color-mix(in srgb, var(--c) var(--t1), transparent),
+    color-mix(in srgb, var(--c) var(--t2), transparent) 50%,
+    color-mix(in srgb, var(--c) var(--t1), transparent)
+  );
+  background-size: 200% 100%;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 24%, transparent);
+}
+.chip-amber {
+  --c: var(--st-amber);
+}
+.chip-red {
+  --c: var(--st-red);
+  --t1: 4%;
+  --t2: 12%;
+}
+.chip-green {
+  --c: var(--st-green);
+  --t1: 3%;
+  --t2: 10%;
+}
+.dark .chip-tone {
+  --t1: 6%;
+  --t2: 16%;
+}
+.chip-today {
+  color: var(--accText);
+  background-image: linear-gradient(100deg, var(--acc), color-mix(in srgb, var(--acc) 62%, #ffffff) 50%, var(--acc));
+  background-size: 200% 100%;
+}
+.chip-live {
+  animation: chip-drift 3.6s ease-in-out infinite alternate;
+}
+@keyframes chip-drift {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 100% 50%;
+  }
+}

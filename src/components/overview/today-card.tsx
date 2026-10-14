@@ -184,7 +184,7 @@ export function TodayCard({ tasks, orgs, today }: { tasks: Task[]; orgs: Org[]; 
                     {i.kind === "mention" ? (
                       <Chip>Erwähnung</Chip>
                     ) : (
-                      <Chip tone={i.late ? "red" : "today"} dot={i.late}>
+                      <Chip tone={i.late ? "red" : "today"}>
                         {i.late ? "überfällig" : "heute"}
                       </Chip>
                     )}

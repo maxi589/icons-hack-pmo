@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ExternalLink, Link2, X } from "lucide-react";
+import { ChevronDown, ExternalLink, X } from "lucide-react";
+import { CopyLinkButton } from "@/components/copy-link-button";
 import { EditText, miniButton as mini, PropRow, SelectBox } from "@/components/detail-fields";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
@@ -41,18 +42,23 @@ export function OrgDetail({
   onClose: () => void;
 }) {
   const { me, people, personById } = useTeam();
-  const [copied, setCopied] = useState(false);
   const next = nextStage(org.stage);
   const follow = followState(org, today);
   const stage = STAGES.find((s) => s.id === org.stage)!;
   const isVenue = org.roles.includes("venue");
+  const hasUrl = !!org.url && /^https?:\/\//.test(org.url);
+  const [more, setMore] = useState(false);
   const f = (name: string) => `org-${org.id}-${name}`;
 
-  const copyLink = async () => {
-    await navigator.clipboard.writeText(`${window.location.origin}/pipeline?firma=${org.id}`);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  // Warmer Kontakt = wer aus icons jemanden dort kennt; eine bestehende Verbindung (TE, Coop) steht klein darunter.
+  const warmRow = (
+    <PropRow label="Warm über" htmlFor={f("warm")}>
+      <span className="flex flex-col">
+        <EditText id={f("warm")} value={org.warm_via} placeholder="Wer kennt jemanden dort?" onSave={(v) => onUpdate({ warm_via: v })} />
+        {org.existing_contact && <span className="px-2 pb-1 text-[12px] text-fg-3">Bestehend: {org.existing_contact}</span>}
+      </span>
+    </PropRow>
+  );
 
   const toggleRole = (r: Role) => {
     const roles = org.roles.includes(r) ? org.roles.filter((x) => x !== r) : [...org.roles, r];
@@ -70,15 +76,24 @@ export function OrgDetail({
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <h2 className="truncate text-base font-semibold tracking-[-0.01em]">{org.name}</h2>
             <span className="truncate text-[12px] text-fg-3">
-              {[org.prio && `Prio ${org.prio}`, org.wave && `Welle ${org.wave}`, org.roles.map((r) => ROLE_NAMES[r]).join(", ")]
+              {[org.prio && `Prio ${org.prio}`, org.roles.map((r) => ROLE_NAMES[r]).join(", "), org.category, !isVenue && org.location]
                 .filter(Boolean)
                 .join(" · ")}
             </span>
           </div>
-          <button type="button" onClick={copyLink} className={mini} aria-label="Link zu dieser Firma kopieren">
-            <Link2 className="mr-1 size-3.5" aria-hidden />
-            <span aria-live="polite">{copied ? "Kopiert" : "Link"}</span>
-          </button>
+          {hasUrl && (
+            <a
+              href={org.url!}
+              target="_blank"
+              rel="noreferrer"
+              title="Website öffnen"
+              className="grid size-8 shrink-0 place-items-center rounded-lg text-fg-3 hover:bg-hover hover:text-fg max-md:size-11"
+              aria-label="Website öffnen"
+            >
+              <ExternalLink className="size-4" aria-hidden />
+            </a>
+          )}
+          <CopyLinkButton path={`/pipeline?firma=${org.id}`} label="Link zu dieser Firma kopieren" />
           <button
             type="button"
             onClick={onClose}
@@ -185,92 +200,103 @@ export function OrgDetail({
             <option value="C">C</option>
           </SelectBox>
         </PropRow>
-        <PropRow label="Welle" htmlFor={f("wave")}>
-          <SelectBox id={f("wave")} value={org.wave ? String(org.wave) : ""} onChange={(v) => onUpdate({ wave: v ? Number(v) : null })}>
-            <option value="">Keine</option>
-            <option value="1">Welle 1 (ab 19.10.)</option>
-            <option value="2">Welle 2 (ab 2.11.)</option>
-            <option value="3">Welle 3 (ab 16.11.)</option>
-          </SelectBox>
-        </PropRow>
-        <PropRow label="Warm über" htmlFor={f("warm")}>
-          <EditText id={f("warm")} value={org.warm_via} placeholder="Wer kennt jemanden dort?" onSave={(v) => onUpdate({ warm_via: v })} />
-        </PropRow>
-        <PropRow label="Bestehend" htmlFor={f("existing")}>
-          <EditText
-            id={f("existing")}
-            value={org.existing_contact}
-            placeholder="z. B. Talent Elevator, Coop"
-            onSave={(v) => onUpdate({ existing_contact: v })}
-          />
-        </PropRow>
-        <PropRow label="Ansprechperson" htmlFor={f("contact")}>
-          <EditText id={f("contact")} value={org.contact_person} placeholder="Name, Rolle" onSave={(v) => onUpdate({ contact_person: v })} />
-        </PropRow>
-        <PropRow label="Kontakt" htmlFor={f("info")}>
-          <EditText id={f("info")} value={org.contact_info} placeholder="Mail oder Telefon" onSave={(v) => onUpdate({ contact_info: v })} />
-        </PropRow>
-        <PropRow label="Link" htmlFor={f("url")}>
-          <span className="flex items-center gap-1">
-            <EditText id={f("url")} value={org.url} placeholder="https://…" onSave={(v) => onUpdate({ url: v })} />
-            {org.url && /^https?:\/\//.test(org.url) && (
-              <a
-                href={org.url}
-                target="_blank"
-                rel="noreferrer"
-                className="grid size-8 shrink-0 place-items-center rounded-lg text-fg-3 hover:bg-hover hover:text-fg"
-                aria-label="Link öffnen"
-              >
-                <ExternalLink className="size-3.5" aria-hidden />
-              </a>
-            )}
+        {!isVenue && warmRow}
+        <PropRow label="Kontakt" htmlFor={f("contact")}>
+          <span className="flex flex-col">
+            <EditText id={f("contact")} value={org.contact_person} placeholder="Name, Rolle" onSave={(v) => onUpdate({ contact_person: v })} />
+            <span className="sr-only">
+              <label htmlFor={f("info")}>Mail oder Telefon</label>
+            </span>
+            <EditText id={f("info")} value={org.contact_info} placeholder="Mail oder Telefon" onSave={(v) => onUpdate({ contact_info: v })} />
           </span>
         </PropRow>
-        {isVenue && (
-          <>
-            <PropRow label="Lage" htmlFor={f("loc")}>
-              <EditText id={f("loc")} value={org.location} placeholder="Adresse" onSave={(v) => onUpdate({ location: v })} />
-            </PropRow>
-            <PropRow label="Kapazität" htmlFor={f("cap")}>
-              <EditText id={f("cap")} value={org.capacity} placeholder="z. B. 120 Personen" onSave={(v) => onUpdate({ capacity: v })} />
-            </PropRow>
-            <PropRow label="Übernachtung" htmlFor={f("night")}>
-              <EditText id={f("night")} value={org.overnight} placeholder="z. B. Ja (24h offen)" onSave={(v) => onUpdate({ overnight: v })} />
-            </PropRow>
-            <PropRow label="Preis / Deal" htmlFor={f("price")}>
-              <EditText id={f("price")} value={org.price} placeholder="z. B. kostenlos" onSave={(v) => onUpdate({ price: v })} />
-            </PropRow>
-          </>
-        )}
         {org.stage === "abgesagt" && (
           <PropRow label="Grund" htmlFor={f("lost")}>
             <EditText id={f("lost")} value={org.lost_reason} placeholder="Warum abgesagt?" onSave={(v) => onUpdate({ lost_reason: v })} />
           </PropRow>
         )}
-        <PropRow label="Rollen">
-          <span className="flex flex-wrap gap-1 py-1">
-            {(Object.keys(ROLE_NAMES) as Role[]).map((r) => (
-              <button
-                key={r}
-                type="button"
-                aria-pressed={org.roles.includes(r)}
-                onClick={() => toggleRole(r)}
-                className={cn(
-                  "h-[26px] rounded-full px-2.5 text-[12px] transition-colors duration-150",
-                  org.roles.includes(r) ? "bg-active text-fg shadow-[inset_0_0_0_1px_var(--line2)]" : "text-fg-3 hover:text-fg-2"
-                )}
-              >
-                {ROLE_NAMES[r]}
-              </button>
-            ))}
-          </span>
-        </PropRow>
+      </div>
+
+      {/* Venue: Eckdaten für den Vergleich */}
+      {isVenue && (
+        <div className="flex flex-col border-b border-line px-[18px] py-2.5">
+          <h3 className="label-mono pt-1 pb-1.5">Eckdaten</h3>
+          <PropRow label="Kapazität" htmlFor={f("cap")}>
+            <EditText id={f("cap")} value={org.capacity} placeholder="z. B. 120 Personen" onSave={(v) => onUpdate({ capacity: v })} />
+          </PropRow>
+          <PropRow label="Übernachtung" htmlFor={f("night")}>
+            <EditText id={f("night")} value={org.overnight} placeholder="z. B. Ja (24h offen)" onSave={(v) => onUpdate({ overnight: v })} />
+          </PropRow>
+          <PropRow label="Preis / Deal" htmlFor={f("price")}>
+            <EditText id={f("price")} value={org.price} placeholder="z. B. kostenlos" onSave={(v) => onUpdate({ price: v })} />
+          </PropRow>
+          <PropRow label="Lage" htmlFor={f("loc")}>
+            <EditText id={f("loc")} value={org.location} placeholder="Adresse" onSave={(v) => onUpdate({ location: v })} />
+          </PropRow>
+        </div>
+      )}
+
+      <div className="flex flex-col border-b border-line px-[18px] py-2.5">
         <div className="flex flex-col gap-1 py-1.5">
           <label htmlFor={f("notes")} className="text-[13px] text-fg-3">
             Notizen
           </label>
           <EditText id={f("notes")} value={org.notes} placeholder="Was sollte das Team wissen?" onSave={(v) => onUpdate({ notes: v })} multiline />
         </div>
+
+        {/* Selten gebraucht: eingeklappt */}
+        <button
+          type="button"
+          aria-expanded={more}
+          onClick={() => setMore((v) => !v)}
+          className="-mx-2 flex min-h-9 items-center gap-1.5 rounded-lg px-2 text-[13px] text-fg-3 hover:bg-hover hover:text-fg max-md:min-h-11"
+        >
+          <ChevronDown className={cn("size-3.5 transition-transform duration-200", !more && "-rotate-90")} aria-hidden />
+          Mehr
+          <span className="truncate text-[12px]">· Website, {isVenue ? "warmer Kontakt, " : ""}Welle, Rollen</span>
+        </button>
+        {more && (
+          <div className="flex flex-col pb-1">
+            <PropRow label="Website" htmlFor={f("url")}>
+              <EditText id={f("url")} value={org.url} placeholder="https://…" onSave={(v) => onUpdate({ url: v })} />
+            </PropRow>
+            {isVenue && warmRow}
+            <PropRow label="Bestehend" htmlFor={f("existing")}>
+              <EditText
+                id={f("existing")}
+                value={org.existing_contact}
+                placeholder="z. B. Talent Elevator, Coop"
+                onSave={(v) => onUpdate({ existing_contact: v })}
+              />
+            </PropRow>
+            <PropRow label="Welle" htmlFor={f("wave")}>
+              <SelectBox id={f("wave")} value={org.wave ? String(org.wave) : ""} onChange={(v) => onUpdate({ wave: v ? Number(v) : null })}>
+                <option value="">Keine</option>
+                <option value="1">Welle 1 (ab 19.10.)</option>
+                <option value="2">Welle 2 (ab 2.11.)</option>
+                <option value="3">Welle 3 (ab 16.11.)</option>
+              </SelectBox>
+            </PropRow>
+            <PropRow label="Rollen">
+              <span className="flex flex-wrap gap-1 py-1">
+                {(Object.keys(ROLE_NAMES) as Role[]).map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    aria-pressed={org.roles.includes(r)}
+                    onClick={() => toggleRole(r)}
+                    className={cn(
+                      "h-[26px] rounded-full px-2.5 text-[12px] transition-colors duration-150",
+                      org.roles.includes(r) ? "bg-active text-fg shadow-[inset_0_0_0_1px_var(--line2)]" : "text-fg-3 hover:text-fg-2"
+                    )}
+                  >
+                    {ROLE_NAMES[r]}
+                  </button>
+                ))}
+              </span>
+            </PropRow>
+          </div>
+        )}
       </div>
 
       {/* Verlauf und Kommentare */}
@@ -286,7 +312,7 @@ export function OrgDetail({
                 : a.action === "followed_up"
                   ? `hat nachgefasst${a.data.next ? `, nächstes Mal ${formatDayMonth(String(a.data.next))}` : ""}`
                   : a.action === "imported"
-                  ? `hat die Firma aus ${String(a.data.source ?? "der Excel").replace(/ Z\. \d+$/, "")} übernommen`
+                  ? `hat die Firma aus ${String(a.data.source ?? "der Excel").replace(/ Z\. \d+.*$/, "")} übernommen`
                   : a.action
           }
         />

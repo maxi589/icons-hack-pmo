@@ -5,6 +5,9 @@ import { de } from "date-fns/locale";
 
 export const TIME_ZONE = "Europe/Vienna";
 export const EVENT_START = "2027-02-27";
+/** Startzeitpunkt für die Live-Uhr: Sa 27.2.2027, 09:00 Wien (Winterzeit, = 08:00 UTC). Maxi, 14.10.: „erstmal 09:00“. */
+export const EVENT_START_UTC = Date.UTC(2027, 1, 27, 8, 0, 0);
+export const EVENT_START_LABEL = "Sa 27.2.2027, 09:00";
 
 /** Heutiges Datum in Wien als YYYY-MM-DD. */
 export function todayInVienna(now: Date = new Date()): string {

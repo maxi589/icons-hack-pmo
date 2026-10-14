@@ -9,7 +9,7 @@ import { Chip, DueChip } from "@/components/chip";
 import { Countdown } from "@/components/countdown";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { useToday } from "@/lib/use-today";
-import { formatDayMonth, formatHeaderDate, formatLong, formatShort, hourInVienna, relativeDays } from "@/lib/dates";
+import { daysBetween, EVENT_START_LABEL, formatDayMonth, formatHeaderDate, formatLong, formatShort, relativeDays } from "@/lib/dates";
 import { currentPhase, FOLLOW_UP_ROUNDS, phaseFill, PHASES, WAVE_1 } from "@/lib/phases";
 import { MilestoneChecklist } from "@/components/milestone-checklist";
 import { OwnersDialog } from "./owners-dialog";
@@ -20,32 +20,29 @@ import { useOverviewData, type Milestone, type Org, type Task } from "./use-over
 
 const card = "rounded-[14px] bg-card shadow-card";
 
-function greeting() {
-  const h = hourInVienna();
-  return h < 11 ? "Guten Morgen" : h < 18 ? "Hallo" : "Guten Abend";
+/** „noch 4 Tage Vorbereitung“ bzw. „letzter Tag Vorbereitung“ */
+function phaseLeft(today: string, phase: number) {
+  const n = daysBetween(today, PHASES[phase].end);
+  if (n < 0) return PHASES[phase].name;
+  return n === 0 ? `letzter Tag ${PHASES[phase].name}` : `noch ${n} ${n === 1 ? "Tag" : "Tage"} ${PHASES[phase].name}`;
 }
 
 export function Overview() {
   const today = useToday();
-  const { me } = useTeam();
   const { data, setMilestoneDone } = useOverviewData();
 
   if (!today || !data) return <OverviewSkeleton />;
 
   const phase = currentPhase(today);
-  const firstName = me?.name.split(" ")[0];
 
   return (
     <div className="mx-auto flex w-full max-w-[1080px] flex-col gap-4 px-3.5 pt-2 pb-8 md:gap-5 md:px-8 md:pt-8 md:pb-12">
-      <div className="flex flex-col gap-1.5 pb-1.5">
-        <h1 className="text-[21px] font-semibold tracking-[-0.025em] md:text-[26px]">
-          {greeting()}
-          {firstName && `, ${firstName}`}
-        </h1>
-        <p className="text-[14px] text-fg-2">
-          {formatLong(today)} · Phase {phase + 1} von {PHASES.length}: {PHASES[phase].name}
-        </p>
-      </div>
+      {/* Ohne Begrüßung (Maxi, 14.10.): eine Zeile mit Datum und Restzeit der Phase */}
+      <h1 className="sr-only">Übersicht</h1>
+      <p className="label-mono -mb-1 pt-1 md:pt-0">
+        <span className="max-md:hidden">{formatLong(today)} · </span>
+        Phase {phase + 1} von {PHASES.length} · {phaseLeft(today, phase)}
+      </p>
 
       <div className="flex flex-wrap gap-4">
         <CountdownCard today={today} phase={phase} />
@@ -72,13 +69,8 @@ function CountdownCard({ today, phase }: { today: string; phase: number }) {
   return (
     <section className={cn(card, "flex min-w-0 flex-[1.45_1_440px] flex-col justify-between gap-[22px] px-5 py-[18px] md:px-6 md:py-[22px]")}>
       <h2 className="label-mono">Countdown</h2>
-      <div className="flex flex-wrap items-end gap-x-[18px] gap-y-2">
-        <Countdown />
-        <div className="flex flex-col gap-1 pb-0.5">
-          <span className="text-[15px] font-medium md:text-base">Tage bis zum Hackathon</span>
-          <span className="text-[13px] text-fg-2">Sa 27. – So 28. Februar 2027 · 24 Stunden</span>
-        </div>
-      </div>
+      <Countdown />
+      <p className="-mt-2 text-[13px] text-fg-2">Bis zum Hackathon am {EVENT_START_LABEL} · 24 Stunden</p>
       <ol className="grid grid-cols-5 gap-1.5" aria-label="Phasen">
         {PHASES.map((p, i) => (
           <li key={p.name} className="flex flex-col gap-2" aria-current={i === phase ? "step" : undefined}>
@@ -312,7 +304,7 @@ function FollowUpCard({ orgs, today }: { orgs: Org[]; today: string }) {
                 <Link href={`/pipeline?firma=${o.id}`} className="min-w-0 flex-1 truncate rounded-sm after:absolute after:inset-0">
                   {o.name}
                 </Link>
-                <Chip tone={late ? "red" : "today"} dot={late}>
+                <Chip tone={late ? "red" : "today"}>
                   {late ? "überfällig" : "heute"}
                 </Chip>
                 <Avatar person={personById(o.owner_id)} size={22} />
@@ -366,7 +358,7 @@ function AreasSection({ milestones, today }: { milestones: Milestone[]; today: s
         <div className="flex items-center gap-2.5">
           <h2 className="text-[14px] font-semibold">Bereiche</h2>
           {open > 0 && (
-            <Chip tone="amber" dot>
+            <Chip tone="amber">
               {open} ohne Verantwortliche
             </Chip>
           )}
