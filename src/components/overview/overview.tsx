@@ -56,7 +56,7 @@ export function Overview() {
 
       <div className="flex flex-wrap gap-4">
         <CountdownCard today={today} phase={phase} />
-        <TodayCard tasks={data.tasks} orgs={data.orgs} today={today} />
+        <TodayCard tasks={data.tasks} orgs={data.orgs} meetings={meetings || []} today={today} />
         <NextMilestoneCard milestones={data.milestones} today={today} onToggle={setMilestoneDone} />
       </div>
 

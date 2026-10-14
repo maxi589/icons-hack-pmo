@@ -5,7 +5,7 @@ import { ArrowUpRight, CalendarPlus, Gavel, Plus, Repeat, Trash2, Video, X } fro
 import { cn } from "@/lib/utils";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { Feed } from "@/components/feed";
-import { EditText, miniButton, PropRow, SelectBox } from "@/components/detail-fields";
+import { EditText, PropRow, SelectBox } from "@/components/detail-fields";
 import { NoteEditor } from "@/components/editor/note-editor";
 import { useNotesDraft } from "@/components/editor/notes-card";
 import { DocBlock } from "@/components/dokumente/doc-block";
@@ -162,16 +162,8 @@ export function MeetingDetail({
           <EditText id={f("loc")} value={m.location} placeholder="–" onSave={(v) => onUpdate({ location: v })} />
         </PropRow>
         <PropRow label="Meet-Link" htmlFor={f("meet")}>
-          <span className="flex items-center gap-1.5">
-            <span className="min-w-0 flex-1">
-              <EditText id={f("meet")} value={m.meet_url} placeholder="–" onSave={(v) => onUpdate({ meet_url: v ? normalizeUrl(v) ?? v : null })} />
-            </span>
-            {!m.meet_url && (
-              <a href="https://meet.new" target="_blank" rel="noopener noreferrer" className={cn(miniButton, "shrink-0 max-md:h-10")}>
-                Neues Meet
-              </a>
-            )}
-          </span>
+          {/* Der Meet-Link kommt aus Google (Google hängt beim Eintragen selbst einen an), sonst gibt es zwei Calls. */}
+          <EditText id={f("meet")} value={m.meet_url} placeholder="aus Google einfügen" onSave={(v) => onUpdate({ meet_url: v ? normalizeUrl(v) ?? v : null })} />
         </PropRow>
         <PropRow label="Wer">
           <div className="py-1">

@@ -4,10 +4,10 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { PeoplePicker } from "@/components/wissen/pickers";
-import { normalizeUrl } from "@/lib/documents";
 import { DURATIONS, durationLabel } from "@/lib/meetings";
 
 // „+ Termin“ (Taste T): nötig sind nur Titel und Zeit, der Rest ist freiwillig und lässt sich im Detail ergänzen.
+// Kein Meet-Link hier: Er kommt aus Google, nachdem man den Termin dort eingetragen hat.
 // Vorbelegung aus der Wochenansicht (gezogener Zeitraum) bzw. aus Bereich oder Firma.
 
 const field =
@@ -20,7 +20,6 @@ export type NewMeetingInput = {
   time: string;
   duration_min: number;
   attendees: string[];
-  meet_url: string | null;
   area_id: string | null;
 };
 
@@ -44,7 +43,6 @@ export function NewMeetingDialog({
   const [time, setTime] = useState<string | null>(null);
   const [duration, setDuration] = useState<number | null>(null);
   const [who, setWho] = useState<string[] | null>(null);
-  const [meet, setMeet] = useState("");
   const [area, setArea] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,7 +55,6 @@ export function NewMeetingDialog({
     setTime(null);
     setDuration(null);
     setWho(null);
-    setMeet("");
     setArea(null);
     setError(null);
   };
@@ -73,7 +70,6 @@ export function NewMeetingDialog({
       time: time ?? defaults.time,
       duration_min: durValue,
       attendees: whoValue,
-      meet_url: meet.trim() ? normalizeUrl(meet) ?? meet.trim() : null,
       area_id: (area ?? defaults.area_id ?? "") || null,
     });
     setBusy(false);
@@ -133,12 +129,7 @@ export function NewMeetingDialog({
             </span>
             <PeoplePicker label="Wer ist dabei" value={whoValue} onChange={setWho} />
           </div>
-          <div className="grid grid-cols-2 gap-2.5">
-            <label className="flex flex-col gap-1.5">
-              <span className={label}>Meet-Link</span>
-              <input value={meet} onChange={(e) => setMeet(e.target.value)} placeholder="optional" className={field} />
-            </label>
-            <label className="flex flex-col gap-1.5">
+          <label className="flex flex-col gap-1.5">
               <span className={label}>Bereich</span>
               <select value={area ?? defaults.area_id ?? ""} onChange={(e) => setArea(e.target.value)} className={field}>
                 <option value="">Keiner</option>
@@ -148,8 +139,7 @@ export function NewMeetingDialog({
                   </option>
                 ))}
               </select>
-            </label>
-          </div>
+          </label>
           {error && (
             <p role="alert" className="text-[13px] text-st-red">
               {error}

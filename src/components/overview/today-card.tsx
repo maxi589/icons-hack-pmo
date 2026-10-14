@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import Link from "next/link";
-import { Check } from "lucide-react";
+import { Check, Video } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Chip } from "@/components/chip";
 import { useToast } from "@/components/toast";
@@ -14,12 +14,15 @@ import { formatShort } from "@/lib/dates";
 import { shiftFollowUp, TABS } from "@/lib/pipeline";
 import { targetHref } from "@/lib/links";
 import { play } from "@/lib/sounds";
+import { endOf, meetingHref, timeRange, viennaParts, type Meeting } from "@/lib/meetings";
+import { useNow } from "@/lib/use-today";
 import type { Org, Task } from "./use-overview-data";
 
 // „Heute für dich“ (Board „Graphit-Handy“), nur am Handy: was die angemeldete Person heute erledigen sollte.
 // - eigene Aufgaben, fällig heute oder überfällig → Abhaken = erledigt
 // - eigene Firmen mit Nachfassen heute oder überfällig → Abhaken = nachgefasst, nächster Termin automatisch in 7 Tagen (Maxi, 13.10.), „+2 T“ verschiebt
 // - ungelesene Erwähnungen → Abhaken = gelesen
+// Darüber die eigenen Termine von heute (noch nicht vorbei), mit „Beitreten“.
 // Abgehakte Zeilen bleiben bis zum Neuladen durchgestrichen stehen und lassen sich wieder aufheben.
 
 type Item = {
@@ -34,15 +37,17 @@ type Item = {
   date: string | null;
 };
 
-export function TodayCard({ tasks, orgs, today }: { tasks: Task[]; orgs: Org[]; today: string }) {
+export function TodayCard({ tasks, orgs, meetings, today }: { tasks: Task[]; orgs: Org[]; meetings: Meeting[]; today: string }) {
   const { me, personById, areaById } = useTeam();
   const { items: inbox, setRead } = useInbox();
   const toast = useToast();
   // Abgehakte Zeilen (für die Anzeige) und ihr Protokoll-Stand (nur für Rückgängig/Verlauf, nicht beim Rendern gelesen)
   const [checked, setChecked] = useState<Record<string, Item>>({});
   const entries = useRef(new Map<string, { logged: boolean }>());
+  const now = useNow();
 
   if (!me) return null;
+  const myMeetings = meetings.filter((m) => m.attendees.includes(me.id) && viennaParts(m.starts_at).date === today && endOf(m).getTime() >= now);
 
   const live: Item[] = [
     ...tasks
@@ -155,6 +160,32 @@ export function TodayCard({ tasks, orgs, today }: { tasks: Task[]; orgs: Org[]; 
         </h2>
         <span className="text-[12.5px] text-fg-3 tabular">{open} offen</span>
       </div>
+      {myMeetings.length > 0 && (
+        <ul aria-label="Deine Termine heute">
+          {myMeetings.map((m) => (
+            <li key={m.id} className="relative flex min-h-[52px] items-center gap-3 border-t border-line px-3.5 py-2">
+              <span className="w-[42px] shrink-0 text-[13px] font-medium text-acc-line tabular">{viennaParts(m.starts_at).time}</span>
+              <span className="flex min-w-0 flex-1 flex-col">
+                <Link href={meetingHref(m.id)} className="truncate rounded-sm text-[15px] after:absolute after:inset-0">
+                  {m.title}
+                </Link>
+                <span className="text-[12px] text-fg-3 tabular">{timeRange(m)}</span>
+              </span>
+              {m.meet_url && (
+                <a
+                  href={m.meet_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="relative z-[1] grid size-11 shrink-0 place-items-center rounded-[9px] text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)]"
+                  aria-label={`„${m.title}“ beitreten`}
+                >
+                  <Video className="size-4" aria-hidden />
+                </a>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
       {rows.length === 0 ? (
         <p className="border-t border-line px-3.5 py-5 text-[14px] text-fg-2">Für heute ist nichts offen.</p>
       ) : (
