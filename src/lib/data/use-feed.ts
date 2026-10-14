@@ -2,11 +2,12 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import type { TargetType } from "@/lib/links";
 
 // Verlauf eines Eintrags: Systemereignisse (Tabelle activity) und Kommentare, zeitlich gemischt.
 // Kommentare mit @Erwähnung erzeugen Einträge in der Inbox (notifications). Keine Mails (Entscheidung Chat 2).
 
-export type TargetType = "organization" | "task" | "milestone" | "decision";
+export type { TargetType } from "@/lib/links";
 
 export type FeedItem =
   | { kind: "activity"; id: string; created_at: string; actor_id: string | null; action: string; data: Record<string, unknown> }

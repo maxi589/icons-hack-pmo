@@ -10,6 +10,7 @@ import { useTeam } from "@/components/app-shell/team-provider";
 import { notifyAssignment } from "@/lib/data/use-feed";
 import { formatDayMonth } from "@/lib/dates";
 import type { OrgPatch } from "@/lib/data/use-organizations";
+import { DocBlock } from "@/components/dokumente/doc-block";
 import {
   followState,
   initials,
@@ -244,6 +245,15 @@ export function OrgDetail({
           </label>
           <EditText id={f("notes")} value={org.notes} placeholder="–" onSave={(v) => onUpdate({ notes: v })} multiline />
         </div>
+      </div>
+
+      {/* Unterlagen zur Firma (Deck, Vertrag, Call-Transkript …) */}
+      <div className="border-b border-line px-[18px] py-3.5">
+        <DocBlock
+          variant="plain"
+          defaults={{ target_type: "organization", target_id: org.id }}
+          match={(d) => d.target_type === "organization" && d.target_id === org.id}
+        />
       </div>
 
       {/* Verlauf und Kommentare */}

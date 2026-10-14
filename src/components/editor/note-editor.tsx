@@ -8,7 +8,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { TaskItem, TaskList } from "@tiptap/extension-list";
 import { Placeholder } from "@tiptap/extensions";
 import { Markdown } from "@tiptap/markdown";
-import { Bold, CircleCheck, Heading2, Italic, Link2, List, ListChecks } from "lucide-react";
+import { Bold, CircleCheck, FileUp, Heading2, Italic, Link2, List, ListChecks } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Gemeinsamer Editor (Plan Welle 1): Notizblock, Bereichs-Notizen, später Termine und Text-Dokumente.
@@ -25,6 +25,8 @@ type Props = {
   disabled?: boolean;
   /** Markierten Text als Aufgabe anlegen. Liefert den Link zur Aufgabe, der Text wird dann dorthin verlinkt. */
   onCreateTask?: (title: string) => Promise<string | null>;
+  /** Markierten Text als Team-Dokument teilen (Markdown der Auswahl, Titel = erste Zeile). */
+  onShare?: (markdown: string, title: string) => Promise<string | null>;
   className?: string;
 };
 
@@ -33,7 +35,7 @@ function tidy(md: string) {
   return md.replace(/^[ \t]*[-*+] (\[[ xX]\])?[ \t]*$\n?/gm, "").replace(/\n{3,}/g, "\n\n");
 }
 
-export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabled, onCreateTask, className }: Props) {
+export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabled, onCreateTask, onShare, className }: Props) {
   const router = useRouter();
   // Zuletzt gesehener Stand: eigener Text oder übernommener fremder. Verhindert, dass der eigene Stand nach dem Speichern zurückgesetzt wird.
   const last = useRef(value);
@@ -101,7 +103,7 @@ export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabl
 
   return (
     <div className={cn("note-editor relative", className)} onClick={onClick}>
-      {editor && <SelectionMenu editor={editor} onCreateTask={onCreateTask} />}
+      {editor && <SelectionMenu editor={editor} onCreateTask={onCreateTask} onShare={onShare} />}
       <EditorContent editor={editor} />
     </div>
   );
@@ -113,7 +115,7 @@ export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabl
 const menuBtn =
   "inline-flex size-[30px] items-center justify-center rounded-[7px] text-fg-2 transition-colors duration-150 hover:bg-hover hover:text-fg aria-pressed:bg-active aria-pressed:text-fg max-md:size-10";
 
-function SelectionMenu({ editor, onCreateTask }: { editor: Editor; onCreateTask?: Props["onCreateTask"] }) {
+function SelectionMenu({ editor, onCreateTask, onShare }: { editor: Editor; onCreateTask?: Props["onCreateTask"]; onShare?: Props["onShare"] }) {
   const [linkOpen, setLinkOpen] = useState(false);
   const [url, setUrl] = useState("");
   const [busy, setBusy] = useState(false);
@@ -152,6 +154,20 @@ function SelectionMenu({ editor, onCreateTask }: { editor: Editor; onCreateTask?
     setBusy(false);
     // Text bleibt stehen und zeigt auf die neue Aufgabe.
     if (href) editor.chain().setTextSelection({ from, to }).setLink({ href }).setTextSelection(to).run();
+  };
+
+  const share = async () => {
+    if (!onShare || busy) return;
+    const { from, to } = editor.state.selection;
+    const slice = editor.state.selection.content().content.toJSON() as object[];
+    const plain = editor.state.doc.textBetween(from, to, "\n");
+    const md = tidy(editor.markdown?.serialize({ type: "doc", content: slice }) ?? plain);
+    const first = plain.split("\n").map((l) => l.trim()).find(Boolean) ?? "";
+    if (!md.trim()) return;
+    setBusy(true);
+    await onShare(md, first.slice(0, 120));
+    setBusy(false);
+    editor.commands.setTextSelection(to);
   };
 
   return (
@@ -211,9 +227,9 @@ function SelectionMenu({ editor, onCreateTask }: { editor: Editor; onCreateTask?
           <button type="button" className={menuBtn} aria-label="Link" aria-pressed={active.link} onClick={openLink}>
             <Link2 className="size-[15px]" aria-hidden />
           </button>
+          {(onCreateTask || onShare) && <span className="mx-0.5 h-4 w-px bg-line-2" aria-hidden />}
           {onCreateTask && (
             <>
-              <span className="mx-0.5 h-4 w-px bg-line-2" aria-hidden />
               <button
                 type="button"
                 onClick={toTask}
@@ -224,6 +240,17 @@ function SelectionMenu({ editor, onCreateTask }: { editor: Editor; onCreateTask?
                 Aufgabe
               </button>
             </>
+          )}
+          {onShare && (
+            <button
+              type="button"
+              onClick={share}
+              disabled={busy}
+              className="inline-flex h-[30px] items-center gap-1.5 rounded-[7px] px-2 text-[12.5px] font-medium text-fg-2 transition-colors duration-150 hover:bg-hover hover:text-fg disabled:opacity-60 max-md:h-10 max-md:text-[14px]"
+            >
+              <FileUp className="size-[14px]" aria-hidden />
+              Teilen
+            </button>
           )}
         </>
       )}

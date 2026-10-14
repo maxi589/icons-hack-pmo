@@ -29,10 +29,57 @@ type Props = {
   /** Schlüssel für „… schreibt gerade“ (nur bei geteilten Notizen) */
   presenceKey?: string;
   onCreateTask?: (title: string) => Promise<string | null>;
+  /** Markierten Text als Team-Dokument teilen */
+  onShare?: (markdown: string, title: string) => Promise<string | null>;
   className?: string;
 };
 
-export function NotesCard({ title, label, data, save, placeholder, private: isPrivate, presenceKey, onCreateTask, className }: Props) {
+export function NotesCard({ title, label, data, save, placeholder, private: isPrivate, presenceKey, onCreateTask, onShare, className }: Props) {
+  const draft = useNotesDraft({ data, save, presenceKey, isPrivate });
+  if (data === false) return null;
+  const { value, onChange, onBlur, meta, error } = draft;
+
+  return (
+    <section
+      className={cn(
+        "flex min-w-0 flex-col overflow-hidden rounded-[14px] bg-card shadow-card transition-shadow duration-150 has-[.ProseMirror-focused]:shadow-[0_0_0_2px_var(--accLine)]",
+        className
+      )}
+    >
+      <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3">
+        <h2 className="flex items-center gap-1.5 text-[14px] font-semibold">
+          {title}
+          {isPrivate && (
+            <span className="inline-flex items-center gap-1 text-[12px] font-normal text-fg-3" title="Nur für dich sichtbar">
+              <Lock className="size-3" aria-hidden />
+              privat
+            </span>
+          )}
+        </h2>
+        <span className={cn("truncate text-[12px] text-fg-3 tabular", error && "text-st-red")} aria-live="polite">
+          {meta}
+        </span>
+      </div>
+      <NoteEditor
+        value={value}
+        label={label}
+        placeholder={placeholder}
+        disabled={data === null}
+        onChange={onChange}
+        onBlur={onBlur}
+        onCreateTask={onCreateTask}
+        onShare={onShare}
+        className="flex min-h-[320px] flex-1 flex-col border-t border-line lg:min-h-[460px]"
+      />
+    </section>
+  );
+}
+
+/**
+ * Autospeichern für ein Notizfeld: eigener Entwurf während des Schreibens, Speichern nach 0,8 s bzw. beim Verlassen,
+ * Meta-Zeile („Speichert …“, „wer · wann“, „Tim schreibt gerade …“). Auch für Text-Dokumente.
+ */
+export function useNotesDraft({ data, save, presenceKey, isPrivate }: { data: NotesData | null | false; save: (markdown: string) => Promise<boolean>; presenceKey?: string; isPrivate?: boolean }) {
   const { personById } = useTeam();
   const today = useToday();
   const [draft, setDraft] = useState<string | null>(null);
@@ -60,10 +107,8 @@ export function NotesCard({ title, label, data, save, placeholder, private: isPr
   // Beim Verlassen der Seite nichts verlieren.
   useEffect(() => () => void flush(), [flush]);
 
-  if (data === false) return null;
-
   // Solange man schreibt (draft gesetzt), gilt der eigene Text; sonst der gespeicherte (auch fremde Änderungen live).
-  const value = draft ?? data?.notes ?? "";
+  const value = draft ?? (data ? data.notes : "");
 
   const onChange = (next: string) => {
     setDraft(next);
@@ -79,50 +124,20 @@ export function NotesCard({ title, label, data, save, placeholder, private: isPr
   else if (state === "saving") meta = "Speichert …";
   else if (state === "saved" && draft !== null) meta = "Gespeichert";
   else if (state === "error") meta = "Nicht gespeichert";
-  else if (data?.updatedAt) {
+  else if (data && data.updatedAt) {
     const day = todayInVienna(new Date(data.updatedAt));
     const when = day === today ? `heute, ${timeFmt.format(new Date(data.updatedAt))}` : formatShort(day);
     const who = isPrivate ? null : personById(data.updatedBy)?.name;
     meta = who ? `${who} · ${when}` : when;
   }
 
-  return (
-    <section
-      className={cn(
-        "flex min-w-0 flex-col overflow-hidden rounded-[14px] bg-card shadow-card transition-shadow duration-150 has-[.ProseMirror-focused]:shadow-[0_0_0_2px_var(--accLine)]",
-        className
-      )}
-    >
-      <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3">
-        <h2 className="flex items-center gap-1.5 text-[14px] font-semibold">
-          {title}
-          {isPrivate && (
-            <span className="inline-flex items-center gap-1 text-[12px] font-normal text-fg-3" title="Nur für dich sichtbar">
-              <Lock className="size-3" aria-hidden />
-              privat
-            </span>
-          )}
-        </h2>
-        <span className={cn("truncate text-[12px] text-fg-3 tabular", state === "error" && "text-st-red")} aria-live="polite">
-          {meta}
-        </span>
-      </div>
-      <NoteEditor
-        value={value}
-        label={label}
-        placeholder={placeholder}
-        disabled={data === null}
-        onChange={onChange}
-        onBlur={async () => {
-          await flush();
-          // Nach dem Speichern wieder dem gespeicherten Stand folgen (fremde Änderungen erscheinen live).
-          if (pending.current === null) setDraft(null);
-        }}
-        onCreateTask={onCreateTask}
-        className="flex min-h-[320px] flex-1 flex-col border-t border-line lg:min-h-[460px]"
-      />
-    </section>
-  );
+  const onBlur = async () => {
+    await flush();
+    // Nach dem Speichern wieder dem gespeicherten Stand folgen (fremde Änderungen erscheinen live).
+    if (pending.current === null) setDraft(null);
+  };
+
+  return { value, onChange, onBlur, meta, error: state === "error" };
 }
 
 // ---------------------------------------------------------------

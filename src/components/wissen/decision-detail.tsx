@@ -44,7 +44,7 @@ export function DecisionDetail({
             className="text-base font-semibold tracking-[-0.01em] md:text-base"
           />
         </h2>
-        <CopyLinkButton path={`/wissen?entscheidung=${d.id}`} label="Link zu dieser Entscheidung kopieren" />
+        <CopyLinkButton path={`/dokumente?entscheidung=${d.id}`} label="Link zu dieser Entscheidung kopieren" />
         <button
           type="button"
           onClick={onClose}

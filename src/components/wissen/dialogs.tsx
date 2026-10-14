@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useTeam } from "@/components/app-shell/team-provider";
-import type { DecisionPatch, LinkItem } from "@/lib/data/use-knowledge";
+import type { DecisionPatch } from "@/lib/data/use-knowledge";
 import { parseTopic, PeoplePicker, TopicOptions, type Topic } from "./pickers";
 
 const field =
@@ -130,108 +130,6 @@ export function NewDecisionDialog({
           )}
           <button type="submit" disabled={busy || !title.trim()} className={submitCls}>
             Festhalten
-          </button>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-// ---------------------------------------------------------------
-// Link hinzufügen oder bearbeiten (Pitch Deck, Website, Luma …)
-// ---------------------------------------------------------------
-
-/** „luma.com/abc“ → „https://luma.com/abc“; nur http(s) erlaubt. */
-export function normalizeUrl(raw: string) {
-  const v = raw.trim();
-  if (!v) return null;
-  const withScheme = /^[a-z][a-z0-9+.-]*:/i.test(v) ? v : `https://${v}`;
-  try {
-    const u = new URL(withScheme);
-    return u.protocol === "http:" || u.protocol === "https:" ? u.toString() : null;
-  } catch {
-    return null;
-  }
-}
-
-export function LinkDialog({
-  open,
-  onOpenChange,
-  link,
-  onSave,
-}: {
-  open: boolean;
-  onOpenChange: (o: boolean) => void;
-  /** null = neuer Link */
-  link: LinkItem | null;
-  onSave: (input: { title: string; url: string }) => Promise<boolean>;
-}) {
-  const [title, setTitle] = useState<string | null>(null);
-  const [url, setUrl] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const titleValue = title ?? link?.title ?? "";
-  const urlValue = url ?? link?.url ?? "";
-  const reset = () => {
-    setTitle(null);
-    setUrl(null);
-    setError(null);
-  };
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const clean = normalizeUrl(urlValue);
-    if (!clean) {
-      setError("Bitte eine gültige Adresse eingeben, z. B. luma.com/icons-hackathon");
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    const ok = await onSave({ title: titleValue.trim() || new URL(clean).hostname.replace(/^www\./, ""), url: clean });
-    setBusy(false);
-    if (ok) {
-      reset();
-      onOpenChange(false);
-    } else setError("Hat nicht geklappt. Bitte nochmal versuchen.");
-  };
-
-  return (
-    <Dialog
-      open={open}
-      onOpenChange={(o) => {
-        if (!o) reset();
-        onOpenChange(o);
-      }}
-    >
-      <DialogContent className="gap-4 p-5 sm:max-w-[440px]">
-        <div className="flex flex-col gap-1 pr-8">
-          <DialogTitle className="text-base font-semibold">{link ? "Link bearbeiten" : "Link hinzufügen"}</DialogTitle>
-        </div>
-        <form onSubmit={submit} className="flex flex-col gap-3.5">
-          <label className="flex flex-col gap-1.5">
-            <span className={label}>Adresse</span>
-            <input
-              autoFocus={!link}
-              required
-              inputMode="url"
-              value={urlValue}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://…"
-              className={field}
-            />
-          </label>
-          <label className="flex flex-col gap-1.5">
-            <span className={label}>Name</span>
-            <input value={titleValue} onChange={(e) => setTitle(e.target.value)} placeholder="z. B. Pitch Deck Partner" className={field} />
-          </label>
-          {error && (
-            <p role="alert" className="text-[13px] text-st-red">
-              {error}
-            </p>
-          )}
-          <button type="submit" disabled={busy || !urlValue.trim()} className={submitCls}>
-            Speichern
           </button>
         </form>
       </DialogContent>

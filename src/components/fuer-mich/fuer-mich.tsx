@@ -7,6 +7,7 @@ import { MobileSheet } from "@/components/mobile-sheet";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { NotesCard } from "@/components/editor/notes-card";
+import { useDocActions } from "@/components/dokumente/use-doc-actions";
 import { NewTaskDialog } from "@/components/tasks/new-task-dialog";
 import { TaskDetail } from "@/components/tasks/task-detail";
 import { TaskList } from "@/components/tasks/tasks";
@@ -15,6 +16,8 @@ import { useToday } from "@/lib/use-today";
 import { useIsMobile } from "@/lib/use-is-mobile";
 import { useMilestones } from "@/lib/data/use-milestones";
 import { useNotepad } from "@/lib/data/use-notepad";
+import { useDocuments } from "@/lib/data/use-documents";
+import { docHref } from "@/lib/documents";
 import { useTasks, type TaskPatch } from "@/lib/data/use-tasks";
 
 // „Für mich“ (Plan Welle 1, ersetzt „Meine Aufgaben“): Aufbau wie die Bereichs-Seite.
@@ -35,6 +38,7 @@ export function FuerMich() {
   const { changeStatus, toggleDone, deleteTask, createTask } = useTaskActions(tasksApi);
   const { milestones } = useMilestones();
   const notepad = useNotepad(me?.id);
+  const docActions = useDocActions(useDocuments());
   const [showDone, setShowDone] = useState(false);
 
   const selectedId = params.get("aufgabe");
@@ -102,6 +106,10 @@ export function FuerMich() {
                 save={notepad.save}
                 placeholder="Gedanken, Ideen, To-dos …"
                 onCreateTask={(title) => createTask({ title }, here)}
+                onShare={async (markdown, title) => {
+                  const d = await docActions.addText({}, title || "Aus dem Notizblock", markdown);
+                  return d ? docHref(d.id) : null;
+                }}
               />
               <section aria-labelledby="mine-title" className="flex min-w-0 flex-col gap-3 self-start max-lg:order-first">
                 <div className="flex min-h-8 items-center justify-between gap-2 px-1">

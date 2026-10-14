@@ -1,4 +1,4 @@
-import { BookOpen, Flag, House, Inbox, Kanban, List, NotebookPen, type LucideIcon } from "lucide-react";
+import { FileText, Flag, House, Inbox, Kanban, List, NotebookPen, type LucideIcon } from "lucide-react";
 
 // Hauptnavigation. `key` ist das Tastenkürzel nach „G“ (z. B. G R = Roadmap).
 
@@ -14,7 +14,7 @@ export const NAV_HACKATHON: NavItem[] = [
   { href: "/roadmap", label: "Roadmap", Icon: Flag, key: "R" },
   { href: "/pipeline", label: "Pipeline", Icon: Kanban, key: "P" },
   { href: "/aufgaben", label: "Aufgaben", Icon: List, key: "A" },
-  { href: "/wissen", label: "Wissen", Icon: BookOpen, key: "W" },
+  { href: "/dokumente", label: "Dokumente", Icon: FileText, key: "D" },
 ];
 
 export const NAV_ALL = [...NAV_MAIN, ...NAV_HACKATHON];
@@ -23,7 +23,8 @@ export const NAV_ALL = [...NAV_MAIN, ...NAV_HACKATHON];
 export const NEW_ACTIONS = [
   { href: "/aufgaben?neu=1", label: "Neue Aufgabe", key: "C" },
   { href: "/pipeline?neu=1", label: "Firma zur Pipeline hinzufügen", key: "F" },
-  { href: "/wissen?neu=1", label: "Entscheidung festhalten", key: "E" },
+  { href: "/dokumente?neu=dokument", label: "Neues Dokument", key: "D" },
+  { href: "/dokumente?neu=entscheidung", label: "Entscheidung festhalten", key: "E" },
 ] as const;
 
 // Die 5 Bereiche (Tabelle `areas`, ohne Sammelzeile „Gesamtleitung“ = id vorbereitung). Feste IDs, damit die
