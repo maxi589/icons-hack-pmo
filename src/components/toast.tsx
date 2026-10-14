@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Check } from "lucide-react";
+import { play, richPlayedWithin } from "@/lib/sounds";
 
 // Hinweis unten mittig, z. B. „Nordwerk → Kontaktiert · Rückgängig“ (Design-System 6.3).
 // 5 Sekunden mit Ablauf-Linie, ersetzt Sicherheitsfragen. Immer nur ein Hinweis gleichzeitig.
@@ -34,6 +35,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       if (current.current) finish(true);
       current.current = t;
       setToast({ ...t, key: Date.now() });
+      // Leiser Ton beim Erscheinen; still, wenn gerade ein eigener Ton lief (z. B. Abhaken, Zusage).
+      if (!richPlayedWithin(400)) play("toast");
       timer.current = setTimeout(() => finish(true), DURATION);
     },
     [finish]

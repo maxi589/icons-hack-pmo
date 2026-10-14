@@ -297,7 +297,7 @@ export function Pipeline() {
 
         {/* Detail: Desktop rechts, Handy als Bottom Sheet */}
         {selected && !isMobile && (
-          <aside aria-label="Firmen-Detail" className="w-[400px] shrink-0 overflow-y-auto border-l border-line bg-card">
+          <aside data-detail aria-label="Firmen-Detail" className="w-[400px] shrink-0 overflow-y-auto border-l border-line bg-card">
             {detail}
           </aside>
         )}

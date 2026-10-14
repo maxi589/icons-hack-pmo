@@ -146,7 +146,7 @@ export function FuerMich() {
         </div>
 
         {selected && !isMobile && (
-          <aside aria-label="Aufgaben-Detail" className="w-[400px] shrink-0 overflow-y-auto border-l border-line bg-card">
+          <aside data-detail aria-label="Aufgaben-Detail" className="w-[400px] shrink-0 overflow-y-auto border-l border-line bg-card">
             {detail}
           </aside>
         )}

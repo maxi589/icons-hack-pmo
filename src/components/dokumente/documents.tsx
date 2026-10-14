@@ -344,6 +344,7 @@ export function Documents() {
 
         {detail && !isMobile && (
           <aside
+            data-detail
             aria-label="Dokument im Detail"
             className={cn(
               "shrink-0 overflow-y-auto border-l border-line bg-card",

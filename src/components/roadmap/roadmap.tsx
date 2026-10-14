@@ -76,7 +76,7 @@ export function Roadmap() {
             <div className="hidden pt-1.5 pb-6 md:block">
               <Timeline milestones={milestones} today={today} selectedId={selected?.id ?? null} onSelect={select} />
               {selected && (
-                <div className="px-5 pt-4">
+                <div data-detail className="px-5 pt-4">
                   <MilestoneDetail
                     milestone={selected}
                     subs={childrenOf(selected.id)}

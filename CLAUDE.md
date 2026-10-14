@@ -60,7 +60,7 @@ Auftraggeber ist Maxi S (kein Entwickler): Deutsch, Ergebnis zuerst, einfache Sp
 - Nur über soundcn: `npx shadcn add @soundcn/<name>`. Auswahl und Lautstärken laut Design-System, Abschnitt 7.
 - **Nie einen Sound der Kategorie `warcraft` installieren.** Die Registry kennzeichnet sie fälschlich als CC0.
 - Ton ist nie das einzige Feedback. Keine Töne bei eingehenden Nachrichten.
-- Code: Sounds in `src/lib/sounds/` (nach `add` dorthin verschieben, soundcn legt sie flach in `src/lib` ab). Abspielen von überall mit `play("taskDone")`, Momente und Lautstärken stehen in `src/lib/sounds/index.ts`. **Sounds sind immer an, ohne Schalter und ohne Fun-Modus** (Maxi, 14.10.). `SoundProvider` lädt die Sounds nur vor. Stumm geht übers Gerät.
+- Code: Sounds in `src/lib/sounds/` (nach `add` dorthin verschieben, soundcn legt sie flach in `src/lib` ab). Abspielen von überall mit `play("taskDone")`, Momente und Lautstärken stehen in `src/lib/sounds/index.ts`. **Sounds sind immer an, ohne Schalter, mit Präsenz „Voll“** (Maxi, 14.10.: Klick, Umschalten, Tippen, Detail auf/zu, Hinweis; Abhaken = Mix aus click-003 + drop-003). `SoundProvider` lädt vor und hört zentral mit; Detail-Fenster brauchen `data-detail`, stumme Elemente `data-sound="none"`. Stumm geht übers Gerät.
 - Wow-Moment „Meilenstein erledigt“: `celebrateMilestone()` aus `src/components/milestone-celebration.tsx`, ausgelöst zentral in `use-milestones.ts` (nur ganze Meilensteine; Unterpunkte bekommen den Haken-Ton).
 
 ## Daten und Sicherheit

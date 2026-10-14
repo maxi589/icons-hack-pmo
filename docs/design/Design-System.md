@@ -127,24 +127,29 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
    - Status-Sheet: Stufen als 48px-Zeilen, Nachfass-Chips, Knopf „Speichern“.
    - Firmen-Detail mit Kommentaren, @-Vorschlagsliste und unten fixiertem Eingabefeld.
 
-## 7. Sounds („Standard“, von Maxi entschieden)
-Quelle soundcn (`npx shadcn add @soundcn/use-sound @soundcn/<name>`), alle Kenney CC0. **Nie einen Sound der Kategorie `warcraft` installieren.** Die Registry kennzeichnet diese Sounds fälschlich als CC0.
+## 7. Sounds (Präsenz „Voll“, von Maxi am 14.10. auf dem Sound-Board gewählt)
+Quelle soundcn, alle Kenney CC0. **Nie einen Sound der Kategorie `warcraft` installieren.** Die Registry kennzeichnet diese Sounds fälschlich als CC0. Sound-Board zum Probehören: https://claude.ai/artifact/Dz3f4n8qSqHCGso3YqMcvr
 
-| Moment | Sound | Startlautstärke | Standard |
-|---|---|---|---|
-| Aufgabe erledigt | `confirmation-001` | 0,19 | an |
-| Firma auf Zugesagt / Fix | `confirmation-004` | 0,32 | an |
-| Meilenstein erledigt | `jingles-pizzi-10` | 0,35 | an |
-| Karte ablegen | `drop-002` / `drop-003` im Wechsel, Tempo ±4 % | 0,12 | an |
-| Strg+K öffnen / schließen | `maximize-008` / `minimize-008` | 0,11 | an |
-| Erwähnung, Fehler | `question-002` / `error-008` | 0,16 / 0,55 | aus (nur bei eigenen Aktionen, nie bei eingehenden Nachrichten) |
+| Moment | Sound | Lautstärke |
+|---|---|---|
+| Aufgabe / Unterpunkt erledigt | **Favoriten-Mix:** `click-003` + `drop-003` (12 ms später), gleich laut wie der alte Haken-Ton (RMS gemessen) | 0,225 / 0,183 |
+| Firma auf Zugesagt / Fix | `confirmation-004` | 0,32 |
+| Meilenstein erledigt | `jingles-pizzi-10` | 0,35 |
+| Karte ablegen | `drop-002` / `drop-003` im Wechsel, Tempo ±4 % | 0,12 |
+| Strg+K öffnen / schließen | `maximize-008` / `minimize-008` | 0,11 |
+| Klick auf Knöpfe, Links, Zeilen | `click-003` | 0,14 |
+| Umschalten (Tabs, Filter, Auswahl, Checkbox) | `switch-006` | 0,25 |
+| Tippen in Feldern und Editoren | `click-002`, Tempo ±4 % | 0,17 |
+| Detail auf / zu | `maximize-006` / `minimize-006` | 0,11 |
+| Hinweis erscheint | `drop-002` (still, wenn gerade ein eigener Ton lief) | 0,12 |
+| Erwähnung, Fehler | keiner (nie bei eingehenden Nachrichten) | – |
 
 Umsetzung:
-- Ein `SoundProvider` an der App-Wurzel dekodiert alle Sounds einmal vor.
+- Ein `SoundProvider` an der App-Wurzel dekodiert alle Sounds einmal vor und hört zentral mit (Klick, Umschalten, Tippen, Detail-Fenster mit `data-detail`). Läuft gerade ein Moment mit eigenem Ton (Abhaken, Zusage, Karte, Strg+K, Detail), bleibt der Klick still. Einzelne Elemente schweigen mit `data-sound="none"`.
 - Ein zentraler Lautstärkeregler (GainNode).
 - `play("taskDone")` mit eigener Lautstärke je Moment.
 - Höchstens ein Abspielen pro Sound alle 60–80ms.
-- **Kein Schalter und kein Fun-Modus** (Maxi, 14.10.: „sieht kindisch aus“). Sounds sind immer an, stumm geht über das Gerät. Die Tabelle `user_settings` bleibt ungenutzt in der Datenbank.
+- **Kein Schalter** (Maxi, 14.10.). Sounds sind immer an, stumm geht über das Gerät. Die Präsenz des früheren Fun-Modus ist jetzt Standard (Maxi, 14.10. abends: „zu wenig Sound“). Die Tabelle `user_settings` bleibt ungenutzt in der Datenbank.
 - Der Ton ist nie das einzige Feedback.
 - Das iPhone darf über den Stummschalter stummschalten (nicht umgehen).
 

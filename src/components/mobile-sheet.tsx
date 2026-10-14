@@ -11,6 +11,7 @@ export function MobileSheet({ open, onClose, title, children }: { open: boolean;
     <Sheet open={open} onOpenChange={(o) => !o && onClose()}>
       <SheetContent
         ref={popup}
+        data-detail
         initialFocus={() => popup.current?.querySelector<HTMLElement>('[aria-label="Detail schließen"]') ?? true}
         side="bottom"
         showCloseButton={false}
