@@ -13,8 +13,9 @@ import { followState, initials, STAGES, type Organization, type Stage } from "@/
 // Kopf klebt beim Scrollen, unten Zähler. Bewusst ohne Rasterlinien und Pills.
 // Feste Spaltenbreiten mit gleichem Abstand (Maxi, 14.10.: „überall gleich“), freier Platz sammelt sich rechts in
 // einer leeren Füllspalte. So bleiben die Spalten stehen, wenn rechts das Detail aufgeht.
-// Kein seitliches Scrollen: Die Tabelle misst ihre eigene Breite (Container-Abfrage). Wird es eng, fällt zuerst die
-// Füllspalte weg (Firma nimmt den Rest; Summe der festen Spalten 1020px, passt neben das offene Detail ab ~1700px Fenster), dann „Warmer Kontakt“/„Kapazität“, dann „Prio“.
+// Kein seitliches Scrollen: Die Tabelle misst ihre eigene Breite (Container-Abfrage). Wird es eng, fällt rechts zuerst
+// „Warmer Kontakt“/„Kapazität“ weg (unter 1020px), dann „Prio“ (unter 800px).
+// Erst unter 740px schrumpft die Firmenspalte (Füllspalte weg).
 // Venues zeigen nur die Kapazität kurz; Übernachtung, Preis und Lage stehen im Detail.
 
 type SortKey = "name" | "stage" | "prio" | "follow" | "owner" | "extra";
@@ -89,16 +90,16 @@ export function OrgTable({
   };
 
   // Spalten, die bei wenig Platz verschwinden bzw. schrumpfen (Breite der Tabelle, nicht des Fensters)
-  const hideFill = "@max-[1020px]:hidden";
-  const hideExtra = "@max-[900px]:hidden";
-  const hidePrio = "@max-[700px]:hidden";
+  const hideFill = "@max-[740px]:hidden";
+  const hideExtra = "@max-[1020px]:hidden";
+  const hidePrio = "@max-[800px]:hidden";
 
   return (
     <div className="@container flex min-h-full flex-col">
       <table className="w-full table-fixed border-separate border-spacing-0 text-[13px]">
         <thead className="text-[12px] text-fg-3">
           <tr>
-            {head("name", venue ? "Venue" : "Firma", "z-[3] w-[300px] pl-[18px] @max-[1020px]:w-auto")}
+            {head("name", venue ? "Venue" : "Firma", "z-[3] w-[300px] pl-[18px] @max-[740px]:w-auto")}
             {head("stage", "Stufe", "w-[128px]")}
             {head("prio", "Prio", cn("w-[60px]", hidePrio))}
             {head("follow", "Nachfassen", "w-[176px]")}
