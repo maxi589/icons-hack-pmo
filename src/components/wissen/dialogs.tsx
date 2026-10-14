@@ -20,12 +20,15 @@ export function NewDecisionDialog({
   onOpenChange,
   today,
   topics,
+  defaults = {},
   onCreate,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   today: string;
   topics: Topic[];
+  /** Vorbelegung, z. B. aus einem Termin (Bereich, „gehört zu“ im Format „typ:id“) */
+  defaults?: { area_id?: string | null; topic?: string };
   onCreate: (input: DecisionPatch & { title: string; decided_on: string }) => Promise<boolean>;
 }) {
   const { me, allAreas } = useTeam();
@@ -33,8 +36,10 @@ export function NewDecisionDialog({
   const [reason, setReason] = useState("");
   const [date, setDate] = useState<string | null>(null);
   const [who, setWho] = useState<string[] | null>(null);
-  const [area, setArea] = useState("");
-  const [topic, setTopic] = useState("");
+  const [areaDraft, setArea] = useState<string | null>(null);
+  const [topicDraft, setTopic] = useState<string | null>(null);
+  const area = areaDraft ?? defaults.area_id ?? "";
+  const topic = topicDraft ?? defaults.topic ?? "";
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,8 +49,8 @@ export function NewDecisionDialog({
     setReason("");
     setDate(null);
     setWho(null);
-    setArea("");
-    setTopic("");
+    setArea(null);
+    setTopic(null);
     setError(null);
   };
 

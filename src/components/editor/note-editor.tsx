@@ -73,7 +73,8 @@ export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabl
     onUpdate: ({ editor }) => {
       const md = tidy(editor.getMarkdown());
       // Nur echte Änderungen melden (Tiptap meldet z. B. auch beim Freischalten), sonst würde ungewollt gespeichert.
-      if (md === last.current) return;
+      // Unterschiede nur in Leerzeilen am Ende (z. B. frisch angelegter Text) zählen nicht.
+      if (md.trimEnd() === last.current.trimEnd()) return;
       last.current = md;
       onChangeRef.current(md);
     },

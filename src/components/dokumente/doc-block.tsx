@@ -9,19 +9,21 @@ import { useDocuments } from "@/lib/data/use-documents";
 import { docHref, docType, type Doc } from "@/lib/documents";
 import { useDocActions, type DocDefaults } from "./use-doc-actions";
 
-// Block „Dokumente“ dort, wo man arbeitet (Bereichs-Seite, Firmen-Detail; später Termine).
+// Block „Dokumente“ dort, wo man arbeitet (Bereichs-Seite, Firmen-Detail, Termin als „Unterlagen“).
 // Bereich bzw. „gehört zu“ sind vorbelegt. Link einfügen + Enter, „Text“, „Datei“ oder Datei hineinziehen.
 
 export function DocBlock({
   defaults,
   match,
   variant = "card",
+  title = "Dokumente",
 }: {
   defaults: DocDefaults;
   /** Welche Dokumente hierher gehören */
   match: (d: Doc) => boolean;
   /** card = eigene Karte (Bereich), plain = Abschnitt im Detail-Panel (Firma) */
   variant?: "card" | "plain";
+  title?: string;
 }) {
   const router = useRouter();
   const api = useDocuments();
@@ -46,7 +48,7 @@ export function DocBlock({
 
   return (
     <section
-      aria-label="Dokumente"
+      aria-label={title}
       className={cn("relative min-w-0", variant === "card" ? "overflow-hidden rounded-[14px] bg-card shadow-card" : "")}
       onDragOver={(e) => {
         if (!e.dataTransfer.types.includes("Files")) return;
@@ -63,7 +65,7 @@ export function DocBlock({
     >
       <div className={cn("flex items-center justify-between gap-2", variant === "card" ? "px-4 pt-4 pb-3" : "pb-2")}>
         <h2 className={cn("flex items-center gap-2 font-semibold", variant === "card" ? "text-[14px]" : "text-[13px]")}>
-          Dokumente
+          {title}
           {list.length > 0 && <span className="font-normal text-fg-3 tabular">{list.length}</span>}
         </h2>
         <span className="flex gap-1.5">

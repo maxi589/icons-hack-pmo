@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { de } from "date-fns/locale";
-import { Check } from "lucide-react";
+import { Check, Video } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { AreaGlyph } from "@/components/area-glyph";
@@ -12,7 +12,9 @@ import { Chip, DueChip } from "@/components/chip";
 import { Countdown } from "@/components/countdown";
 import { RasterField } from "@/components/raster-field";
 import { useTeam } from "@/components/app-shell/team-provider";
-import { useToday } from "@/lib/use-today";
+import { useNow, useToday } from "@/lib/use-today";
+import { useMeetings } from "@/lib/data/use-meetings";
+import { endOf, meetingHref, viennaParts, type Meeting } from "@/lib/meetings";
 import { daysBetween, EVENT_START, EVENT_START_UTC, formatDayMonth, formatLong, formatShort, relativeDays, TIME_ZONE } from "@/lib/dates";
 import { currentPhase, phaseFill, PHASES, WAVE_1 } from "@/lib/phases";
 import { MilestoneChecklist } from "@/components/milestone-checklist";
@@ -37,6 +39,7 @@ function phaseLeft(today: string, phase: number) {
 export function Overview() {
   const today = useToday();
   const { data, setMilestoneDone } = useOverviewData();
+  const { meetings } = useMeetings();
 
   if (!today || !data) return <OverviewSkeleton />;
 
@@ -60,7 +63,7 @@ export function Overview() {
       <GoalTiles orgs={data.orgs} milestones={data.milestones} />
 
       <div className="flex flex-wrap gap-4">
-        <DueCard milestones={data.milestones} tasks={data.tasks} today={today} />
+        <DueCard milestones={data.milestones} tasks={data.tasks} meetings={meetings || []} today={today} />
         <FollowUpCard orgs={data.orgs} today={today} />
       </div>
 
@@ -210,12 +213,13 @@ function GoalTiles({ orgs, milestones }: { orgs: Org[]; milestones: Milestone[] 
 }
 
 // ---------------------------------------------------------------
-// Als Nächstes fällig (Meilensteine und Aufgaben, nach Tag gruppiert)
+// Als Nächstes (Termine, Meilensteine und Aufgaben, nach Tag gruppiert)
 // ---------------------------------------------------------------
-type DueItem = { key: string; kind: "milestone" | "task"; id?: string; title: string; due: string; areaId: string | null; ownerId: string | null };
+type DueItem = { key: string; kind: "milestone" | "task" | "meeting"; id?: string; time?: string; title: string; due: string; areaId: string | null; ownerId: string | null; video?: boolean };
 
-function DueCard({ milestones, tasks, today }: { milestones: Milestone[]; tasks: Task[]; today: string }) {
-  const { areaById, personById } = useTeam();
+function DueCard({ milestones, tasks, meetings, today }: { milestones: Milestone[]; tasks: Task[]; meetings: Meeting[]; today: string }) {
+  const { areaById, personById, me } = useTeam();
+  const now = useNow();
   const parentsWithChildren = new Set(milestones.map((m) => m.parent_id).filter(Boolean));
   const areaOwner = (id: string | null) => areaById(id)?.owner_id ?? null;
 
@@ -224,7 +228,16 @@ function DueCard({ milestones, tasks, today }: { milestones: Milestone[]; tasks:
       .filter((m) => m.status !== "erledigt" && !parentsWithChildren.has(m.id))
       .map((m) => ({ key: m.id, kind: "milestone" as const, id: m.id, title: m.title, due: m.due_date, areaId: m.area_id, ownerId: areaOwner(m.area_id) })),
     ...tasks.map((t) => ({ key: t.id, kind: "task" as const, title: t.title, due: t.due_date!, areaId: t.area_id, ownerId: t.assignee_id })),
-  ].sort((a, b) => a.due.localeCompare(b.due));
+    // Termine: nur kommende bzw. laufende, mit Uhrzeit vor Meilensteinen und Aufgaben des Tages
+    ...meetings
+      .filter((m) => endOf(m).getTime() >= now)
+      .map((m) => {
+        const p = viennaParts(m.starts_at);
+        const owner = me && m.attendees.includes(me.id) ? me.id : (m.attendees[0] ?? null);
+        return { key: m.id, kind: "meeting" as const, time: p.time, title: m.title, due: p.date, areaId: m.area_id, ownerId: owner, video: !!m.meet_url };
+      }),
+  ];
+  items.sort((a, b) => a.due.localeCompare(b.due) || (a.time ?? "99").localeCompare(b.time ?? "99"));
 
   // Überfälliges zuerst, dann die nächsten 3 Tage mit Einträgen.
   const overdue = items.filter((i) => i.due < today);
@@ -237,7 +250,7 @@ function DueCard({ milestones, tasks, today }: { milestones: Milestone[]; tasks:
   return (
     <section className={cn(card, "min-w-0 flex-[1.45_1_440px] overflow-hidden")}>
       <div className="flex items-center justify-between px-4 pt-4 pb-3">
-        <h2 className="text-[14px] font-semibold">Als Nächstes fällig</h2>
+        <h2 className="text-[14px] font-semibold">Als Nächstes</h2>
         <Link href="/aufgaben" className="rounded-md text-[12.5px] text-fg-2 hover:text-fg">
           Alle Aufgaben
         </Link>
@@ -251,7 +264,9 @@ function DueCard({ milestones, tasks, today }: { milestones: Milestone[]; tasks:
               const area = areaById(it.areaId);
               return (
                 <li key={it.key} className="relative flex min-h-10 items-center gap-3 border-t border-line px-4 text-[13.5px] has-[a]:hover:bg-hover">
-                  {it.kind === "milestone" ? (
+                  {it.kind === "meeting" ? (
+                    <Video className="size-[13px] shrink-0 text-fg-3" aria-label="Termin" />
+                  ) : it.kind === "milestone" ? (
                     <svg viewBox="0 0 24 24" className="size-[13px] shrink-0 text-fg-3" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" aria-label="Meilenstein">
                       <path d="M12 3 21 12 12 21 3 12z" />
                     </svg>
@@ -259,7 +274,12 @@ function DueCard({ milestones, tasks, today }: { milestones: Milestone[]; tasks:
                     <span className="size-[13px] shrink-0 rounded-full border-[1.5px] border-line-2" aria-label="Aufgabe" />
                   )}
                   {it.id && <span className="w-[34px] shrink-0 font-mono text-[12px] text-fg-3">{it.id}</span>}
-                  {it.kind === "milestone" ? (
+                  {it.time && <span className="w-[38px] shrink-0 font-mono text-[12px] text-fg-3">{it.time}</span>}
+                  {it.kind === "meeting" ? (
+                    <Link href={meetingHref(it.key)} className="min-w-0 flex-1 truncate rounded-sm after:absolute after:inset-0">
+                      {it.title}
+                    </Link>
+                  ) : it.kind === "milestone" ? (
                     <Link href={`/roadmap?m=${it.id}`} className="min-w-0 flex-1 truncate rounded-sm after:absolute after:inset-0">
                       {it.title}
                     </Link>

@@ -7,7 +7,7 @@ import type { Task } from "@/lib/tasks";
 // Alle Aufgaben mit Live-Updates. Änderungen erscheinen sofort (optimistisch) und werden bei Fehler
 // zurückgenommen. Versionszähler wie in use-organizations.ts: eine ältere Antwort überschreibt keine eigene Änderung.
 
-const FIELDS = "id, title, description, status, assignee_id, due_date, area_id, milestone_id, done_at, created_by, created_at";
+const FIELDS = "id, title, description, status, assignee_id, due_date, area_id, milestone_id, meeting_id, done_at, created_by, created_at";
 
 export type TaskPatch = Partial<Omit<Task, "id" | "created_at">>;
 

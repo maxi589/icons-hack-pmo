@@ -1,6 +1,6 @@
 // Direktlinks auf einen Eintrag (für Inbox und „Link kopieren“ → WhatsApp).
 
-export type TargetType = "organization" | "task" | "milestone" | "decision" | "document";
+export type TargetType = "organization" | "task" | "milestone" | "decision" | "document" | "meeting";
 
 export function targetHref(type: TargetType, id: string) {
   switch (type) {
@@ -14,6 +14,8 @@ export function targetHref(type: TargetType, id: string) {
       return `/dokumente?entscheidung=${id}`;
     case "document":
       return `/dokumente?dok=${id}`;
+    case "meeting":
+      return `/termine?termin=${id}`;
   }
 }
 
@@ -23,4 +25,5 @@ export const TARGET_NAMES: Record<TargetType, string> = {
   milestone: "Meilenstein",
   decision: "Entscheidung",
   document: "Dokument",
+  meeting: "Termin",
 };

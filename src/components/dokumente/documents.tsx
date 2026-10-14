@@ -21,6 +21,7 @@ import { useKnowledge, type Decision } from "@/lib/data/use-knowledge";
 import { useMilestones } from "@/lib/data/use-milestones";
 import { useOrganizations } from "@/lib/data/use-organizations";
 import { useTasks } from "@/lib/data/use-tasks";
+import { useMeetings } from "@/lib/data/use-meetings";
 import { logActivity } from "@/lib/data/use-feed";
 import { DECISION_TYPE, docType, formatSize, hostOf, NEW_TITLE, type Doc, type DocType } from "@/lib/documents";
 import { DocDetail } from "./doc-detail";
@@ -108,7 +109,8 @@ export function Documents() {
   const { orgs } = useOrganizations();
   const tasksApi = useTasks();
   const { createTask } = useTaskActions(tasksApi);
-  const topics = useTopics(milestones, orgs, tasksApi.tasks);
+  const { meetings } = useMeetings();
+  const topics = useTopics(milestones, orgs, tasksApi.tasks, meetings);
 
   const [query, setQuery] = useState("");
   const [area, setArea] = useState("");

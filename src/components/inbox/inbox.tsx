@@ -91,7 +91,7 @@ function InboxRow({ item: n, onRead }: { item: InboxItem; onRead: (read: boolean
   const actor = personById(n.actor_id);
   const unread = !n.read_at;
   const gone = n.targetName === null;
-  const what = n.kind === "mention" ? "hat dich erwähnt" : "hat dich zugewiesen";
+  const what = n.kind === "mention" ? "hat dich erwähnt" : n.target_type === "meeting" ? "hat dich eingetragen" : "hat dich zugewiesen";
 
   const copy = async () => {
     await navigator.clipboard.writeText(window.location.origin + n.href);

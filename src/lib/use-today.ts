@@ -14,3 +14,8 @@ function subscribe(onChange: () => void) {
 export function useToday(): string {
   return useSyncExternalStore(subscribe, () => todayInVienna(), () => "");
 }
+
+/** Aktueller Zeitpunkt in ms, auf die Minute gerundet (für „vorbei/kommend“ bei Terminen). 0 auf dem Server. */
+export function useNow(): number {
+  return useSyncExternalStore(subscribe, () => Math.floor(Date.now() / 60_000) * 60_000, () => 0);
+}

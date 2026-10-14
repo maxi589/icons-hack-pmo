@@ -14,6 +14,8 @@ export type Task = {
   due_date: string | null;
   area_id: string | null;
   milestone_id: string | null;
+  /** Ergebnis aus einem Termin */
+  meeting_id: string | null;
   done_at: string | null;
   created_by: string | null;
   created_at: string;

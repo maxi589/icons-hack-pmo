@@ -8,9 +8,10 @@ import { Avatar } from "@/components/avatar";
 import { Feed } from "@/components/feed";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { notifyAssignment } from "@/lib/data/use-feed";
-import { formatDayMonth } from "@/lib/dates";
+import { formatDayMonth, formatShort, todayInVienna } from "@/lib/dates";
 import type { OrgPatch } from "@/lib/data/use-organizations";
 import { DocBlock } from "@/components/dokumente/doc-block";
+import { MeetingBlock } from "@/components/termine/meeting-block";
 import {
   followState,
   initials,
@@ -247,6 +248,11 @@ export function OrgDetail({
         </div>
       </div>
 
+      {/* Calls und Meetings mit der Firma */}
+      <div className="border-b border-line px-[18px] py-3.5">
+        <MeetingBlock variant="plain" organization_id={org.id} match={(m) => m.organization_id === org.id} />
+      </div>
+
       {/* Unterlagen zur Firma (Deck, Vertrag, Call-Transkript …) */}
       <div className="border-b border-line px-[18px] py-3.5">
         <DocBlock
@@ -270,7 +276,9 @@ export function OrgDetail({
                   ? `hat nachgefasst${a.data.next ? `, nächstes Mal ${formatDayMonth(String(a.data.next))}` : ""}`
                   : a.action === "imported"
                   ? `hat die Firma aus ${String(a.data.source ?? "der Excel").replace(/ Z\. \d+.*$/, "")} übernommen`
-                  : a.action
+                  : a.action === "meeting_linked"
+                    ? `hat den Termin „${String(a.data.title ?? "")}“ am ${formatShort(todayInVienna(new Date(String(a.data.starts_at))))} eingetragen`
+                    : a.action
           }
         />
       </div>

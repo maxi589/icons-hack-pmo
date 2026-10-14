@@ -3,7 +3,7 @@ import { ExternalLink, FileText, FileAudio, File, FileImage, FileSpreadsheet, Pr
 // Dokumente (Plan Welle 1, Schritt 2): Arten, Erkennung von Links an der Adresse, Hilfen für Anzeige.
 
 export type DocumentKind = "link" | "file" | "text" | "transcript";
-export type DocTarget = "milestone" | "organization" | "task";
+export type DocTarget = "milestone" | "organization" | "task" | "meeting";
 
 export type Doc = {
   id: string;

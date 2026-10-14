@@ -10,6 +10,7 @@ import { Chip, DueChip } from "@/components/chip";
 import { useToast } from "@/components/toast";
 import { NotesCard } from "@/components/editor/notes-card";
 import { DocBlock } from "@/components/dokumente/doc-block";
+import { MeetingBlock } from "@/components/termine/meeting-block";
 import { useTaskActions } from "@/components/tasks/use-task-actions";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { useTeam } from "@/components/app-shell/team-provider";
@@ -80,6 +81,7 @@ export function AreaPage({ id }: { id: string }) {
           <div className="flex min-w-0 flex-col items-stretch gap-4 self-start max-lg:order-first md:gap-5">
             <MilestonesCard milestones={milestones} own={own} today={today} onToggle={setMilestoneDone} />
             <TasksCard areaId={id} tasks={areaTasks} milestones={milestones} today={today} onToggle={toggleDone} onNew={newTask} />
+            <MeetingBlock area_id={id} match={(m) => m.area_id === id} />
             <DocBlock defaults={{ area_id: id }} match={(d) => d.area_id === id} />
           </div>
         </div>

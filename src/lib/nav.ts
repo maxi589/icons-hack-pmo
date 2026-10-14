@@ -1,4 +1,4 @@
-import { FileText, Flag, House, Inbox, Kanban, List, NotebookPen, type LucideIcon } from "lucide-react";
+import { CalendarDays, FileText, Flag, House, Inbox, Kanban, List, NotebookPen, type LucideIcon } from "lucide-react";
 
 // Hauptnavigation. `key` ist das Tastenkürzel nach „G“ (z. B. G R = Roadmap).
 
@@ -11,6 +11,7 @@ export const NAV_MAIN: NavItem[] = [
 ];
 
 export const NAV_HACKATHON: NavItem[] = [
+  { href: "/termine", label: "Termine", Icon: CalendarDays, key: "T" },
   { href: "/roadmap", label: "Roadmap", Icon: Flag, key: "R" },
   { href: "/pipeline", label: "Pipeline", Icon: Kanban, key: "P" },
   { href: "/aufgaben", label: "Aufgaben", Icon: List, key: "A" },
@@ -22,6 +23,7 @@ export const NAV_ALL = [...NAV_MAIN, ...NAV_HACKATHON];
 // Neu anlegen: führt vorerst auf die passende Seite, das Formular kommt mit der jeweiligen Seite.
 export const NEW_ACTIONS = [
   { href: "/aufgaben?neu=1", label: "Neue Aufgabe", key: "C" },
+  { href: "/termine?neu=1", label: "Neuer Termin", key: "T" },
   { href: "/pipeline?neu=1", label: "Firma zur Pipeline hinzufügen", key: "F" },
   { href: "/dokumente?neu=dokument", label: "Neues Dokument", key: "D" },
   { href: "/dokumente?neu=entscheidung", label: "Entscheidung festhalten", key: "E" },

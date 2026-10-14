@@ -7,10 +7,20 @@ import type { TargetType } from "@/lib/links";
 
 // Auswahl-Bausteine für Entscheidungen: wer hat entschieden (mehrere), womit hängt es zusammen (ein Thema).
 
-export function PeoplePicker({ value, onChange, size = "md" }: { value: string[]; onChange: (ids: string[]) => void; size?: "sm" | "md" }) {
+export function PeoplePicker({
+  value,
+  onChange,
+  size = "md",
+  label = "Wer hat entschieden",
+}: {
+  value: string[];
+  onChange: (ids: string[]) => void;
+  size?: "sm" | "md";
+  label?: string;
+}) {
   const { people } = useTeam();
   return (
-    <div className="flex flex-wrap gap-1.5" role="group" aria-label="Wer hat entschieden">
+    <div className="flex flex-wrap gap-1.5" role="group" aria-label={label}>
       {people.map((p) => {
         const on = value.includes(p.id);
         return (
@@ -42,6 +52,7 @@ const GROUPS: { type: TargetType; name: string }[] = [
   { type: "milestone", name: "Meilensteine" },
   { type: "organization", name: "Pipeline" },
   { type: "task", name: "Aufgaben" },
+  { type: "meeting", name: "Termine" },
 ];
 
 /** Wert im Format „typ:id“, leer = kein Thema. */
