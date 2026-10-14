@@ -63,7 +63,7 @@ export function MilestoneDetail({
             <span className="size-[7px] rounded-full" style={{ background: area?.color }} aria-hidden />
             {area?.name}
           </span>
-          <span className="tabular">· {formatShort(m.due_date)}</span>
+          {done && <span className="tabular">· {formatShort(m.due_date)}</span>}
           {done ? (
             <Chip tone="green">
               <Check className="size-3" strokeWidth={3} aria-hidden />
@@ -92,7 +92,14 @@ export function MilestoneDetail({
         )}
         <div className="flex items-center gap-2 pt-1 text-[12.5px] text-fg-2">
           <Avatar person={owner} size={20} />
-          {owner ? `${owner.name} (verantwortlich für ${area?.name})` : <span className="text-st-amber">Verantwortlich offen</span>}
+          {owner ? (
+            <span>
+              <span className="sr-only">Verantwortlich: </span>
+              {owner.name}
+            </span>
+          ) : (
+            <span className="text-st-amber">Verantwortlich offen</span>
+          )}
         </div>
         <div className="flex flex-wrap gap-2 pt-1.5">
           {done ? (

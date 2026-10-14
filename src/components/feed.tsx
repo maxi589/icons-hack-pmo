@@ -61,7 +61,7 @@ export function Feed({
           it.kind === "activity" ? (
             <li key={`a${it.id}`} className="flex gap-2.5 text-[12.5px] text-fg-3">
               <span className="flex w-5 shrink-0 justify-center pt-[5px]" aria-hidden>
-                <span className="size-1.5 rounded-full bg-st-blue" />
+                <span className="size-1.5 rounded-full bg-st-gray" />
               </span>
               <span>
                 <b className="font-medium text-fg-2">{personById(it.actor_id)?.name ?? "Jemand"}</b> {describe(it)} · {when(it.created_at)}
@@ -146,7 +146,7 @@ function Composer({ targetType, targetId }: { targetType: TargetType; targetId: 
           ref={ref}
           rows={2}
           value={text}
-          placeholder="Schreib etwas … mit @ erwähnst du jemanden"
+          placeholder="Kommentar … @ erwähnt"
           onChange={(e) => onChange(e.target.value, e.target.selectionStart)}
           onKeyDown={(e) => {
             if (suggestions.length) {
@@ -181,7 +181,7 @@ function Composer({ targetType, targetId }: { targetType: TargetType; targetId: 
           Senden
         </button>
       </div>
-      <p id={`cm-hint-${targetId}`} className="text-[11.5px] text-fg-3">
+      <p id={`cm-hint-${targetId}`} className="sr-only">
         Strg + Enter sendet
       </p>
       {error && (

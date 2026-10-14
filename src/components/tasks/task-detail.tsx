@@ -5,7 +5,6 @@ import { ArrowUpRight, Trash2, X } from "lucide-react";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
-import { DueChip } from "@/components/chip";
 import { Feed } from "@/components/feed";
 import { EditText, miniButton, PropRow, SelectBox } from "@/components/detail-fields";
 import { useTeam } from "@/components/app-shell/team-provider";
@@ -126,15 +125,14 @@ export function TaskDetail({
             />
             {!done && (
               <>
-                <button type="button" className={miniButton} onClick={() => onUpdate({ due_date: shiftDue(task.due_date, today, 2) })}>
-                  +2 Tage
+                <button type="button" className={miniButton} aria-label="+2 Tage" onClick={() => onUpdate({ due_date: shiftDue(task.due_date, today, 2) })}>
+                  +2 T
                 </button>
-                <button type="button" className={miniButton} onClick={() => onUpdate({ due_date: shiftDue(task.due_date, today, 7) })}>
-                  +1 Woche
+                <button type="button" className={miniButton} aria-label="+1 Woche" onClick={() => onUpdate({ due_date: shiftDue(task.due_date, today, 7) })}>
+                  +1 W
                 </button>
               </>
             )}
-            {task.due_date && !done && <DueChip due={task.due_date} today={today} />}
           </span>
         </PropRow>
         <PropRow label="Bereich" htmlFor={f("area")}>

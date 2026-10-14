@@ -65,8 +65,6 @@ export function OrgTable({
     return sort.asc ? c : -c;
   });
   const follow = rows.map((o) => followState(o, today));
-  const late = follow.filter((f) => f?.tone === "red").length;
-  const due = follow.filter((f) => f?.tone === "today").length;
 
   const head = (key: SortKey, label: string, className?: string) => {
     const active = sort.key === key;
@@ -178,8 +176,6 @@ export function OrgTable({
       </table>
       <div className="sticky bottom-0 z-[2] mt-auto flex h-9 shrink-0 items-center gap-4 border-t border-line bg-panel px-[18px] text-[12px] text-fg-3 tabular">
         <span className="text-fg-2">{rows.length} Einträge</span>
-        {late > 0 && <span className="text-st-red">{late} überfällig</span>}
-        {due > 0 && <span>{due} heute</span>}
         <span className="ml-auto flex gap-4">
           {STAGES.map((s) => {
             const n = rows.filter((o) => o.stage === s.id).length;

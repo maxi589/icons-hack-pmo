@@ -35,7 +35,7 @@
 | `--hover` | rgba(255,255,255,.04) | rgba(0,0,0,.035) | Hover |
 | `--active` | rgba(255,255,255,.075) | rgba(0,0,0,.06) | aktiver Eintrag |
 
-**Status-Farben** (Text und Punkte): grau #a1a1aa / #52525b · blau #60a5fa / #1d4ed8 · amber #fbbf24 / #b45309 · grün #34d399 / #047857 · rot #f87171 / #b91c1c (jeweils dunkel / hell). Im Hellmodus nur die 700er-Töne als Text verwenden. Die 500er-Töne fallen durch (Amber 2,15:1, Grün 2,28:1).
+**Status-Farben** (Text und Punkte): grau #a1a1aa / #52525b · blau #60a5fa / #1d4ed8 · amber #fbbf24 / #a94d07 · grün #34d399 / #047857 · rot #f87171 / #b91c1c (jeweils dunkel / hell). Im Hellmodus nur die 700er-Töne als Text verwenden. Die 500er-Töne fallen durch (Amber 2,15:1, Grün 2,28:1).
 
 **Signatur-Akzent Lime**
 

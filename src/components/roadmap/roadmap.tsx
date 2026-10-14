@@ -73,8 +73,7 @@ export function Roadmap() {
       ) : (
         <>
           {view === "timeline" && (
-            <div className="hidden pb-6 md:block">
-              <Legend today={today} />
+            <div className="hidden pt-1.5 pb-6 md:block">
               <Timeline milestones={milestones} today={today} selectedId={selected?.id ?? null} onSelect={select} />
               {selected && (
                 <div className="px-5 pt-4">
@@ -103,33 +102,6 @@ export function Roadmap() {
         </>
       )}
     </>
-  );
-}
-
-// ---------------------------------------------------------------
-// Legende
-// ---------------------------------------------------------------
-function Legend({ today }: { today: string }) {
-  return (
-    <div className="flex flex-wrap items-center gap-[18px] px-5 pt-5 text-[12.5px] text-fg-2">
-      <span className="flex items-center gap-1.5">
-        <span className="size-2.5 rotate-45 rounded-[2px] bg-fg-2" aria-hidden />
-        Meilenstein
-      </span>
-      <span className="flex items-center gap-1.5">
-        <span className="h-1.5 w-[18px] rounded-[3px] bg-line-2" aria-hidden />
-        Zeitraum
-      </span>
-      <span className="flex items-center gap-1.5">
-        <span className="h-3.5 border-l-[1.5px] border-dashed border-fg-3" aria-hidden />
-        Nachfass-Runde
-      </span>
-      <span className="flex items-center gap-1.5">
-        <span className="h-3.5 w-0.5 bg-acc-line" aria-hidden />
-        Heute, {formatDayMonth(today)}
-      </span>
-      <span className="label-mono ml-auto">Klick auf einen Meilenstein</span>
-    </div>
   );
 }
 

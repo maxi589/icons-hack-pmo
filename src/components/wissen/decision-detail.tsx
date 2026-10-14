@@ -33,7 +33,6 @@ export function DecisionDetail({
     <div className="flex flex-col">
       <div className="flex items-start gap-2 border-b border-line px-[18px] pt-4 pb-3.5">
         <h2 className="min-w-0 flex-1">
-          <span className="label-mono block px-2 pb-1">Entscheidung</span>
           <span className="sr-only">Was wurde entschieden</span>
           <EditText
             id={f("title")}
@@ -45,11 +44,11 @@ export function DecisionDetail({
             className="text-base font-semibold tracking-[-0.01em] md:text-base"
           />
         </h2>
-        <CopyLinkButton path={`/wissen?entscheidung=${d.id}`} label="Link zu dieser Entscheidung kopieren" className="mt-4" />
+        <CopyLinkButton path={`/wissen?entscheidung=${d.id}`} label="Link zu dieser Entscheidung kopieren" />
         <button
           type="button"
           onClick={onClose}
-          className="mt-4 grid size-8 shrink-0 place-items-center rounded-lg text-fg-3 hover:bg-hover hover:text-fg max-md:size-11"
+          className="grid size-8 shrink-0 place-items-center rounded-lg text-fg-3 hover:bg-hover hover:text-fg max-md:size-11"
           aria-label="Detail schließen"
         >
           <X className="size-4" aria-hidden />

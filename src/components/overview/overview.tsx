@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Check, Send } from "lucide-react";
+import { format, parseISO } from "date-fns";
+import { de } from "date-fns/locale";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { AreaGlyph } from "@/components/area-glyph";
@@ -10,8 +12,8 @@ import { Chip, DueChip } from "@/components/chip";
 import { Countdown } from "@/components/countdown";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { useToday } from "@/lib/use-today";
-import { daysBetween, EVENT_START_LABEL, formatDayMonth, formatHeaderDate, formatLong, formatShort, relativeDays } from "@/lib/dates";
-import { currentPhase, FOLLOW_UP_ROUNDS, phaseFill, PHASES, WAVE_1 } from "@/lib/phases";
+import { daysBetween, EVENT_START, EVENT_START_UTC, formatDayMonth, formatLong, formatShort, relativeDays, TIME_ZONE } from "@/lib/dates";
+import { currentPhase, phaseFill, PHASES, WAVE_1 } from "@/lib/phases";
 import { MilestoneChecklist } from "@/components/milestone-checklist";
 import { OwnersDialog } from "./owners-dialog";
 import { TodayCard } from "./today-card";
@@ -20,6 +22,9 @@ import { useOverviewData, type Milestone, type Org, type Task } from "./use-over
 // Übersicht (Board „Richtung A Graphit“): Wo stehen wir? Was ist als Nächstes dran? Wer ist zuständig?
 
 const card = "rounded-[14px] bg-card shadow-card";
+
+/** „bis Sa 27.2., 09:00“ aus Datum und Startzeit des Events */
+const EVENT_UNTIL = `bis ${format(parseISO(EVENT_START), "EEEEEE d.M.", { locale: de })}, ${new Intl.DateTimeFormat("de-AT", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(EVENT_START_UTC)}`;
 
 /** „noch 4 Tage Vorbereitung“ bzw. „letzter Tag Vorbereitung“ */
 function phaseLeft(today: string, phase: number) {
@@ -42,7 +47,7 @@ export function Overview() {
       <h1 className="sr-only">Übersicht</h1>
       <p className="label-mono -mb-1 pt-1 md:pt-0">
         <span className="max-md:hidden">{formatLong(today)} · </span>
-        Phase {phase + 1} von {PHASES.length} · {phaseLeft(today, phase)}
+        {phaseLeft(today, phase)}
       </p>
 
       <div className="flex flex-wrap gap-4">
@@ -71,7 +76,7 @@ function CountdownCard({ today, phase }: { today: string; phase: number }) {
     <section className={cn(card, "flex min-w-0 flex-[1.45_1_440px] flex-col justify-between gap-[22px] px-5 py-[18px] md:px-6 md:py-[22px]")}>
       <h2 className="label-mono">Countdown</h2>
       <Countdown />
-      <p className="-mt-2 text-[13px] text-fg-2">Bis zum Hackathon am {EVENT_START_LABEL} · 24 Stunden</p>
+      <p className="-mt-2 text-[13px] text-fg-2">{EVENT_UNTIL}</p>
       <ol className="grid grid-cols-5 gap-1.5" aria-label="Phasen">
         {PHASES.map((p, i) => (
           <li key={p.name} className="flex flex-col gap-2" aria-current={i === phase ? "step" : undefined}>
@@ -80,7 +85,7 @@ function CountdownCard({ today, phase }: { today: string; phase: number }) {
             </div>
             <div className="hidden flex-col gap-0.5 sm:flex">
               <span className={cn("text-[12.5px] font-medium", i === phase ? "text-fg" : "text-fg-3")}>{p.name}</span>
-              <span className="text-[11.5px] text-fg-3 tabular">{p.label}</span>
+              <span className={cn("text-[11.5px] text-fg-3 tabular", i !== phase && "sr-only")}>{p.label}</span>
             </div>
             <span className="sr-only sm:hidden">
               {p.name} {p.label}
@@ -125,13 +130,10 @@ function NextMilestoneCard({
         <h2 className="label-mono">Nächster Meilenstein</h2>
         <DueChip due={next.due_date} today={today} />
       </div>
-      <div className="flex flex-col gap-1.5">
-        <Link href={`/roadmap?m=${next.id}`} className="rounded-md text-[16.5px] leading-[1.35] font-semibold tracking-[-0.01em] hover:underline hover:decoration-line-2 hover:underline-offset-4">
-          <span className="font-mono text-[13px] font-medium text-fg-3">{next.id} </span>
-          {next.title}
-        </Link>
-        <p className="text-[13px] text-fg-2">{formatHeaderDate(next.due_date)}</p>
-      </div>
+      <Link href={`/roadmap?m=${next.id}`} className="rounded-md text-[16.5px] leading-[1.35] font-semibold tracking-[-0.01em] hover:underline hover:decoration-line-2 hover:underline-offset-4">
+        <span className="font-mono text-[13px] font-medium text-fg-3">{next.id} </span>
+        {next.title}
+      </Link>
 
       {children.length > 0 && <MilestoneChecklist items={children} onToggle={onToggle} />}
 
@@ -140,7 +142,9 @@ function NextMilestoneCard({
           <div className="h-[3px] flex-1 overflow-hidden rounded-sm bg-line-2">
             <div className="h-full rounded-sm bg-acc-line transition-[width] duration-300 ease-out" style={{ width: `${(done / children.length) * 100}%` }} />
           </div>
-          {done} von {children.length} erledigt
+          <span className="sr-only">
+            {done} von {children.length} erledigt
+          </span>
         </div>
       )}
 
@@ -173,7 +177,7 @@ function GoalTiles({ orgs, milestones }: { orgs: Org[]; milestones: Milestone[] 
     { label: "Track-Partner zugesagt", value: won("challenge"), target: 4, note: `bis ${due("M3")}` },
     { label: "Jury zugesagt", value: won("jury"), target: 4, note: `bis ${due("M4")}` },
     { label: "Venue fixiert", value: won("venue", ["fix"]), target: 1, note: `plus Backup · bis ${due("M2")}` },
-    { label: "Sponsoren zugesagt", value: won("sponsor") + won("tokens"), target: null, note: "Credits und Verpflegung" },
+    { label: "Sponsoren zugesagt", value: won("sponsor") + won("tokens"), target: null, note: "" },
   ];
 
   return (
@@ -189,12 +193,14 @@ function GoalTiles({ orgs, milestones }: { orgs: Org[]; milestones: Milestone[] 
             <span className="text-[28px] leading-none font-medium tracking-[-0.04em] tabular md:text-[34px]">{g.value}</span>
             <span className="text-[14px] text-fg-3 tabular md:text-[15px]">{g.target ? `/ ${g.target}` : "Ziel offen"}</span>
           </span>
-          <span className="flex gap-1" aria-hidden>
-            {Array.from({ length: g.target ?? 1 }, (_, i) => (
-              <span key={i} className={cn("h-1 flex-1 rounded-sm", i < g.value ? "bg-acc-line" : "bg-line-2")} />
-            ))}
-          </span>
-          <span className="text-[12px] text-fg-3">{g.note}</span>
+          {g.target && (
+            <span className="flex gap-1" aria-hidden>
+              {Array.from({ length: g.target }, (_, i) => (
+                <span key={i} className={cn("h-1 flex-1 rounded-sm", i < g.value ? "bg-acc-line" : "bg-line-2")} />
+              ))}
+            </span>
+          )}
+          {g.note && <span className="text-[12px] text-fg-3">{g.note}</span>}
         </Link>
       ))}
     </div>
@@ -315,28 +321,10 @@ function FollowUpCard({ orgs, today }: { orgs: Org[]; today: string }) {
         </ul>
       ) : (
         <div className="flex flex-1 flex-col items-center justify-center gap-2.5 rounded-[10px] bg-card-2 px-3 py-5 text-center">
-          <div className="grid size-10 place-items-center rounded-xl text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)]">
-            <Send className="size-[18px]" strokeWidth={1.8} aria-hidden />
-          </div>
           <p className="text-[14px] font-medium">Noch nichts nachzufassen</p>
           {today < WAVE_1 && <p className="text-[13px] text-fg-2">Welle 1 startet am {formatShort(WAVE_1)}</p>}
-          <Link
-            href="/pipeline"
-            className="mt-1 inline-flex h-8 items-center rounded-[9px] px-3 text-[13px] font-medium text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)] transition-colors duration-150 hover:bg-hover hover:text-fg"
-          >
-            Pipeline öffnen
-          </Link>
         </div>
       )}
-
-      <div className="flex flex-wrap items-center gap-2 text-[12.5px] text-fg-3">
-        Nachfass-Runden
-        {FOLLOW_UP_ROUNDS.map((d) => (
-          <Chip key={d} className={cn(d < today && "line-through opacity-60")}>
-            {formatDayMonth(d)}
-          </Chip>
-        ))}
-      </div>
     </section>
   );
 }
@@ -352,21 +340,16 @@ function AreasSection({ milestones, today }: { milestones: Milestone[]; today: s
   return (
     <section className="flex flex-col gap-3 pt-1.5">
       <div className="flex flex-wrap items-center justify-between gap-2.5">
-        <div className="flex items-center gap-2.5">
-          <h2 className="text-[14px] font-semibold">Bereiche</h2>
-          {open > 0 && (
-            <Chip tone="amber">
-              {open} ohne Verantwortliche
-            </Chip>
-          )}
-        </div>
-        <button
-          type="button"
-          onClick={() => setDialog(true)}
-          className="inline-flex h-8 items-center rounded-[9px] px-3 text-[13px] font-medium text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)] transition-[background,color,scale] duration-150 hover:bg-hover hover:text-fg active:scale-[.97]"
-        >
-          Zuständigkeiten verteilen
-        </button>
+        <h2 className="text-[14px] font-semibold">Bereiche</h2>
+        {open > 0 && (
+          <button
+            type="button"
+            onClick={() => setDialog(true)}
+            className="inline-flex h-8 items-center rounded-[9px] px-3 text-[13px] font-medium text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)] transition-[background,color,scale] duration-150 hover:bg-hover hover:text-fg active:scale-[.97]"
+          >
+            Zuständigkeiten verteilen
+          </button>
+        )}
       </div>
 
       {/* Breit genug: alle Bereiche in einer Zeile (Spaltenzahl folgt der Zahl der Bereiche), sonst 2–4 Spalten */}

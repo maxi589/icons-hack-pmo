@@ -86,10 +86,10 @@ export function initials(name: string) {
   return (words.length > 1 ? words[0][0] + words[1][0] : name.slice(0, 2)).toUpperCase();
 }
 
-/** Zweite Kartenzeile: „warm über Kilian · Welle 1“. */
+/** Zweite Kartenzeile: „warm über Kilian · Welle 1“. Leer, wenn weder Kontakt noch Welle bekannt. */
 export function warmLine(o: Organization) {
-  const warm = o.warm_via ? `warm über ${o.warm_via}` : o.existing_contact ? o.existing_contact : "kein warmer Kontakt";
-  return o.wave ? `${warm} · Welle ${o.wave}` : warm;
+  const warm = o.warm_via ? `warm über ${o.warm_via}` : (o.existing_contact ?? "");
+  return [warm, o.wave ? `Welle ${o.wave}` : ""].filter(Boolean).join(" · ");
 }
 
 export type FollowState = { tone: "today" | "red" | "gray"; label: string } | null;

@@ -158,7 +158,7 @@ function Palette({ mode, close }: { mode: Mode; close: () => void }) {
                 [
                   ["light", "Hell", Sun],
                   ["dark", "Dunkel", Moon],
-                  ["system", "Wie das Gerät (System)", Monitor],
+                  ["system", "System", Monitor],
                 ] as const
               ).map(([value, label, Icon]) => (
                 <CommandItem key={value} value={`Darstellung ${label}`} onSelect={run(() => setTheme(value))}>
@@ -179,7 +179,7 @@ function Palette({ mode, close }: { mode: Mode; close: () => void }) {
                 onSelect={run(() => sound.setPrefs(sound.sounds ? { fun: !sound.fun } : { sounds: true, fun: true }))}
               >
                 <Sparkles aria-hidden />
-                <span className="flex-1">Fun-Modus (Klicks und Tippen)</span>
+                <span className="flex-1">Fun-Modus</span>
                 {sound.sounds && sound.fun && <Check className="text-acc-line" aria-label="an" />}
               </CommandItem>
             </CommandGroup>

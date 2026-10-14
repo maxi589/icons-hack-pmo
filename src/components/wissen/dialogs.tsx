@@ -84,7 +84,7 @@ export function NewDecisionDialog({
         </div>
         <form onSubmit={submit} className="flex flex-col gap-3.5">
           <label className="flex flex-col gap-1.5">
-            <span className={label}>Was wurde entschieden?</span>
+            <span className={label}>Entscheidung</span>
             <input autoFocus required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="z. B. Hack-Venue ist das HOIV" className={field} />
           </label>
           <label className="flex flex-col gap-1.5">
@@ -93,12 +93,11 @@ export function NewDecisionDialog({
               rows={3}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="Begründung, Alternativen, was dagegen sprach"
               className="w-full resize-y rounded-[9px] border border-field bg-card px-3 py-2 text-[14px] leading-normal text-fg placeholder:text-fg-3 focus-visible:outline-solid max-md:text-base"
             />
           </label>
           <div className="flex flex-col gap-1.5">
-            <span className={label}>Wer hat entschieden?</span>
+            <span className={label}>Wer</span>
             <PeoplePicker value={whoValue} onChange={setWho} />
           </div>
           <div className="grid grid-cols-2 gap-2.5">

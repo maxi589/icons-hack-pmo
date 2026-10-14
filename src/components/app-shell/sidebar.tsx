@@ -137,7 +137,6 @@ export function Sidebar() {
         </div>
 
         <div className="flex flex-col gap-0.5">
-          <div className={sectionLabel}>Hackathon</div>
           {NAV_HACKATHON.map((item) => (
             <NavLink key={item.href} item={item} pathname={pathname} />
           ))}

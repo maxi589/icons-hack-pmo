@@ -67,7 +67,7 @@ export function OrgDetail({
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
             <h2 className="truncate text-base font-semibold tracking-[-0.01em]">{org.name}</h2>
             <span className="truncate text-[12px] text-fg-3">
-              {[org.prio && `Prio ${org.prio}`, org.roles.map((r) => ROLE_NAMES[r]).join(", "), org.category, !isVenue && org.location]
+              {[org.roles.map((r) => ROLE_NAMES[r]).join(", "), org.category, !isVenue && org.location]
                 .filter(Boolean)
                 .join(" · ")}
             </span>

@@ -73,7 +73,7 @@ export function NewOrgDialog({
     >
       <DialogContent className="gap-4 p-5 sm:max-w-[460px]">
         <div className="flex flex-col gap-1 pr-8">
-          <DialogTitle className="text-base font-semibold">Firma zur Pipeline hinzufügen</DialogTitle>
+          <DialogTitle className="text-base font-semibold">Neue Firma</DialogTitle>
         </div>
         <form onSubmit={submit} className="flex flex-col gap-3.5">
           <label className="flex flex-col gap-1.5">

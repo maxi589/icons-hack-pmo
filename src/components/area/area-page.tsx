@@ -70,24 +70,16 @@ export function AreaPage({ id }: { id: string }) {
     });
   };
 
-  const openCount = areaTasks.filter((t) => t.status !== "erledigt").length;
-
   return (
     <>
       <PageHeader title={area.name} action={{ label: "Aufgabe", onClick: newTask }} />
       <div className="mx-auto flex w-full max-w-[1080px] flex-col gap-4 px-3.5 pt-2 pb-8 md:gap-5 md:px-8 md:pt-8 md:pb-12">
-        <div className="flex flex-col gap-1.5 pb-1.5">
-          <h1 className="flex items-center gap-2.5 text-[21px] font-semibold tracking-[-0.025em] md:text-[26px]">
-            <span className="group">
-              <AreaGlyph color={area.color} progress={own.length ? own.filter((m) => m.status === "erledigt").length / own.length : 0} size={22} />
-            </span>
-            {area.name}
-          </h1>
-          <p className="text-[14px] text-fg-2 tabular">
-            Teilprojekt · {own.length} {own.length === 1 ? "Meilenstein" : "Meilensteine"} · {openCount}{" "}
-            {openCount === 1 ? "offene Aufgabe" : "offene Aufgaben"}
-          </p>
-        </div>
+        <h1 className="flex items-center gap-2.5 pb-1.5 text-[21px] font-semibold tracking-[-0.025em] md:sr-only">
+          <span className="group">
+            <AreaGlyph color={area.color} progress={own.length ? own.filter((m) => m.status === "erledigt").length / own.length : 0} size={22} />
+          </span>
+          {area.name}
+        </h1>
 
         <div className="flex flex-wrap gap-4">
           <OwnerCard areaId={id} />
@@ -245,7 +237,10 @@ function PipelineGoal({ tab, orgs, today }: { tab: TabId; orgs: Organization[]; 
             )}
           </span>
         )}
-        <span className="ml-auto text-fg-3">Zur Pipeline →</span>
+        <span className="ml-auto text-fg-3">
+          <span aria-hidden>→</span>
+          <span className="sr-only">Zur Pipeline</span>
+        </span>
       </span>
     </Link>
   );
@@ -334,7 +329,20 @@ function MilestonesCard({
                 >
                   <span className="md:hidden">{status}</span>
                   {(parent || subs.length > 0) && (
-                    <span className="truncate">{parent ? `Teil von ${parent.id}` : `${subsDone} von ${subs.length} Unterpunkten erledigt`}</span>
+                    <span className="truncate">
+                      {parent ? (
+                        `Teil von ${parent.id}`
+                      ) : (
+                        <>
+                          <span aria-hidden>
+                            {subsDone}/{subs.length}
+                          </span>
+                          <span className="sr-only">
+                            {subsDone} von {subs.length} Unterpunkten erledigt
+                          </span>
+                        </>
+                      )}
+                    </span>
                   )}
                 </span>
               </span>
@@ -377,18 +385,13 @@ function TasksCard({
           Aufgaben
           {open.length > 0 && <span className="font-normal text-fg-3 tabular">{open.length} offen</span>}
         </h2>
-        <span className="flex items-center gap-1">
-          <Link href={`/aufgaben?bereich=${areaId}`} className="rounded-md px-1.5 py-1 text-[12.5px] text-fg-2 hover:text-fg">
-            Alle
-          </Link>
-          <button
-            type="button"
-            onClick={onNew}
-            className="inline-flex h-8 items-center rounded-[9px] px-2.5 text-[13px] font-medium text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)] transition-[background,color,scale] duration-150 hover:bg-hover hover:text-fg active:scale-[.97] max-md:h-10"
-          >
-            + Aufgabe
-          </button>
-        </span>
+        <button
+          type="button"
+          onClick={onNew}
+          className="inline-flex h-8 items-center rounded-[9px] px-2.5 text-[13px] font-medium text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)] transition-[background,color,scale] duration-150 hover:bg-hover hover:text-fg active:scale-[.97] max-md:h-10 md:hidden"
+        >
+          + Aufgabe
+        </button>
       </div>
 
       {open.length === 0 ? (
@@ -450,10 +453,7 @@ export function AreaSkeleton() {
         aria-busy="true"
         aria-label="Bereich lädt"
       >
-        <div className="flex flex-col gap-2 pb-1.5">
-          <div className="h-7 w-44 rounded-md bg-card-2" />
-          <div className="h-4 w-64 rounded-md bg-card-2" />
-        </div>
+        <div className="h-7 w-44 rounded-md bg-card-2 md:hidden" />
         <div className="flex flex-wrap gap-4">
           <div className={cn(block, "h-[180px] min-w-0 flex-[1_1_300px]")} />
           <div className={cn(block, "h-[180px] min-w-0 flex-[1.45_1_440px]")} />

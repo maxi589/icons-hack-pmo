@@ -221,18 +221,12 @@ export function Pipeline() {
           </b>
           {tabDef.goal ? (tab === "venues" ? "plus Backup" : "zugesagt") : "zugesagt · Ziel offen"}
         </span>
-        <span className="flex items-center gap-2">
-          <Chip tone="today" still={dueToday === 0}>
-            heute
-          </Chip>
-          <span className="tabular">{dueToday}</span> nachfassen
-        </span>
-        <span className="flex items-center gap-2">
-          <Chip tone="red" still={overdue === 0}>
-            überfällig
-          </Chip>
-          <span className="tabular">{overdue}</span>
-        </span>
+        {(dueToday > 0 || overdue > 0) && (
+          <span className="flex gap-1.5">
+            {dueToday > 0 && <Chip tone="today">{dueToday} heute</Chip>}
+            {overdue > 0 && <Chip tone="red">{overdue} überfällig</Chip>}
+          </span>
+        )}
         {nextRound && <span className="md:ml-auto">Nächste Runde: {formatShort(nextRound)}</span>}
       </div>
 
@@ -260,16 +254,13 @@ export function Pipeline() {
                           <span className={cn("size-2 rounded-full", st.dot)} aria-hidden />
                           <span className="text-[12.5px] font-semibold whitespace-nowrap">{st.name}</span>
                           <span className="text-[12px] text-fg-3 tabular">{count}</span>
-                          <span className="ml-auto text-[11px] text-fg-3">
-                            {st.id === "zugesagt" && tabDef.goal ? `Ziel ${tabDef.goal}` : st.id === "fix" ? "Vertrag" : ""}
-                          </span>
                         </KanbanHeader>
                         <KanbanCards<{ id: string; name: string; column: string }>
                           id={col.id}
                           className="flex-1"
                           empty={
                             <div className="flex min-h-[70px] items-center justify-center rounded-[10px] border border-dashed border-line-2 p-2 text-center text-[12px] text-fg-3">
-                              {st.id === "fix" ? "Vertrag unterschrieben? Karte hierher." : "Noch leer"}
+                              Noch leer
                             </div>
                           }
                         >
@@ -369,7 +360,7 @@ function OrgList({ orgs, today, selectedId, onOpen }: { orgs: Organization[]; to
                       </span>
                       <span className="flex min-w-0 flex-1 flex-col gap-0.5 md:flex-row md:items-center md:gap-3">
                         <span className="truncate text-[14px] font-medium md:w-[240px] md:shrink-0 md:text-[13.5px]">{o.name}</span>
-                        <span className="truncate text-[12.5px] text-fg-2">{warmLine(o)}</span>
+                        {warmLine(o) && <span className="truncate text-[12.5px] text-fg-2">{warmLine(o)}</span>}
                       </span>
                       {o.prio && (
                         <span className="rounded-[5px] px-[5px] py-px font-mono text-[10.5px] font-medium text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)]">

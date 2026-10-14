@@ -32,7 +32,7 @@ export function OrgCard({ org, today, selected, onOpen }: { org: Organization; t
           </span>
         )}
       </span>
-      <span className="text-[12px] text-fg-2">{warmLine(org)}</span>
+      {warmLine(org) && <span className="text-[12px] text-fg-2">{warmLine(org)}</span>}
       {(follow || org.owner_id) && (
         <span className="flex w-full items-center gap-1.5">
           {follow && (

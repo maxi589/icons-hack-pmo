@@ -21,7 +21,6 @@ export function LoginCard() {
         <span className="font-display text-[17px] tracking-[0.01em]">{EVENT_NAME}</span>
         <span className="label-mono">by icons</span>
         <h1 className="mt-3 text-[21px] font-semibold tracking-[-0.025em]">Anmelden</h1>
-        <p className="text-fg-2">Steuerung für das Orga-Team.</p>
       </div>
 
       <form action={action} className="flex flex-col gap-4">

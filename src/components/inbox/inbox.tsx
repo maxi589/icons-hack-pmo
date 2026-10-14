@@ -4,10 +4,9 @@ import { useState } from "react";
 import Link from "next/link";
 import { format, isToday, isYesterday, parseISO } from "date-fns";
 import { de } from "date-fns/locale";
-import { Check, CheckCheck, Inbox as InboxIcon, Link2, Mail } from "lucide-react";
+import { Check, CheckCheck, Link2, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
-import { Segmented } from "@/components/segmented";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { useInbox, type InboxItem } from "@/components/app-shell/inbox-provider";
@@ -15,8 +14,6 @@ import { TARGET_NAMES } from "@/lib/links";
 
 // Inbox (Umfang v1, ohne Mails): Erwähnungen und Zuweisungen der angemeldeten Person.
 // Klick öffnet den Eintrag und markiert ihn als gelesen. „Link“ kopiert den Direktlink für WhatsApp.
-
-type Filter = "alle" | "ungelesen";
 
 function dayLabel(iso: string) {
   const d = parseISO(iso);
@@ -30,7 +27,6 @@ const iconBtn =
 
 export function Inbox() {
   const { items, unread, setRead } = useInbox();
-  const [filter, setFilter] = useState<Filter>("alle");
 
   if (!items) {
     return (
@@ -41,8 +37,7 @@ export function Inbox() {
     );
   }
 
-  const shown = filter === "ungelesen" ? items.filter((n) => !n.read_at) : items;
-  const days = [...new Set(shown.map((n) => dayLabel(n.created_at)))];
+  const days = [...new Set(items.map((n) => dayLabel(n.created_at)))];
   const markAll = () =>
     setRead(
       items.filter((n) => !n.read_at).map((n) => n.id),
@@ -54,28 +49,12 @@ export function Inbox() {
       <PageHeader title="Inbox" />
       <div className="mx-auto flex w-full max-w-[760px] flex-col gap-4 px-3.5 pt-2 pb-8 md:px-6 md:pt-6">
         <div className="flex flex-wrap items-center gap-2.5">
-          <h1 className="mr-auto text-[21px] font-semibold tracking-[-0.025em] md:text-[22px]">Inbox</h1>
-          <Segmented
-            label="Anzeigen"
-            value={filter}
-            onChange={setFilter}
-            options={[
-              { value: "alle", label: "Alle" },
-              {
-                value: "ungelesen",
-                label: (
-                  <>
-                    Ungelesen <span className="text-fg-3 tabular">{unread}</span>
-                  </>
-                ),
-              },
-            ]}
-          />
+          <h1 className="mr-auto text-[21px] font-semibold tracking-[-0.025em] md:sr-only">Inbox</h1>
           {unread > 0 && (
             <button
               type="button"
               onClick={markAll}
-              className="inline-flex h-8 items-center gap-1.5 rounded-[9px] px-3 text-[13px] font-medium text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)] transition-colors duration-150 hover:bg-hover hover:text-fg max-md:h-10"
+              className="ml-auto inline-flex h-8 items-center gap-1.5 rounded-[9px] px-3 text-[13px] font-medium text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)] transition-colors duration-150 hover:bg-hover hover:text-fg max-md:h-10"
             >
               <CheckCheck className="size-3.5" aria-hidden />
               Alle gelesen
@@ -83,19 +62,16 @@ export function Inbox() {
           )}
         </div>
 
-        {shown.length === 0 ? (
+        {items.length === 0 ? (
           <div className="flex flex-col items-center gap-2.5 rounded-[14px] bg-card-2 px-4 py-12 text-center">
-            <div className="grid size-10 place-items-center rounded-xl text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)]">
-              <InboxIcon className="size-[18px]" strokeWidth={1.8} aria-hidden />
-            </div>
-            <p className="text-sm font-medium">{filter === "ungelesen" && items.length ? "Alles gelesen" : "Noch nichts in deiner Inbox"}</p>
+            <p className="text-sm font-medium">Noch nichts in deiner Inbox</p>
           </div>
         ) : (
           days.map((day) => (
             <section key={day} className="flex flex-col gap-2">
               <h2 className="label-mono px-1">{day}</h2>
               <ul className="overflow-hidden rounded-xl bg-card shadow-card">
-                {shown
+                {items
                   .filter((n) => dayLabel(n.created_at) === day)
                   .map((n) => (
                     <InboxRow key={n.id} item={n} onRead={(read) => setRead([n.id], read)} />
@@ -115,7 +91,7 @@ function InboxRow({ item: n, onRead }: { item: InboxItem; onRead: (read: boolean
   const actor = personById(n.actor_id);
   const unread = !n.read_at;
   const gone = n.targetName === null;
-  const what = n.kind === "mention" ? "hat dich erwähnt" : "hat dich als zuständig eingetragen";
+  const what = n.kind === "mention" ? "hat dich erwähnt" : "hat dich zugewiesen";
 
   const copy = async () => {
     await navigator.clipboard.writeText(window.location.origin + n.href);

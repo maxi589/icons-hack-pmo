@@ -1,10 +1,9 @@
 "use client";
 
 import { Plus } from "lucide-react";
-import { Kbd } from "@/components/ui/command";
 import { usePalette } from "./command-palette";
 
-// Kopfleiste im Hauptpanel (nur Desktop): Seitentitel links, „Befehle“ und „Neu“ rechts.
+// Kopfleiste im Hauptpanel (nur Desktop): Seitentitel links, „Neu“ rechts.
 // `children` sind zusätzliche Knöpfe der Seite (z. B. Board/Liste in der Pipeline).
 // `action` ersetzt „Neu“ durch eine seiteneigene Hauptaktion (z. B. „+ Firma“).
 
@@ -23,13 +22,6 @@ export function PageHeader({
       <div className="text-[13.5px] text-fg-2">{title}</div>
       <div className="flex items-center gap-2">
         {children}
-        <button
-          type="button"
-          onClick={() => open()}
-          className="inline-flex h-8 items-center gap-2 rounded-[9px] px-3 text-[13px] font-medium text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)] transition-[background,color,scale] duration-150 hover:bg-hover hover:text-fg active:scale-[.97]"
-        >
-          Befehle <Kbd>Strg K</Kbd>
-        </button>
         <button
           type="button"
           onClick={action ? action.onClick : () => open("new")}

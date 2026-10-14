@@ -272,7 +272,7 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
               />
             </div>
             {visible.length === 0 && (
-              <p className="px-5 py-8 text-center text-[13.5px] text-fg-2">{mine && !filtered ? "Dir ist gerade nichts zugewiesen." : "Keine Treffer. Filter anpassen."}</p>
+              <p className="px-5 py-8 text-center text-[13.5px] text-fg-2">{mine && !filtered ? "Dir ist gerade nichts zugewiesen." : "Keine Treffer."}</p>
             )}
           </div>
       )}

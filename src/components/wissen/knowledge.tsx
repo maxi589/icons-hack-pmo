@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { format, parseISO } from "date-fns";
 import { de } from "date-fns/locale";
-import { ChevronDown, ExternalLink, Link2, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import { ChevronDown, ExternalLink, Pencil, Plus, Search, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { useToast } from "@/components/toast";
@@ -211,7 +211,6 @@ export function Knowledge() {
                 <ul className="overflow-hidden rounded-xl bg-card shadow-card">
                   {k.links.map((l) => (
                     <li key={l.id} className="group relative flex min-h-12 items-center gap-2.5 border-t border-line pr-1.5 pl-3 first:border-t-0 hover:bg-hover">
-                      <Link2 className="size-4 shrink-0 text-fg-3" aria-hidden />
                       <a href={l.url} target="_blank" rel="noreferrer" className="flex min-w-0 flex-1 flex-col rounded-sm py-2 after:absolute after:inset-0">
                         <span className="truncate text-[14px] font-medium md:text-[13.5px]">{l.title}</span>
                         <span className="truncate text-[12px] text-fg-3">{hostOf(l.url)}</span>
@@ -311,8 +310,7 @@ function DecisionRow({ d, topics, selected, onOpen }: { d: Decision; topics: Top
                     </span>
                   ))}
                 </span>
-                <span className="sr-only">Entschieden von </span>
-                {people.map((p) => p.name).join(", ")}
+                <span className="sr-only">Entschieden von {people.map((p) => p.name).join(", ")}</span>
               </span>
             )}
             {area && (
