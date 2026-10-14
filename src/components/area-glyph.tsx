@@ -24,13 +24,13 @@ export function AreaGlyph({ color, progress, size = 14, active = false }: { colo
       className="shrink-0 -rotate-90 transition-transform duration-200 ease-out group-hover:scale-115 motion-reduce:transition-none"
       aria-hidden
     >
-      <circle cx="12" cy="12" r={r} fill="none" stroke={color} strokeOpacity={0.4} strokeWidth={stroke} />
+      <circle cx="12" cy="12" r={r} fill="none" style={{ stroke: color }} strokeOpacity={0.4} strokeWidth={stroke} />
       <circle
         cx="12"
         cy="12"
         r={r}
         fill="none"
-        stroke={color}
+        style={{ stroke: color }}
         strokeWidth={stroke}
         strokeLinecap="round"
         strokeDasharray={c}
@@ -38,7 +38,7 @@ export function AreaGlyph({ color, progress, size = 14, active = false }: { colo
         className="transition-[stroke-dashoffset] duration-300 ease-out motion-reduce:transition-none"
         opacity={shown > 0 ? 1 : 0}
       />
-      <circle cx="12" cy="12" r={active ? 5.5 : 4} fill={color} className={cn("transition-[r] duration-200 ease-out", "group-hover:[r:5.5px]")} />
+      <circle cx="12" cy="12" r={active ? 5.5 : 4} style={{ fill: color }} className={cn("transition-[r] duration-200 ease-out", "group-hover:[r:5.5px]")} />
     </svg>
   );
 }

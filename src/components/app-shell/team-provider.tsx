@@ -45,7 +45,8 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
         .from("areas")
         .select("id, name, color, owner_id, is_project")
         .order("sort");
-      if (data) setAreas(data);
+      // Farbe je Hell/Dunkel aus den Tokens (--area-<id> in globals.css), Datenbank-Wert nur als Rückfall.
+      if (data) setAreas(data.map((a) => ({ ...a, color: `var(--area-${a.id}, ${a.color})` })));
     };
 
     (async () => {
@@ -61,9 +62,11 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
         loadAreas(),
       ]);
       const list = team.data ?? [];
-      setPeople(list.map(({ id, name, initials, color }) => ({ id, name, initials, color })));
+      // Avatar-Farbe ebenfalls aus den Tokens (--avatar-<initialen>), Datenbank-Wert als Rückfall.
+      const tone = (initials: string, color: string) => `var(--avatar-${initials.toLowerCase()}, ${color})`;
+      setPeople(list.map(({ id, name, initials, color }) => ({ id, name, initials, color: tone(initials, color) })));
       const mine = list.find((p) => p.user_id === auth.user!.id);
-      if (mine) setMe({ id: mine.id, name: mine.name, initials: mine.initials, color: mine.color });
+      if (mine) setMe({ id: mine.id, name: mine.name, initials: mine.initials, color: tone(mine.initials, mine.color) });
     })();
 
     const channel = supabase

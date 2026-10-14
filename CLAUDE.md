@@ -22,13 +22,13 @@ Auftraggeber ist Maxi S (kein Entwickler): Deutsch, Ergebnis zuerst, einfache Sp
 - shadcn-Skill bzw. -MCP nutzen. **Keinen beUI-MCP**, keine beUI-Bausteine.
 
 ## Design (Kurzfassung, Details in `docs/design/Design-System.md`)
-- Richtung **Graphit**, Signatur-Akzent **Lime**. Hell und dunkel gleichwertig, Standard ist die Systemeinstellung.
+- Palette **„Tinte“** (14.10.): Navy + Kobalt der Event-Website. Hell und dunkel gleichwertig, Standard ist die Systemeinstellung. Werte und Prüfergebnisse in `docs/design/palette-tinte.json`.
 - Alle Farben nur über die Tokens in `src/app/globals.css`, keine frei erfundenen Werte. Tailwind-Namen: `bg-bg`, `bg-panel`, `bg-card`, `bg-card-2`, `bg-col`, `border-line`, `border-line-2`, `border-field`, `text-fg` / `text-fg-2` / `text-fg-3`, `bg-hover`, `bg-active`, `bg-acc` + `text-acc-text`, `text-acc-line`, Status `*-st-gray|blue|amber|green|red`, Bereiche `bg-area-*`. Schrift `font-display` = Michroma, Hilfsklassen `tabular` und `label-mono`.
 - Hell/Dunkel über die Klasse `.dark` auf `<html>` (Inline-Skript in `src/app/layout.tsx`, Wahl im Cookie `theme`, sonst Systemeinstellung).
 - Daten-Hilfen in `src/lib/dates.ts` (`todayInVienna`, `daysUntil`) statt eigener Datumsrechnung.
-- Farbe nur für Bedeutung (Stufen, Bereichs-Punkte, Fälligkeit) plus der eine Lime-Akzent.
+- Farbe nur für Bedeutung (Stufen, Bereichs-Punkte, Fälligkeit) plus der eine Kobalt-Akzent. Bereichs- und Avatar-Farben je Modus als `--area-<id>` / `--avatar-<initialen>`.
 - **Kontrastregeln:**
-  - Dünne Linien, Icons und Text in Akzentfarbe immer mit `--accLine` (hell #4d7c0f). Lime #c6f432 nur als Fläche mit `--accText` darauf.
+  - Dünne Linien, Icons und Text in Akzentfarbe immer mit `--accLine` (hell #0f5ba5, dunkel #7fb2ee). Kobalt #0f5ba5 als Fläche immer mit `--accText` (weiß) darauf.
   - Im Hellmodus Status-Farben als Text nur in den 700er-Tönen.
   - Ränder von Eingabefeldern mit `--field` (mind. 3:1). `--line` ist nur Dekoration.
   - `--text3` ist die hellste erlaubte Textfarbe.

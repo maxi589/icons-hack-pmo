@@ -7,46 +7,46 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ------------------------------------------------------------------
-   Design-Tokens „Graphit“ (docs/design/Design-System.md, Abschnitt 2)
+   Design-Tokens „Tinte“ (docs/design/Design-System.md, Abschnitt 2; Palette 14.10., geprüft mit WCAG + APCA)
    Hell = :root, Dunkel = .dark
    ------------------------------------------------------------------ */
 :root {
   color-scheme: light;
 
   /* Flächen */
-  --bg: #f1f1f2;
-  --panel: #fbfbfb;
+  --bg: #edf0f5;
+  --panel: #f7f8fb;
   --card: #ffffff;
-  --card2: #f6f6f7;
-  --col: #f4f4f5;
+  --card2: #f3f5f9;
+  --col: #eef1f6;
 
   /* Linien: --line/--line2 nur Dekoration, --field für Eingabefelder (mind. 3:1) */
-  --line: rgba(0, 0, 0, 0.09);
-  --line2: rgba(0, 0, 0, 0.13);
-  --field: #8e8e96;
+  --line: rgba(14, 18, 27, 0.09);
+  --line2: rgba(14, 18, 27, 0.14);
+  --field: #778093;
 
   /* Text: --text3 ist die hellste erlaubte Textfarbe */
-  --text: #18181b;
-  --text2: #52525b;
-  --text3: #6b6b73;
+  --text: #161d2b;
+  --text2: #465063;
+  --text3: #5a6477;
 
-  --hover: rgba(0, 0, 0, 0.035);
-  --active: rgba(0, 0, 0, 0.06);
+  --hover: rgba(14, 18, 27, 0.035);
+  --active: rgba(14, 18, 27, 0.06);
 
-  /* Signatur-Akzent Lime: --acc nur als Fläche, Linien/Icons/Text mit --accLine */
-  --acc: #c6f432;
-  --accText: #0a0a0b;
-  --accLine: #4d7c0f;
+  /* Akzent Kobalt (Knopf der Event-Website): --acc als Fläche mit --accText, Linien/Icons/Text mit --accLine */
+  --acc: #0f5ba5;
+  --accText: #ffffff;
+  --accLine: #0f5ba5;
 
   /* Status (im Hellmodus nur 700er-Töne als Text) */
-  --st-gray: #52525b;
-  --st-blue: #1d4ed8;
-  --st-amber: #a94d07;
-  --st-green: #047857;
-  --st-red: #b91c1c;
+  --st-gray: #474a52;
+  --st-blue: #643b9b;
+  --st-amber: #7e4801;
+  --st-green: #206734;
+  --st-red: #a32730;
 
-  --shadow-card: 0 0 0 1px var(--line), 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-cmdk: 0 24px 64px rgba(0, 0, 0, 0.45);
+  --shadow-card: 0 0 0 1px var(--line), 0 1px 2px rgba(14, 18, 27, 0.05);
+  --shadow-cmdk: 0 24px 64px rgba(14, 18, 27, 0.28);
 
   /* shadcn/ui-Variablen, auf die Graphit-Tokens gelegt */
   --background: var(--bg);
@@ -80,39 +80,62 @@
   --sidebar-accent-foreground: var(--text);
   --sidebar-border: var(--line);
   --sidebar-ring: var(--accLine);
+  /* Bereiche (Ringe/Punkte, Palette „Tinte“ 14.10.): je Modus eigene Töne, mind. 3:1 auf allen Flächen */
+  --area-venue: #2b8c81;
+  --area-partner: #0088b3;
+  --area-sponsoren: #c25485;
+  --area-jury: #9b7a01;
+  --area-marketing: #ca5e30;
+  --area-vorbereitung: #7b7f88;
+
+  /* Avatare (Initialen --avatarInk, mind. 13,6:1) */
+  --avatarInk: #111111;
+  --avatar-ms: #dbd6ff;
+  --avatar-md: #ffddd4;
+  --avatar-ma: #c4ffe4;
+  --avatar-ti: #fff2bc;
+  --avatar-ki: #bbeaff;
 }
 
 .dark {
   color-scheme: dark;
 
-  --bg: #0a0a0b;
-  --panel: #111113;
-  --card: #161618;
-  --card2: #1c1c1f;
-  --col: #141416;
+  --bg: #0e121b;
+  --panel: #131824;
+  --card: #181e2a;
+  --card2: #1e2532;
+  --col: #10151f;
 
-  --line: rgba(255, 255, 255, 0.09);
-  --line2: rgba(255, 255, 255, 0.13);
-  --field: #6b6b72;
+  --line: rgba(226, 231, 239, 0.08);
+  --line2: rgba(226, 231, 239, 0.13);
+  --field: #687284;
 
-  --text: #ededee;
-  --text2: #a8a8ae;
-  --text3: #8b8b93;
+  --text: #e2e7ef;
+  --text2: #b5bece;
+  --text3: #97a2b5;
 
-  --hover: rgba(255, 255, 255, 0.04);
-  --active: rgba(255, 255, 255, 0.075);
+  --hover: rgba(230, 234, 242, 0.04);
+  --active: rgba(230, 234, 242, 0.07);
 
-  --acc: #c6f432;
-  --accText: #0a0a0b;
-  --accLine: #c6f432;
+  --acc: #0f5ba5;
+  --accText: #ffffff;
+  --accLine: #7fb2ee;
 
-  --st-gray: #a1a1aa;
-  --st-blue: #60a5fa;
-  --st-amber: #fbbf24;
-  --st-green: #34d399;
-  --st-red: #f87171;
+  --st-gray: #adb1b8;
+  --st-blue: #c79be4;
+  --st-amber: #f4b067;
+  --st-green: #7dbf87;
+  --st-red: #fc9382;
 
   --shadow-card: 0 0 0 1px var(--line), 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-cmdk: 0 24px 64px rgba(0, 0, 0, 0.55);
+  /* Bereiche (Ringe/Punkte, Palette „Tinte“ 14.10.): je Modus eigene Töne, mind. 3:1 auf allen Flächen */
+  --area-venue: #258f7a;
+  --area-partner: #1f8ba7;
+  --area-sponsoren: #bc6c83;
+  --area-jury: #a29547;
+  --area-marketing: #b6703f;
+  --area-vorbereitung: #7d8087;
 }
 
 @theme inline {
@@ -144,15 +167,13 @@
   --color-st-green: var(--st-green);
   --color-st-red: var(--st-red);
 
-  /* Bereichs-Farben: nur als 7–8px-Punkte, nie als Text auf hell */
-  --color-area-partner: #a78bfa;
-  --color-area-sponsoren: #f472b6;
-  --color-area-venue: #2dd4bf;
-  --color-area-marketing: #fb923c;
-  --color-area-jury: #facc15;
-  --color-area-teilnehmer: #60a5fa;
-  --color-area-event: #f87171;
-  --color-area-vorbereitung: #a1a1aa;
+  /* Bereichs-Farben: Tokens je Modus (siehe :root/.dark) */
+  --color-area-venue: var(--area-venue);
+  --color-area-partner: var(--area-partner);
+  --color-area-sponsoren: var(--area-sponsoren);
+  --color-area-jury: var(--area-jury);
+  --color-area-marketing: var(--area-marketing);
+  --color-area-vorbereitung: var(--area-vorbereitung);
 
   --shadow-card: var(--shadow-card);
   --shadow-cmdk: var(--shadow-cmdk);
@@ -240,7 +261,7 @@
   }
 }
 
-/* Login: langsames Atmen des Lime-Schimmers oben */
+/* Login: langsames Atmen des Kobalt-Schimmers oben */
 @keyframes login-shimmer {
   from {
     opacity: 0.7;
@@ -343,11 +364,11 @@
   animation: celebrate-burst 750ms cubic-bezier(0.2, 0.7, 0.3, 1) 120ms both;
 }
 
-/* Status-Chips (Maxi, 14.10.): ruhiger Farbverlauf statt „Oval mit Punkt“. Status steht immer als Wort im Chip.
-   Tönung hell schwächer, weil Amber-Text sonst unter 4,5:1 fällt (nachgerechnet 14.10.: Amber max. 7 %, Grün 10 %, Rot 12 %). */
+/* Status-Chips: ruhiger Farbverlauf, Status steht immer als Wort im Chip.
+   Tönung laut Palette „Tinte“ (14.10., final-check.mjs): hell 3/8 %, Rot 6/6 %; dunkel 5/12 %, Amber 6/14 %, Rot 10/10 %. */
 .chip-tone {
-  --t1: 2%;
-  --t2: 7%;
+  --t1: 3%;
+  --t2: 8%;
   color: var(--c);
   background-image: linear-gradient(
     100deg,
@@ -371,8 +392,12 @@
   --t2: 10%;
 }
 .dark .chip-tone {
+  --t1: 5%;
+  --t2: 12%;
+}
+.dark .chip-amber {
   --t1: 6%;
-  --t2: 16%;
+  --t2: 14%;
 }
 .dark .chip-red {
   --t1: 10%;
@@ -383,16 +408,20 @@
   background: var(--acc);
 }
 
-/* „heute“ und „überfällig“: ein Lichtstreifen läuft alle 3,2 s einmal durch (hinter dem Text).
-   Rot: Streifen +14 %, Text bleibt über 4,5:1 (hell 4,64, dunkel 4,57, nachgerechnet 14.10.). */
+/* „heute“ und „überfällig“: Lichtstreifen hinter dem Text. Stärke so, dass der Text an der hellsten Stelle ≥ 4,5:1 bleibt
+   (Palette „Tinte“: heute Weiß 16 % → 4,83:1; überfällig Rot 10 % hell / 8 % dunkel → mind. 4,66:1). */
 .chip-live {
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  --sheen: color-mix(in srgb, var(--c) 14%, transparent);
+  --sheen: color-mix(in srgb, var(--c) 10%, transparent);
 }
-.chip-today.chip-live {
-  --sheen: rgb(255 255 255 / 0.55);
+.dark .chip-live {
+  --sheen: color-mix(in srgb, var(--c) 8%, transparent);
+}
+.chip-today.chip-live,
+.dark .chip-today.chip-live {
+  --sheen: rgb(255 255 255 / 0.16);
 }
 .chip-live::after {
   content: "";

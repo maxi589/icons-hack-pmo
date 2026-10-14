@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { daysBetween, relativeDays } from "@/lib/dates";
 
 // Chips (Maxi, 14.10.): kein Punkt mehr, stattdessen ein ruhiger Farbverlauf in der Statusfarbe (Stile in globals.css).
-// „heute“ (Lime) und „überfällig“ (rot) bekommen einen durchlaufenden Lichtstreifen, damit sie auffallen;
+// „heute“ (Kobalt) und „überfällig“ (rot) bekommen einen durchlaufenden Lichtstreifen, damit sie auffallen;
 // der Rest steht still. `still` schaltet den Streifen ab (z. B. Legende mit 0 Einträgen).
 const TONES = {
   gray: "text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)]",
@@ -39,7 +39,7 @@ export function Chip({
   );
 }
 
-/** Frist als Chip: überfällig rot, heute Lime, ≤ 7 Tage amber, sonst neutral. */
+/** Frist als Chip: überfällig rot, heute Kobalt, ≤ 7 Tage amber, sonst neutral. */
 export function dueTone(due: string, today: string): ChipTone {
   const n = daysBetween(today, due);
   if (n < 0) return "red";

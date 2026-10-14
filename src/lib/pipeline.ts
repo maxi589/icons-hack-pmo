@@ -94,7 +94,7 @@ export function warmLine(o: Organization) {
 
 export type FollowState = { tone: "today" | "red" | "gray"; label: string } | null;
 
-/** Nachfass-Chip: heute (Lime), überfällig (rot), sonst Datum. Bei Fix/Abgesagt keiner. */
+/** Nachfass-Chip: heute (Kobalt), überfällig (rot), sonst Datum. Bei Fix/Abgesagt keiner. */
 export function followState(o: Organization, today: string): FollowState {
   if (!o.next_follow_up || o.stage === "fix" || o.stage === "abgesagt") return null;
   const n = daysBetween(today, o.next_follow_up);

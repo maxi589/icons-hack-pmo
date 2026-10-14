@@ -16,13 +16,11 @@ const LEAVE_MS = 300;
 
 const DOT_COLORS = [
   "var(--accLine)",
-  "var(--color-area-partner)",
-  "var(--color-area-sponsoren)",
-  "var(--color-area-venue)",
-  "var(--color-area-marketing)",
-  "var(--color-area-jury)",
-  "var(--color-area-teilnehmer)",
-  "var(--color-area-event)",
+  "var(--area-partner)",
+  "var(--area-sponsoren)",
+  "var(--area-venue)",
+  "var(--area-marketing)",
+  "var(--area-jury)",
 ];
 const DOTS = Array.from({ length: 16 }, (_, i) => ({
   angle: `${i * 22.5 + (i % 2 ? 6 : -4)}deg`,

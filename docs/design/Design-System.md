@@ -1,6 +1,6 @@
-# Design-System „Graphit“: Bau-Spezifikation
+# Design-System „Tinte“: Bau-Spezifikation
 
-**Status:** Von Maxi entschieden am 13.10.2026: **Graphit + Akzent Lime + Countdown in Michroma + Sounds „Standard“**.
+**Status:** Von Maxi entschieden am 13.10.2026 (Countdown in Michroma, Sounds „Standard“), Farben neu am 14.10.2026: **Palette „Tinte“** (Navy + Kobalt der Event-Website) statt Graphit + Lime.
 **Referenz-Umsetzung:** `design/leinwand/*.dc.html`. Das sind die Boards der Leinwand https://claude.ai/artifact/EAvS67Yi6WYS5rtPRhiw7Y. Werte und Aufbau dort sind verbindlich, sofern hier nichts anderes steht.
 **Alle Kontraste nachgerechnet** (WCAG-Formel) am 13.10.2026.
 
@@ -8,50 +8,44 @@
 
 ## 1. Grundsätze
 - Ruhig, dicht und schnell wie Linear. Jede Seite beantwortet in 5 Sekunden: Wo stehen wir? Was ist als Nächstes dran? Wer ist zuständig?
-- **Farbe nur für Bedeutung:** Pipeline-Stufen, Bereichs-Punkte, Fälligkeit. Alles andere ist neutral. Dazu kommt **ein** Signatur-Akzent (Lime).
+- **Farbe nur für Bedeutung:** Pipeline-Stufen, Bereichs-Punkte, Fälligkeit. Alles andere ist neutral. Dazu kommt **ein** Akzent (Kobalt).
 - Hell und dunkel sind gleichwertig. **Standard = Systemeinstellung** des Geräts. Umschalter in der Sidebar unten.
 - Genau zwei Wow-Momente: der Countdown als Live-Uhr (Michroma, Ziffern rollen) und „Meilenstein erledigt“ (Animation + Sound).
 - Keine icons-Farben (Wunsch von Maxi). Das Logo ist der einfarbige Schriftzug „hack-vienna“ in Michroma (vorher „icons“).
-- **Eventname und Logo „hack-vienna“** (Team, 14.10.): klein, mit Bindestrich wie die Domain. Logo = einfarbiger Schriftzug „hack-vienna“ in Michroma, darunter klein „by icons“ (Sidebar „by icons · 2027“). Seitentitel „… · hack-vienna PMO“, App-Name, App-Icons „hack / vienna“ mit Lime-Strich, Favicon „hv“. Name zentral in `src/lib/brand.ts`.
+- **Eventname und Logo „hack-vienna“** (Team, 14.10.): klein, mit Bindestrich wie die Domain. Logo = einfarbiger Schriftzug „hack-vienna“ in Michroma, darunter klein „by icons“ (Sidebar „by icons · 2027“). Seitentitel „… · hack-vienna PMO“, App-Name, App-Icons „hack / vienna“ mit Kobalt-Strich, Favicon „hv“. Name zentral in `src/lib/brand.ts`.
 - **Wenig Text (Maxi, 14.10.):** keine Erklärsätze unter Überschriften, in Dialogen oder Leerzuständen. Leerzustand = ein kurzer Satz („Keine Treffer.“, „Noch keine Kommentare.“). Begriffe erklären sich über die Oberfläche, nicht über Hinweistexte.
-- **Ausnahme Login-Seite (Maxi, 13.10.):** immer dunkel, Hintergrund schwarz, oben mittig ein leichter Lime-Schimmer (atmet langsam) und ein weicher Lime-Schein unter dem Mauszeiger. Login-Karte mittig und schlicht. Gilt nur dort.
+- **Ausnahme Login-Seite (Maxi, 13.10.):** immer dunkel, Hintergrund schwarz, oben mittig ein leichter Kobalt-Schimmer (atmet langsam) und ein weicher Kobalt-Schein unter dem Mauszeiger. Login-Karte mittig und schlicht. Gilt nur dort.
 - **Nicht verwenden:** Glas-Effekte, Glow (Ausnahme oben), animierte Sidebar, Kipp- und Magnet-Effekte, eigener Mauszeiger, WebGL. Außerdem keine Werte oder Code von uimaxx.ing und aicss.dev (beide untersagen KI-Nutzung).
 
-## 2. Farb-Tokens
+## 2. Farb-Tokens: Palette „Tinte“ (Maxi, 14.10.2026)
+Navy und Kobalt der Event-Website, für langes Arbeiten ruhiger gestuft. Gebaut von einem Design-Agenten, geprüft von einem Kritiker: **1.005 Prüfungen bestanden** (WCAG 2.x, APCA 0.0.98G, Farbabstand ΔE2000 ≥ 15 zwischen allen Bedeutungsfarben, keine reinweiße Schrift auf Schwarz, Sättigung dunkel ≤ 0,14). Alle Werte und Prüfergebnisse: `docs/design/palette-tinte.json`. Werte stehen in `src/app/globals.css` und nirgends sonst.
 
 | Token | Dunkel | Hell | Verwendung |
 |---|---|---|---|
-| `--bg` | #0a0a0b | #f1f1f2 | App-Hintergrund, Sidebar |
-| `--panel` | #111113 | #fbfbfb | Hauptfläche (eingerückt, Radius 14) |
-| `--card` | #161618 | #ffffff | Karten (Pipeline-Karte dunkel #18181a) |
-| `--card2` | #1c1c1f | #f6f6f7 | Gruppenköpfe, Leerzustände |
-| `--col` | #141416 | #f4f4f5 | Kanban-Spalte |
-| `--line` | rgba(255,255,255,.09) | rgba(0,0,0,.09) | Haarlinien (nur Dekoration) |
-| `--line2` | rgba(255,255,255,.13) | rgba(0,0,0,.13) | Ränder von Knöpfen und Chips |
-| `--field` | #6b6b72 (3,42:1) | #8e8e96 (3,25:1) | **Ränder von Eingabefeldern (mind. 3:1)** |
-| `--text` | #ededee | #18181b | Haupttext |
-| `--text2` | #a8a8ae (7,6:1) | #52525b | Nebentext |
-| `--text3` | #8b8b93 (5,4–5,6:1) | #6b6b73 (5,1:1) | Labels, Meta (nie heller!) |
-| `--hover` | rgba(255,255,255,.04) | rgba(0,0,0,.035) | Hover |
-| `--active` | rgba(255,255,255,.075) | rgba(0,0,0,.06) | aktiver Eintrag |
+| `--bg` | #0e121b | #edf0f5 | App-Hintergrund, Sidebar |
+| `--panel` | #131824 | #f7f8fb | Hauptfläche |
+| `--card` | #181e2a | #ffffff | Karten |
+| `--card2` | #1e2532 | #f3f5f9 | Gruppenköpfe, Leerzustände |
+| `--col` | #10151f | #eef1f6 | Kanban-Spalte (Mulde) |
+| `--field` | #687284 | #778093 | Ränder von Eingabefeldern (≥ 3:1) |
+| `--text` | #e2e7ef | #161d2b | Haupttext (dunkel bewusst nicht reinweiß: 14,3:1) |
+| `--text2` | #b5bece | #465063 | Nebentext |
+| `--text3` | #97a2b5 | #5a6477 | Labels, Meta (hellste erlaubte Textfarbe, ≥ 4,6:1) |
+| `--acc` | #0f5ba5 | #0f5ba5 | Fläche: Primärknopf, „+“, Chip „heute“ (Kobalt der Website) |
+| `--accText` | #ffffff | #ffffff | Text auf Akzentfläche (6,86:1) |
+| `--accLine` | #7fb2ee | #0f5ba5 | Linien, Icons, Fokus, Heute-Linie, aktive Navigation, Fortschritt |
 
-**Status-Farben** (Text und Punkte): grau #a1a1aa / #52525b · blau #60a5fa / #1d4ed8 · amber #fbbf24 / #a94d07 · grün #34d399 / #047857 · rot #f87171 / #b91c1c (jeweils dunkel / hell). Im Hellmodus nur die 700er-Töne als Text verwenden. Die 500er-Töne fallen durch (Amber 2,15:1, Grün 2,28:1).
+**Status-Farben** (dunkel / hell): grau #adb1b8 / #474a52 · Kontaktiert (violett) #c79be4 / #643b9b · amber #f4b067 / #7e4801 · grün #7dbf87 / #206734 · rot #fc9382 / #a32730. „Kontaktiert“ ist violett, damit es nicht mit dem Kobalt-Akzent verwechselt wird (Token heißt weiter `--st-blue`).
 
-**Signatur-Akzent Lime**
+**Bereichs-Farben** je Modus (`--area-<id>`, dunkel / hell, ≥ 3:1 auf allen Flächen): Venue & Event #258f7a / #2b8c81 · Track-Partner #1f8ba7 / #0088b3 · Sponsoren #bc6c83 / #c25485 · Programm & Jury #a29547 / #9b7a01 · Marketing & Teilnehmer #b6703f / #ca5e30 · Gesamtleitung (id vorbereitung) #7d8087 / #7b7f88. Der Wert in der Datenbank (`areas.color`) ist nur noch Rückfall.
 
-| Token | Dunkel | Hell | Wofür |
-|---|---|---|---|
-| `--acc` | #c6f432 | #c6f432 | Flächen: Primärknopf, „+“, Chip „heute“ |
-| `--accText` | #0a0a0b (15,4:1) | #0a0a0b | Text auf Akzentfläche |
-| `--accLine` | #c6f432 (14,7:1) | **#4d7c0f** (4,8:1) | dünne Linien, Icons, Text: Heute-Linie, aktive Navigation (2px links), Fortschrittsbalken, Fokusring, @Erwähnung |
+**Avatar-Farben** (`--avatar-<initialen>`, Initialen #111, ≥ 13,6:1): Maxi S #dbd6ff · Maxi D #ffddd4 · Manu #c4ffe4 · Tim #fff2bc · Kilian #bbeaff.
 
-Wichtig: Dünne Lime-Linien auf Weiß sind unsichtbar. Im Hellmodus deshalb immer `--accLine` nehmen.
+**Lichtstreifen in Chips:** „heute“ Weiß 16 % (Text an der hellsten Stelle 4,83:1), „überfällig“ Statusrot 10 % hell / 8 % dunkel. Nie stärker, sonst fällt der Text unter 4,5:1 (früher 55 % = 2,14:1).
 
-**Bereichs-Farben** (nur als 7–8px-Punkte, nie als Text auf hell): Venue & Event #2dd4bf · Track-Partner #a78bfa · Sponsoren #f472b6 · Programm & Jury #facc15 · Marketing & Teilnehmer #fb923c · Gesamtleitung #a1a1aa (Sammelzeile, kein Bereich). **5 Bereiche seit 14.10.** (vorher 7; Event in Venue, Teilnehmer in Marketing), Reihenfolge = Ablauf.
+**Login:** Schimmer in #4f8fd9 (0,18 Mitte, 0,06 bei 45 %), Schein unterm Mauszeiger 0,06. **App-Icons:** Navy #0e121b, Schrift #e2e7ef, Strich #4f8fd9.
 
-**Avatar-Farben** (Initialen #111): Maxi S #c4b5fd (MS) · Maxi D #fda4af (MD) · Manu #99f6e4 (MA) · Tim #fde68a (TI) · Kilian #bfdbfe (KI).
-
-**Status-Chips (Maxi, 14.10.):** kein „Oval mit Punkt“ mehr. Chips sind Pillen mit Wort und einem ruhigen Farbverlauf in der Statusfarbe (Klassen `chip-tone`/`chip-amber|red|green`, `chip-today` in `globals.css`). Nur „heute“ (Lime) und „überfällig“ (rot) bewegen sich: Ein Lichtstreifen läuft alle 3,2 s einmal durch (Rot +14 %, Text bleibt über 4,5:1). Legenden-Chips mit 0 Einträgen bleiben still (`still`). Bei „Bewegung reduzieren“ im System steht alles still. Tönung im Hellmodus höchstens Amber 7 %, Grün 10 %, Rot 12 % (sonst Text unter 4,5:1, nachgerechnet 14.10.).
+**Status-Chips (Maxi, 14.10.):** kein „Oval mit Punkt“ mehr. Chips sind Pillen mit Wort und einem ruhigen Farbverlauf in der Statusfarbe (Klassen `chip-tone`/`chip-amber|red|green`, `chip-today` in `globals.css`). Nur „heute“ (Kobalt) und „überfällig“ (rot) bewegen sich: Ein Lichtstreifen läuft alle 3,2 s einmal durch (Rot +14 %, Text bleibt über 4,5:1). Legenden-Chips mit 0 Einträgen bleiben still (`still`). Bei „Bewegung reduzieren“ im System steht alles still. Tönung im Hellmodus höchstens Amber 7 %, Grün 10 %, Rot 12 % (sonst Text unter 4,5:1, nachgerechnet 14.10.).
 
 **Bereichs-Zeichen (14.10.):** statt Punkt ein kleiner Ring in Bereichsfarbe mit Kern (`AreaGlyph`). Der Ring füllt sich mit dem Anteil erledigter Meilensteine des Bereichs, zeichnet sich beim Erscheinen (300 ms) und wächst beim Drüberfahren leicht.
 
@@ -97,7 +91,7 @@ Wichtig: Dünne Lime-Linien auf Weiß sind unsichtbar. Im Hellmodus deshalb imme
    - Karte: Initialen, Name, Prio, „warm über X · Welle n“, Nachfass-Chip (heute = Akzent, überfällig = rot), Avatar.
    - Detail-Sheet:
      - Stufe plus Primärknopf „Weiter zu ‚…‘“
-     - Eigenschaften (entschlackt 14.10.): Zuständig, Nachfassen (Datum rot/Lime je nach Status, +2 T und +1 W in einer Zeile), Prio, Warm über (bestehende Verbindung klein darunter, nicht bei Venues), Ansprechperson, E-Mail / Tel., Website. Venues zusätzlich Block „Eckdaten“: Kapazität, Übernachtung, Preis/Deal, Lage. Dann Notizen. Kein „Mehr“, keine Welle, keine Rollen im Detail (Maxi: nicht overengineeren). Leere Felder zeigen „–“, keine Beispieltexte. Website-Symbol im Kopf, wenn gesetzt.
+     - Eigenschaften (entschlackt 14.10.): Zuständig, Nachfassen (Datum rot/Kobalt je nach Status, +2 T und +1 W in einer Zeile), Prio, Warm über (bestehende Verbindung klein darunter, nicht bei Venues), Ansprechperson, E-Mail / Tel., Website. Venues zusätzlich Block „Eckdaten“: Kapazität, Übernachtung, Preis/Deal, Lage. Dann Notizen. Kein „Mehr“, keine Welle, keine Rollen im Detail (Maxi: nicht overengineeren). Leere Felder zeigen „–“, keine Beispieltexte. Website-Symbol im Kopf, wenn gesetzt.
      - Das Detail-Panel steht rechts über die volle Höhe unter der Kopfzeile; Tabs und Filter stehen nur über der Liste (gilt auch für Aufgaben und Wissen).
      - „Link kopieren“ überall nur als Link-Symbol in der Ecke.
      - Verlauf aus Systemereignissen und Kommentaren
