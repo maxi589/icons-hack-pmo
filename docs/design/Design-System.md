@@ -22,13 +22,13 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
 
 | Token | Dunkel | Hell | Verwendung |
 |---|---|---|---|
-| `--bg` | #050506 | #f5f5f6 | App-Hintergrund, Sidebar |
-| `--panel` | #0a0a0b | #ffffff | Hauptfläche |
-| `--card` | #0f0f11 | #ffffff | Karten |
-| `--card2` | #161618 | #f7f7f8 | Gruppenköpfe, Leerzustände |
-| `--col` | #060607 | #f4f4f5 | Kanban-Spalte (Mulde) |
+| `--bg` | #080809 | #f5f5f6 | App-Hintergrund, Sidebar |
+| `--panel` | #0d0d0f | #ffffff | Hauptfläche |
+| `--card` | #121214 | #ffffff | Karten |
+| `--card2` | #18181a | #f7f7f8 | Gruppenköpfe, Leerzustände |
+| `--col` | #09090a | #f4f4f5 | Kanban-Spalte (Mulde) |
 
-**Flächen neu (Maxi, 14.10.: „weißer bzw. schwärzer, Boxen nicht so fremd“):** hell ist die Hauptfläche reinweiß und Karten heben sich nur über den feinen Ring ab (wie Vercel/Linear), dunkel fast schwarz mit Karten knapp darüber (Kontrast Karte/Fläche 1,03:1). Alle Text-, Status-, Bereichs- und Feldfarben auf allen Flächen nachgerechnet: 160 Prüfungen, 0 Fehler (WCAG; schwächste Werte: hell `--text3` 5,84:1, Bereichsfarben ≥ 3,65:1).
+**Flächen neu (Maxi, 14.10.: „weißer bzw. schwärzer, Boxen nicht so fremd“):** hell ist die Hauptfläche reinweiß und Karten heben sich nur über den feinen Ring ab (wie Vercel/Linear), dunkel fast schwarz mit Karten knapp darüber (Kontrast Karte/Fläche 1,04:1). **Dunkel nachjustiert (Maxi, 14.10. abends: „minimal weniger schwarz“):** alle Flächen ein Drittel des Wegs zurück zur alten Graphit-Stufe (Panel L\* 2,8 → 3,7, ein Wahrnehmungsschritt), Abstufung gleich; geprüft von einem Design-Agenten, nachgerechnet: schwächste Werte auf `--card2` `--text3` 6,92:1, `--field` 3,35:1, Bereichsfarben ≥ 4,47:1. Alle Text-, Status-, Bereichs- und Feldfarben auf allen Flächen nachgerechnet: 160 Prüfungen, 0 Fehler (WCAG; schwächste Werte: hell `--text3` 5,84:1, Bereichsfarben ≥ 3,65:1).
 | `--field` | #6b6b72 | #7c7c85 | Ränder von Eingabefeldern (≥ 3:1) |
 | `--text` | #e4e4e8 | #18181b | Haupttext (dunkel bewusst nicht reinweiß: 14,3:1) |
 | `--text2` | #bbbbc2 | #52525b | Nebentext |
@@ -67,7 +67,7 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
 
 ## 5. Layout
 - **Desktop:** Sidebar 220px (Maxi, 14.10.: enger), auf ein 60px-Icon-Band einklappbar. Der Knopf zum Ein-/Ausklappen sitzt in beiden Zuständen an exakt derselben Stelle oben links. Hauptpanel eingerückt (8px), Radius 14, Ring. Inhalt von Übersicht, Bereichen und Wissen max. 1440px breit, mittig (Maxi, 14.10.: Breite besser nutzen; vorher 1080px). Pipeline über die volle Breite, rechts Detail-Sheet mit 400px.
-- **Sidebar:** Einklapp-Knopf + Logo · Suche (Strg K) · Übersicht, Inbox, Meine Aufgaben · HACKATHON: Roadmap, Pipeline, Aufgaben, Wissen · BEREICHE: 5 mit Bereichs-Zeichen (Ring = Fortschritt) und rechts der verantwortlichen Person als Mini-Avatar (gestrichelter Kreis = noch offen) · unten Avatar, Hell/Dunkel, Abmelden. Eingeklappt erscheinen die Bereichs-Zeichen ebenfalls. Kein Sound-Schalter (Maxi, 14.10.: Sounds sind immer an, auch kein Schalter in Strg+K oder im Handy-Menü).
+- **Sidebar:** Einklapp-Knopf + Logo · Suche (Strg K) · Übersicht, Inbox, Meine Aufgaben · HACKATHON: Roadmap, Pipeline, Aufgaben, Wissen · BEREICHE: 5 mit Bereichs-Zeichen (Ring = Fortschritt) und rechts der verantwortlichen Person als Mini-Avatar (gestrichelter Kreis = noch offen) · unten Avatar, Hell/Dunkel, Abmelden. **Klick auf den eigenen Avatar öffnet „Profil“** (auch Strg+K und Handy-Menü oben): Passwort ändern (aktuelles + neues zweimal) und Team mit „Einladen“ (Name + Mail = Eintrag in der Team-Liste, Anmeldung wie beim ersten Mal; „eingeladen“ = noch kein Konto) und Link zum Tool kopieren. Ohne Erklärtexte. Eingeklappt erscheinen die Bereichs-Zeichen ebenfalls. Kein Sound-Schalter (Maxi, 14.10.: Sounds sind immer an, auch kein Schalter in Strg+K oder im Handy-Menü).
 - **Handy:** Tab-Leiste: Heute · Pipeline · **+** (Akzent-Kreis 52px) · Aufgaben · Inbox. Bottom Sheets, `env(safe-area-inset-bottom)`, Tippflächen mind. 44px, **kein Ziehen & Ablegen** (Status per Sheet).
 
 ## 6. Seiten (siehe Boards)

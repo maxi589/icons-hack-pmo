@@ -11,6 +11,7 @@ import { setTheme } from "@/components/theme-toggle";
 import { Kbd } from "@/components/ui/command";
 import { usePalette, signOut } from "./command-palette";
 import { Avatar } from "@/components/avatar";
+import { openProfile } from "./profile-dialog";
 import { AreaGlyph } from "@/components/area-glyph";
 import { useMilestones } from "@/lib/data/use-milestones";
 import { EVENT_NAME } from "@/lib/brand";
@@ -170,8 +171,15 @@ export function Sidebar() {
         </div>
 
         <div className="mt-auto flex items-center gap-2.5 border-t border-line px-1.5 pt-2">
-          <Avatar person={me} />
-          <span className="flex-1 truncate text-[13px]">{me?.name}</span>
+          <button
+            type="button"
+            onClick={openProfile}
+            title="Profil"
+            className="-ml-1 flex h-8 min-w-0 flex-1 items-center gap-2.5 rounded-lg px-1 text-left transition-colors duration-150 hover:bg-hover"
+          >
+            <Avatar person={me} />
+            <span className="flex-1 truncate text-[13px]">{me?.name}</span>
+          </button>
           <button type="button" onClick={toggleDark} className={iconBtn} aria-label="Hell oder dunkel umschalten" title="Hell/Dunkel">
             <ThemeIcon />
           </button>
@@ -219,9 +227,9 @@ export function Sidebar() {
           <button type="button" onClick={signOut} className={iconBtn} aria-label="Abmelden" title="Abmelden">
             <LogOut className="size-4" strokeWidth={1.8} aria-hidden />
           </button>
-          <span title={me?.name} className="pt-1">
+          <button type="button" onClick={openProfile} title="Profil" aria-label="Profil" className="mt-1 grid size-9 place-items-center rounded-[9px] hover:bg-hover">
             <Avatar person={me} />
-          </span>
+          </button>
         </div>
       </nav>
     </>

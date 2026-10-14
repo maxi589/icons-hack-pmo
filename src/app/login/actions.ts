@@ -3,12 +3,10 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { safeNext } from "@/lib/auth";
+import { MIN_PASSWORD, safeNext } from "@/lib/auth";
 
 // firstTime: Adresse steht auf der Team-Liste, hat aber noch kein Konto → Passwort wiederholen lassen.
 export type LoginState = { error?: string; email?: string; firstTime?: boolean };
-
-const MIN_PASSWORD = 10;
 
 // Ein Formular für alles: Anmelden, und beim ersten Mal das Passwort festlegen.
 export async function login(_prev: LoginState, form: FormData): Promise<LoginState> {

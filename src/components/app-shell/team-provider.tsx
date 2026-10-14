@@ -21,6 +21,8 @@ type Team = {
   areaById: (id: string | null | undefined) => Area | null;
   personById: (id: string | null | undefined) => Person | null;
   setAreaOwner: (areaId: string, ownerId: string | null) => Promise<boolean>;
+  /** Team neu laden, z. B. nach einer Einladung. */
+  reloadPeople: () => Promise<void>;
 };
 
 const TeamContext = createContext<Team>({
@@ -31,7 +33,11 @@ const TeamContext = createContext<Team>({
   areaById: () => null,
   personById: () => null,
   setAreaOwner: async () => false,
+  reloadPeople: async () => {},
 });
+
+// Avatar-Farbe aus den Tokens (--avatar-<initialen>), Datenbank-Wert als Rückfall (z. B. für neu Eingeladene).
+const tone = (initials: string, color: string) => `var(--avatar-${initials.toLowerCase()}, ${color})`;
 
 export function TeamProvider({ children }: { children: React.ReactNode }) {
   const [me, setMe] = useState<Person | null>(null);
@@ -62,8 +68,6 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
         loadAreas(),
       ]);
       const list = team.data ?? [];
-      // Avatar-Farbe ebenfalls aus den Tokens (--avatar-<initialen>), Datenbank-Wert als Rückfall.
-      const tone = (initials: string, color: string) => `var(--avatar-${initials.toLowerCase()}, ${color})`;
       setPeople(list.map(({ id, name, initials, color }) => ({ id, name, initials, color: tone(initials, color) })));
       const mine = list.find((p) => p.user_id === auth.user!.id);
       if (mine) setMe({ id: mine.id, name: mine.name, initials: mine.initials, color: tone(mine.initials, mine.color) });
@@ -100,7 +104,14 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     return true;
   }, []);
 
-  return <TeamContext value={{ me, people, areas, allAreas: lanes, areaById, personById, setAreaOwner }}>{children}</TeamContext>;
+  const reloadPeople = useCallback(async () => {
+    const { data } = await createClient().from("people").select("id, name, initials, color").order("sort");
+    if (data) setPeople(data.map(({ id, name, initials, color }) => ({ id, name, initials, color: tone(initials, color) })));
+  }, []);
+
+  return (
+    <TeamContext value={{ me, people, areas, allAreas: lanes, areaById, personById, setAreaOwner, reloadPeople }}>{children}</TeamContext>
+  );
 }
 
 export function useTeam() {

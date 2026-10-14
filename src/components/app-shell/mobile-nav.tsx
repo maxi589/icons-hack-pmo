@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Avatar } from "@/components/avatar";
 import { signOut, usePalette } from "./command-palette";
 import { useTeam } from "./team-provider";
+import { openProfile } from "./profile-dialog";
 import { useToday } from "@/lib/use-today";
 import { formatHeaderDate } from "@/lib/dates";
 import { EVENT_NAME } from "@/lib/brand";
@@ -61,9 +62,20 @@ function MenuSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (o: bo
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="bottom" className="max-h-[88dvh] gap-3 overflow-y-auto px-3.5 pt-3 pb-[max(20px,env(safe-area-inset-bottom))]">
         <div className="mx-auto h-1 w-9 shrink-0 rounded-full bg-line-2" aria-hidden />
-        <div className="flex items-center gap-3 px-1 pt-1 pr-12">
-          <Avatar person={me} size={36} />
-          <SheetTitle className="text-[17px] font-semibold">{me?.name ?? "Menü"}</SheetTitle>
+        <div className="pr-12">
+          <SheetTitle className="sr-only">Menü</SheetTitle>
+          <button
+            type="button"
+            onClick={() => {
+              close();
+              openProfile();
+            }}
+            className={cn(sheetRow, "min-h-14 px-1.5")}
+          >
+            <Avatar person={me} size={36} />
+            <span className="flex-1 text-[17px] font-semibold">{me?.name ?? "Profil"}</span>
+            <ChevronRight className="size-4 text-fg-3" aria-hidden />
+          </button>
         </div>
 
         <div className="flex flex-col">

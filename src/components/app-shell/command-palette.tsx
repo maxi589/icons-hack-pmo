@@ -2,7 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, LogOut, Monitor, Moon, PanelLeft, Plus, Sun } from "lucide-react";
+import { Check, LogOut, Monitor, Moon, PanelLeft, Plus, Sun, UserRound } from "lucide-react";
+import { openProfile } from "./profile-dialog";
 import {
   Command,
   CommandDialog,
@@ -170,6 +171,10 @@ function Palette({ mode, close }: { mode: Mode; close: () => void }) {
               <CommandItem value="Sidebar ein- oder ausklappen" onSelect={run(toggleSidebar)} className="max-md:hidden">
                 <PanelLeft aria-hidden />
                 <span className="flex-1">Sidebar ein- oder ausklappen</span>
+              </CommandItem>
+              <CommandItem value="Profil Passwort ändern Team einladen" onSelect={run(openProfile)}>
+                <UserRound aria-hidden />
+                <span className="flex-1">Profil &amp; Team</span>
               </CommandItem>
               <CommandItem value="Abmelden" onSelect={run(signOut)}>
                 <LogOut aria-hidden />

@@ -4,6 +4,7 @@ import { MilestoneCelebration } from "@/components/milestone-celebration";
 import { CommandProvider } from "./command-palette";
 import { InboxProvider } from "./inbox-provider";
 import { MobileHeader, MobileTabBar } from "./mobile-nav";
+import { ProfileDialog } from "./profile-dialog";
 import { Sidebar } from "./sidebar";
 import { SoundProvider } from "./sound-provider";
 import { TeamProvider } from "./team-provider";
@@ -30,6 +31,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </div>
               <MobileTabBar />
               <MilestoneCelebration />
+              <ProfileDialog />
             </ToastProvider>
           </CommandProvider>
         </InboxProvider>

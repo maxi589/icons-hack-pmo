@@ -100,11 +100,11 @@
 .dark {
   color-scheme: dark;
 
-  --bg: #050506;
-  --panel: #0a0a0b;
-  --card: #0f0f11;
-  --card2: #161618;
-  --col: #060607;
+  --bg: #080809;
+  --panel: #0d0d0f;
+  --card: #121214;
+  --card2: #18181a;
+  --col: #09090a;
 
   --line: rgba(255, 255, 255, 0.09);
   --line2: rgba(255, 255, 255, 0.13);
