@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { APP_NAME, EVENT_NAME } from "@/lib/brand";
 
 // Web-App-Manifest: Damit lässt sich das Tool am Handy auf den Home-Bildschirm legen
 // und startet dann ohne Browser-Leiste wie eine App. Bewusst ohne Service Worker (kein Offline-Modus).
@@ -6,9 +7,9 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "icons Hackathon PMO",
-    short_name: "icons PMO",
-    description: "Steuerung für den icons Hackathon 2027",
+    name: APP_NAME,
+    short_name: EVENT_NAME,
+    description: `Steuerung für ${EVENT_NAME} 2027`,
     lang: "de",
     start_url: "/",
     scope: "/",

@@ -82,7 +82,6 @@ export function Inbox() {
             </button>
           )}
         </div>
-        <p className="-mt-2 text-[13px] text-fg-2">Hier landet, wo dich jemand mit @ erwähnt oder dir etwas zuweist. Mails verschickt das Tool keine.</p>
 
         {shown.length === 0 ? (
           <div className="flex flex-col items-center gap-2.5 rounded-[14px] bg-card-2 px-4 py-12 text-center">
@@ -90,9 +89,6 @@ export function Inbox() {
               <InboxIcon className="size-[18px]" strokeWidth={1.8} aria-hidden />
             </div>
             <p className="text-sm font-medium">{filter === "ungelesen" && items.length ? "Alles gelesen" : "Noch nichts in deiner Inbox"}</p>
-            <p className="max-w-[340px] text-[13px] leading-normal text-fg-2">
-              Erwähnt dich jemand in einem Kommentar oder trägt dich als zuständig ein, siehst du es hier und im Zähler links bzw. unten.
-            </p>
           </div>
         ) : (
           days.map((day) => (

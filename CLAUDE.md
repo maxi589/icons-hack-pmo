@@ -1,6 +1,6 @@
 # icons Hackathon PMO-Tool: Projektregeln
 
-Internes Steuerungs-Tool für den **icons Hackathon (27./28.2.2027)**. Ersetzt WhatsApp als Ort für Aufgaben, Entscheidungen und Outreach-Stand. 5 Nutzer ohne Rollen: Maxi S, Maxi D, Manu, Tim, Kilian. **Kernstück ist die Pipeline (CRM).** Go-live 30.10.2026, Design-Freeze 24.10.2026.
+Internes Steuerungs-Tool für **hackvienna**, den icons Hackathon (27./28.2.2027). Ersetzt WhatsApp als Ort für Aufgaben, Entscheidungen und Outreach-Stand. 5 Nutzer ohne Rollen: Maxi S, Maxi D, Manu, Tim, Kilian. **Kernstück ist die Pipeline (CRM).** Go-live 30.10.2026, Design-Freeze 24.10.2026.
 
 Auftraggeber ist Maxi S (kein Entwickler): Deutsch, Ergebnis zuerst, einfache Sprache, Fachbegriffe beim ersten Mal übersetzen.
 
@@ -51,6 +51,8 @@ Auftraggeber ist Maxi S (kein Entwickler): Deutsch, Ergebnis zuerst, einfache Sp
 
 ## Texte
 - Alle UI-Texte auf **Deutsch**, Anrede **du**, kurz und konkret (Ton wie in den Boards).
+- **Wenig Text** (Maxi, 14.10.): keine Erklärsätze, keine Dialog-Beschreibungen, Leerzustände mit einem kurzen Satz. Clean und simpel.
+- Eventname **hackvienna** (klein, zusammen), nur über `src/lib/brand.ts`.
 - „TE“ in der UI als „Talent Elevator“ ausschreiben.
 
 ## Sounds

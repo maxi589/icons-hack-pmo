@@ -495,9 +495,6 @@ function EmptyState({ onNew }: { onNew: () => void }) {
   return (
     <div className="m-3.5 flex flex-col items-center gap-2.5 rounded-[14px] bg-card-2 px-4 py-12 text-center md:m-5">
       <p className="text-sm font-medium">Noch keine Aufgaben</p>
-      <p className="max-w-[340px] text-[13px] leading-normal text-fg-2">
-        Was im WhatsApp-Chat ausgemacht wird, kommt hierher: mit zuständiger Person und Frist. Tipp: Taste C legt überall eine neue Aufgabe an.
-      </p>
       <button type="button" onClick={onNew} className="mt-1 inline-flex h-8 items-center rounded-[9px] bg-acc px-3 text-[13px] font-medium text-acc-text max-md:h-10">
         + Aufgabe
       </button>

@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Pipeline } from "@/components/pipeline/pipeline";
 
-export const metadata: Metadata = { title: "Pipeline · icons Hackathon PMO" };
+export const metadata: Metadata = { title: "Pipeline" };
 
 // Suspense, weil die Pipeline ihren Zustand aus der Adresse liest (?tab=…&firma=…).
 export default function PipelinePage() {

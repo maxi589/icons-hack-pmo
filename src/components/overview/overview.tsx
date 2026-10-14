@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Check, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
+import { AreaGlyph } from "@/components/area-glyph";
 import { Chip, DueChip } from "@/components/chip";
 import { Countdown } from "@/components/countdown";
 import { useTeam } from "@/components/app-shell/team-provider";
@@ -169,10 +170,10 @@ function GoalTiles({ orgs, milestones }: { orgs: Org[]; milestones: Milestone[] 
   };
 
   const goals = [
-    { label: "Challenge-Partner zugesagt", value: won("challenge"), target: 4, note: `Ziel M3 · bis ${due("M3")}` },
-    { label: "Jury zugesagt", value: won("jury"), target: 4, note: `Ziel M4 · bis ${due("M4")}` },
+    { label: "Track-Partner zugesagt", value: won("challenge"), target: 4, note: `bis ${due("M3")}` },
+    { label: "Jury zugesagt", value: won("jury"), target: 4, note: `bis ${due("M4")}` },
     { label: "Venue fixiert", value: won("venue", ["fix"]), target: 1, note: `plus Backup · bis ${due("M2")}` },
-    { label: "Sponsoren zugesagt", value: won("sponsor"), target: null, note: "Credits und Verpflegung · M3" },
+    { label: "Sponsoren zugesagt", value: won("sponsor") + won("tokens"), target: null, note: "Credits und Verpflegung" },
   ];
 
   return (
@@ -233,7 +234,7 @@ function DueCard({ milestones, tasks, today }: { milestones: Milestone[]; tasks:
           Alle Aufgaben
         </Link>
       </div>
-      {groups.length === 0 && <p className="border-t border-line px-4 py-6 text-[13.5px] text-fg-2">Nichts fällig. Gönn dir eine Pause.</p>}
+      {groups.length === 0 && <p className="border-t border-line px-4 py-6 text-[13.5px] text-fg-2">Nichts fällig.</p>}
       {groups.map((g) => (
         <div key={g.label}>
           <h3 className={cn("label-mono border-t border-line bg-card-2 px-4 pt-2.5 pb-2", g.red && "text-st-red!")}>{g.label}</h3>
@@ -318,11 +319,7 @@ function FollowUpCard({ orgs, today }: { orgs: Org[]; today: string }) {
             <Send className="size-[18px]" strokeWidth={1.8} aria-hidden />
           </div>
           <p className="text-[14px] font-medium">Noch nichts nachzufassen</p>
-          <p className="max-w-[280px] text-[13px] leading-normal text-fg-2">
-            {today < WAVE_1
-              ? `Welle 1 startet am ${formatShort(WAVE_1)} Ab dann siehst du hier, welche Firma heute eine Antwort von dir braucht.`
-              : "Heute braucht keine Firma eine Antwort. Neue Termine setzt ihr in der Pipeline."}
-          </p>
+          {today < WAVE_1 && <p className="text-[13px] text-fg-2">Welle 1 startet am {formatShort(WAVE_1)}</p>}
           <Link
             href="/pipeline"
             className="mt-1 inline-flex h-8 items-center rounded-[9px] px-3 text-[13px] font-medium text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)] transition-colors duration-150 hover:bg-hover hover:text-fg"
@@ -372,36 +369,41 @@ function AreasSection({ milestones, today }: { milestones: Milestone[]; today: s
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-[repeat(auto-fit,minmax(180px,1fr))]">
-        {areas.map((a) => {
-          const own = milestones.filter((m) => m.area_id === a.id);
-          const next = own.find((m) => m.status !== "erledigt" && m.due_date >= today);
-          const owner = personById(a.owner_id);
-          return (
-            <Link
-              key={a.id}
-              href={`/bereiche/${a.id}`}
-              className={cn(card, "flex flex-col gap-2.5 px-3.5 py-3 transition-shadow duration-150 hover:shadow-[0_0_0_1px_var(--line2)] md:px-4 md:py-3.5")}
-            >
-              <span className="flex items-center gap-2 text-[13.5px] font-medium">
-                <span className="size-2 rounded-full" style={{ background: a.color }} aria-hidden />
-                {a.name}
-              </span>
-              <span className="flex min-w-0 items-center gap-2">
-                <Avatar person={owner} size={22} />
-                {owner ? (
-                  <span className="truncate text-[12.5px] text-fg-2">{owner.name}</span>
-                ) : (
-                  <span className="text-[12.5px] leading-snug text-st-amber">Verantwortlich offen</span>
-                )}
-              </span>
-              <span className="text-[12px] text-fg-3 tabular">
-                {own.length} {own.length === 1 ? "Meilenstein" : "Meilensteine"}
-                {next && ` · nächster ${formatDayMonth(next.due_date)}`}
-              </span>
-            </Link>
-          );
-        })}
+      {/* Breit genug: alle Bereiche in einer Zeile (Spaltenzahl folgt der Zahl der Bereiche), sonst 2–4 Spalten */}
+      <div className="@container">
+        <div className="grid grid-cols-2 gap-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-flow-col @4xl:grid-cols-none @4xl:auto-cols-fr">
+          {areas.map((a) => {
+            const own = milestones.filter((m) => m.area_id === a.id);
+            const done = own.filter((m) => m.status === "erledigt").length;
+            const next = own.find((m) => m.status !== "erledigt" && m.due_date >= today);
+            const owner = personById(a.owner_id);
+            return (
+              <Link
+                key={a.id}
+                href={`/bereiche/${a.id}`}
+                aria-label={`${a.name}: ${owner ? owner.name : "Verantwortlich offen"}, ${done} von ${own.length} Meilensteinen erledigt${next ? `, nächster ${formatDayMonth(next.due_date)}` : ""}`}
+                className={cn(card, "group flex min-w-0 flex-col gap-2 px-3 py-2.5 transition-shadow duration-150 hover:shadow-[0_0_0_1px_var(--line2)]")}
+              >
+                <span className="flex min-w-0 items-center gap-1.5 text-[13px] font-medium">
+                  <AreaGlyph color={a.color} progress={own.length ? done / own.length : 0} size={13} />
+                  <span className="truncate">{a.name}</span>
+                </span>
+                <span className="flex min-w-0 items-center gap-1.5">
+                  <Avatar person={owner} size={18} />
+                  {owner ? (
+                    <span className="truncate text-[12px] text-fg-2">{owner.name}</span>
+                  ) : (
+                    <span className="truncate text-[12px] text-st-amber">offen</span>
+                  )}
+                </span>
+                <span className="truncate font-mono text-[11px] text-fg-3 tabular">
+                  {done}/{own.length}
+                  {next ? ` · ${formatDayMonth(next.due_date)}` : own.length ? " · fertig" : ""}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
       <OwnersDialog open={dialog} onOpenChange={setDialog} />

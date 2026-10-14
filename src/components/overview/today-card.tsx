@@ -156,7 +156,7 @@ export function TodayCard({ tasks, orgs, today }: { tasks: Task[]; orgs: Org[]; 
         <span className="text-[12.5px] text-fg-3 tabular">{open} offen</span>
       </div>
       {rows.length === 0 ? (
-        <p className="border-t border-line px-3.5 py-5 text-[14px] text-fg-2">Für heute ist nichts offen. Neue Aufgaben legst du mit dem „+“ unten an.</p>
+        <p className="border-t border-line px-3.5 py-5 text-[14px] text-fg-2">Für heute ist nichts offen.</p>
       ) : (
         <ul>
           {rows.map((i) => {

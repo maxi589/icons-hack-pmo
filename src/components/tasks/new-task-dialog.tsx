@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useTeam } from "@/components/app-shell/team-provider";
 import type { Milestone } from "@/lib/data/use-milestones";
 import { milestoneOptions } from "@/lib/tasks";
@@ -87,7 +87,6 @@ export function NewTaskDialog({
       <DialogContent className="gap-4 p-5 sm:max-w-[460px]">
         <div className="flex flex-col gap-1 pr-8">
           <DialogTitle className="text-base font-semibold">Neue Aufgabe</DialogTitle>
-          <DialogDescription className="text-[13px] text-fg-2">Beschreibung und Kommentare ergänzt du danach im Detail.</DialogDescription>
         </div>
         <form onSubmit={submit} className="flex flex-col gap-3.5">
           <label className="flex flex-col gap-1.5">

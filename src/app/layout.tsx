@@ -4,6 +4,7 @@ import { GeistMono } from "geist/font/mono";
 import { Michroma } from "next/font/google";
 import { THEME_SCRIPT } from "@/lib/theme";
 import { SIDEBAR_SCRIPT } from "@/lib/sidebar";
+import { APP_NAME, EVENT_NAME } from "@/lib/brand";
 import "./globals.css";
 
 // next/font lädt Michroma beim Build herunter und liefert sie selbst aus (kein Abruf bei Google zur Laufzeit).
@@ -14,12 +15,12 @@ const michroma = Michroma({
 });
 
 export const metadata: Metadata = {
-  title: "icons Hackathon PMO",
-  description: "Steuerung für den icons Hackathon 2027",
+  title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
+  description: `Steuerung für ${EVENT_NAME} 2027`,
   robots: { index: false, follow: false },
   // iPhone: „Zum Home-Bildschirm“ startet ohne Safari-Leiste. Statusleiste „default“ statt „black-translucent“:
   // Durchsichtig hätte weiße Uhr-Schrift, die im Hellmodus auf hellem Grund verschwindet.
-  appleWebApp: { capable: true, title: "icons PMO", statusBarStyle: "default" },
+  appleWebApp: { capable: true, title: EVENT_NAME, statusBarStyle: "default" },
 };
 
 export const viewport: Viewport = {

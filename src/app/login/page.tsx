@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { LoginBackdrop } from "./login-backdrop";
 import { LoginCard } from "./login-card";
 
-export const metadata: Metadata = { title: "Anmelden · icons Hackathon PMO" };
+export const metadata: Metadata = { title: "Anmelden" };
 
 // Login immer dunkel (Klasse .dark setzt die dunklen Tokens), Hintergrund tiefschwarz.
 export default function LoginPage() {

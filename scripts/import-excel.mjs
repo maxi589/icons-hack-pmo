@@ -353,16 +353,19 @@ for (const o of partners.rows) {
   else seen.set(k, o.source);
 }
 
-// Jury ist eine eigene Anfrage mit eigener Stufe (Maxi, 14.10.): Eine Sponsor-Zusage ist keine Jury-Zusage.
-// „Sponsor/Jury“ wird deshalb zu zwei Einträgen, einer im Tab Sponsoren und einer im Tab Jury.
-const SRC_JURY = " · Jury";
-const splitCount = partners.rows.filter((o) => o.roles.includes("jury") && o.roles.length > 1).length;
-partners.rows = partners.rows.flatMap((o) =>
-  o.roles.includes("jury") && o.roles.length > 1
-    ? [{ ...o, roles: o.roles.filter((r) => r !== "jury") }, { ...o, roles: ["jury"], source: o.source + SRC_JURY }]
-    : [o]
-);
-if (splitCount) hints.push(`${splitCount} Firmen mit Jury und weiterer Rolle als zwei Einträge angelegt (eigene Stufe für die Jury-Anfrage)`);
+// „Sponsor/Jury“ wird nach Kategorie zugeordnet, ein Eintrag pro Firma (Entscheidung 14.10., Begriffe der Website):
+// VCs und Ecosystem geben Jury-Mitglieder → Tab „Jury & Ecosystem“, Konzerne → Supporter im Tab Sponsoren.
+const JURY_KINDS = ["vc", "ecosystem"];
+let toJury = 0;
+let toSponsor = 0;
+partners.rows = partners.rows.map((o) => {
+  if (!(o.roles.includes("jury") && o.roles.length > 1)) return o;
+  const jury = JURY_KINDS.includes((o.category ?? "").trim().toLowerCase());
+  if (jury) toJury++;
+  else toSponsor++;
+  return { ...o, roles: jury ? ["jury"] : o.roles.filter((r) => r !== "jury") };
+});
+if (toJury + toSponsor) hints.push(`„Sponsor/Jury“: ${toJury} VCs/Ecosystem → Jury & Ecosystem, ${toSponsor} Konzerne → Sponsoren`);
 const all = [...partners.rows, ...venues.rows];
 const { data: existing } = await db.from("organizations").select("name, source");
 const existingOther = existing.filter((e) => !e.source?.startsWith(SRC_PARTNER) && !e.source?.startsWith(SRC_VENUE));

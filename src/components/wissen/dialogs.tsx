@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useTeam } from "@/components/app-shell/team-provider";
 import type { DecisionPatch, LinkItem } from "@/lib/data/use-knowledge";
 import { parseTopic, PeoplePicker, TopicOptions, type Topic } from "./pickers";
@@ -81,7 +81,6 @@ export function NewDecisionDialog({
       <DialogContent className="max-h-[92dvh] gap-4 overflow-y-auto p-5 sm:max-w-[500px]">
         <div className="flex flex-col gap-1 pr-8">
           <DialogTitle className="text-base font-semibold">Entscheidung festhalten</DialogTitle>
-          <DialogDescription className="text-[13px] text-fg-2">Was nicht im Tool steht, gilt nicht als vereinbart.</DialogDescription>
         </div>
         <form onSubmit={submit} className="flex flex-col gap-3.5">
           <label className="flex flex-col gap-1.5">
@@ -209,7 +208,6 @@ export function LinkDialog({
       <DialogContent className="gap-4 p-5 sm:max-w-[440px]">
         <div className="flex flex-col gap-1 pr-8">
           <DialogTitle className="text-base font-semibold">{link ? "Link bearbeiten" : "Link hinzufügen"}</DialogTitle>
-          <DialogDescription className="text-[13px] text-fg-2">Für alles, was das Team immer wieder sucht: Pitch Deck, Website, Luma, Drive-Ordner.</DialogDescription>
         </div>
         <form onSubmit={submit} className="flex flex-col gap-3.5">
           <label className="flex flex-col gap-1.5">

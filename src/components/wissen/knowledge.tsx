@@ -72,7 +72,7 @@ export function Knowledge() {
   if (!k.decisions || !k.links || !today) {
     return (
       <>
-        <PageHeader title="Wissen & Entscheidungen" />
+        <PageHeader title="Wissen" />
         <div className="m-3.5 h-[420px] rounded-xl bg-card-2 md:m-5" aria-busy="true" aria-label="Wissen lädt" />
       </>
     );
@@ -109,7 +109,7 @@ export function Knowledge() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <PageHeader title="Wissen & Entscheidungen" action={{ label: "Entscheidung", onClick: () => setParams({ neu: "1" }) }} />
+      <PageHeader title="Wissen" action={{ label: "Entscheidung", onClick: () => setParams({ neu: "1" }) }} />
       <div className="flex min-h-0 flex-1">
         <div className="min-w-0 flex-1 md:overflow-auto">
           <div className="mx-auto grid w-full max-w-[1080px] gap-5 px-3.5 pt-2 pb-8 md:grid-cols-[minmax(0,1fr)_300px] md:px-6 md:pt-6">
@@ -162,9 +162,6 @@ export function Knowledge() {
               {k.decisions.length === 0 ? (
                 <div className="flex flex-col items-center gap-2.5 rounded-[14px] bg-card-2 px-4 py-12 text-center">
                   <p className="text-sm font-medium">Noch keine Entscheidungen</p>
-                  <p className="max-w-[360px] text-[13px] leading-normal text-fg-2">
-                    Wird im Call oder im WhatsApp-Chat etwas beschlossen, halte es hier fest: was, warum, wer und wann. Tipp: Taste E.
-                  </p>
                   <button
                     type="button"
                     onClick={() => setParams({ neu: "1" })}
@@ -174,7 +171,7 @@ export function Knowledge() {
                   </button>
                 </div>
               ) : visible.length === 0 ? (
-                <p className="px-1 py-6 text-center text-[13.5px] text-fg-2">Keine Treffer. Suche oder Bereich anpassen.</p>
+                <p className="px-1 py-6 text-center text-[13.5px] text-fg-2">Keine Treffer.</p>
               ) : (
                 months.map((m) => (
                   <div key={m} className="flex flex-col gap-2">
@@ -208,7 +205,7 @@ export function Knowledge() {
               </div>
               {k.links.length === 0 ? (
                 <p className="rounded-xl bg-card-2 px-3.5 py-4 text-[13px] leading-normal text-fg-2">
-                  Noch keine Links. Leg ab, was ihr ständig sucht: Pitch Deck, Website, Luma, Drive-Ordner.
+                  Noch keine Links.
                 </p>
               ) : (
                 <ul className="overflow-hidden rounded-xl bg-card shadow-card">

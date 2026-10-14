@@ -26,8 +26,10 @@ export const NEW_ACTIONS = [
   { href: "/wissen?neu=1", label: "Entscheidung festhalten", key: "E" },
 ] as const;
 
-// Die 7 Teilprojekte (Tabelle `areas`, ohne „Vorbereitung“). Feste IDs, damit die Seiten vorab gebaut werden.
-export const AREA_IDS = ["partner", "sponsoren", "venue", "marketing", "jury", "teilnehmer", "event"] as const;
+// Die 5 Bereiche (Tabelle `areas`, ohne Sammelzeile „Gesamtleitung“ = id vorbereitung). Feste IDs, damit die
+// Seiten vorab gebaut werden. Namen in der Datenbank: Venue & Event, Track-Partner, Sponsoren, Programm & Jury,
+// Marketing & Teilnehmer.
+export const AREA_IDS = ["venue", "partner", "sponsoren", "jury", "marketing"] as const;
 
 export function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);

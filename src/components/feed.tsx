@@ -55,7 +55,7 @@ export function Feed({
     <div className="flex flex-col gap-3.5">
       <h3 className="label-mono">Verlauf</h3>
       {items === null && <div className="h-10 rounded-lg bg-card-2" aria-busy="true" />}
-      {items?.length === 0 && <p className="text-[12.5px] text-fg-3">Noch nichts passiert. Schreib den ersten Kommentar.</p>}
+      {items?.length === 0 && <p className="text-[12.5px] text-fg-3">Noch keine Kommentare.</p>}
       <ol className="flex flex-col gap-3.5">
         {items?.map((it) =>
           it.kind === "activity" ? (
@@ -182,7 +182,7 @@ function Composer({ targetType, targetId }: { targetType: TargetType; targetId: 
         </button>
       </div>
       <p id={`cm-hint-${targetId}`} className="text-[11.5px] text-fg-3">
-        Strg + Enter sendet. Erwähnte sehen den Kommentar in ihrer Inbox.
+        Strg + Enter sendet
       </p>
       {error && (
         <p role="alert" className="text-[12.5px] text-st-red">

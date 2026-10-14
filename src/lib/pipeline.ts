@@ -52,28 +52,30 @@ export function nextStage(s: Stage): Stage | null {
 }
 
 export const ROLE_NAMES: Record<Role, string> = {
-  challenge: "Challenge-Partner",
-  sponsor: "Sponsor",
-  jury: "Jury",
-  tokens: "Credits",
+  challenge: "Track-Partner",
+  sponsor: "Supporter",
+  jury: "Jury & Ecosystem",
+  tokens: "Tech-Partner",
   venue: "Venue",
 };
 
 export type TabId = "partner" | "sponsoren" | "jury" | "venues";
 
-/** Tabs je Typ. Sponsoren umfasst auch Credits (Tokens). Ziel null = „Ziel offen“. */
+/** Tabs je Typ, Begriffe wie auf der Website. Sponsoren = Tech-Partner (Credits) + Supporter. Ziel null = „Ziel offen“. */
 export const TABS: {
   id: TabId;
   name: string;
+  /** Kurzname für die Tab-Leiste am Handy (alle 4 Tabs ohne Wischen sichtbar). */
+  short: string;
   roles: Role[];
   goalLabel: string;
   goal: number | null;
   goalStages: Stage[];
 }[] = [
-  { id: "partner", name: "Partner", roles: ["challenge"], goalLabel: "Challenge-Partner", goal: 4, goalStages: ["zugesagt", "fix"] },
-  { id: "sponsoren", name: "Sponsoren", roles: ["sponsor", "tokens"], goalLabel: "Sponsoren", goal: null, goalStages: ["zugesagt", "fix"] },
-  { id: "jury", name: "Jury", roles: ["jury"], goalLabel: "Jury", goal: 4, goalStages: ["zugesagt", "fix"] },
-  { id: "venues", name: "Venues", roles: ["venue"], goalLabel: "Venue fixiert", goal: 1, goalStages: ["fix"] },
+  { id: "partner", name: "Track-Partner", short: "Tracks", roles: ["challenge"], goalLabel: "Track-Partner", goal: 4, goalStages: ["zugesagt", "fix"] },
+  { id: "sponsoren", name: "Sponsoren", short: "Sponsoren", roles: ["sponsor", "tokens"], goalLabel: "Sponsoren", goal: null, goalStages: ["zugesagt", "fix"] },
+  { id: "jury", name: "Jury & Ecosystem", short: "Jury", roles: ["jury"], goalLabel: "Jury", goal: 4, goalStages: ["zugesagt", "fix"] },
+  { id: "venues", name: "Venues", short: "Venues", roles: ["venue"], goalLabel: "Venue fixiert", goal: 1, goalStages: ["fix"] },
 ];
 
 export const inTab = (o: Organization, tab: TabId) => o.roles.some((r) => TABS.find((t) => t.id === tab)!.roles.includes(r));

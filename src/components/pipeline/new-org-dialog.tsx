@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { ROLE_NAMES, type Organization, type Role } from "@/lib/pipeline";
 
@@ -74,7 +74,6 @@ export function NewOrgDialog({
       <DialogContent className="gap-4 p-5 sm:max-w-[460px]">
         <div className="flex flex-col gap-1 pr-8">
           <DialogTitle className="text-base font-semibold">Firma zur Pipeline hinzufügen</DialogTitle>
-          <DialogDescription className="text-[13px] text-fg-2">Startet in der Stufe „Recherche“. Alles andere kannst du später ergänzen.</DialogDescription>
         </div>
         <form onSubmit={submit} className="flex flex-col gap-3.5">
           <label className="flex flex-col gap-1.5">

@@ -12,6 +12,8 @@
 - Hell und dunkel sind gleichwertig. **Standard = Systemeinstellung** des Geräts. Umschalter in der Sidebar unten.
 - Genau zwei Wow-Momente: der Countdown als Live-Uhr (Michroma, Ziffern rollen) und „Meilenstein erledigt“ (Animation + Sound).
 - Keine icons-Farben (Wunsch von Maxi). Das Logo erscheint nur als einfarbiger Schriftzug „icons“ in Michroma.
+- **Eventname „hackvienna“** (Team, 14.10.): immer klein und zusammen. Steht nur als Text (Sidebar-Label „hackvienna 27“, Seitentitel „… · hackvienna PMO“, App-Name), zentral in `src/lib/brand.ts`.
+- **Wenig Text (Maxi, 14.10.):** keine Erklärsätze unter Überschriften, in Dialogen oder Leerzuständen. Leerzustand = ein kurzer Satz („Keine Treffer.“, „Noch keine Kommentare.“). Begriffe erklären sich über die Oberfläche, nicht über Hinweistexte.
 - **Ausnahme Login-Seite (Maxi, 13.10.):** immer dunkel, Hintergrund schwarz, oben mittig ein leichter Lime-Schimmer (atmet langsam) und ein weicher Lime-Schein unter dem Mauszeiger. Login-Karte mittig und schlicht. Gilt nur dort.
 - **Nicht verwenden:** Glas-Effekte, Glow (Ausnahme oben), animierte Sidebar, Kipp- und Magnet-Effekte, eigener Mauszeiger, WebGL. Außerdem keine Werte oder Code von uimaxx.ing und aicss.dev (beide untersagen KI-Nutzung).
 
@@ -45,7 +47,7 @@
 
 Wichtig: Dünne Lime-Linien auf Weiß sind unsichtbar. Im Hellmodus deshalb immer `--accLine` nehmen.
 
-**Bereichs-Farben** (nur als 7–8px-Punkte, nie als Text auf hell): Partner #a78bfa · Sponsoren #f472b6 · Venue #2dd4bf · Marketing #fb923c · Jury #facc15 · Teilnehmer #60a5fa · Event #f87171 · Vorbereitung #a1a1aa.
+**Bereichs-Farben** (nur als 7–8px-Punkte, nie als Text auf hell): Venue & Event #2dd4bf · Track-Partner #a78bfa · Sponsoren #f472b6 · Programm & Jury #facc15 · Marketing & Teilnehmer #fb923c · Gesamtleitung #a1a1aa (Sammelzeile, kein Bereich). **5 Bereiche seit 14.10.** (vorher 7; Event in Venue, Teilnehmer in Marketing), Reihenfolge = Ablauf.
 
 **Avatar-Farben** (Initialen #111): Maxi S #c4b5fd (MS) · Maxi D #fda4af (MD) · Manu #99f6e4 (MA) · Tim #fde68a (TI) · Kilian #bfdbfe (KI).
 
@@ -69,28 +71,28 @@ Wichtig: Dünne Lime-Linien auf Weiß sind unsichtbar. Im Hellmodus deshalb imme
 
 ## 5. Layout
 - **Desktop:** Sidebar 220px (Maxi, 14.10.: enger), auf ein 60px-Icon-Band einklappbar. Der Knopf zum Ein-/Ausklappen sitzt in beiden Zuständen an exakt derselben Stelle oben links. Hauptpanel eingerückt (8px), Radius 14, Ring. Übersicht-Inhalt max. 1080px breit, mittig. Pipeline über die volle Breite, rechts Detail-Sheet mit 400px.
-- **Sidebar:** Einklapp-Knopf + Logo · Suche (Strg K) · Übersicht, Inbox, Meine Aufgaben · HACKATHON: Roadmap, Pipeline, Aufgaben, Wissen · BEREICHE: 7 mit Bereichs-Zeichen (Ring = Fortschritt) und rechts der verantwortlichen Person als Mini-Avatar (gestrichelter Kreis = noch offen) · unten Avatar, Hell/Dunkel, Abmelden. Eingeklappt erscheinen die Bereichs-Zeichen ebenfalls. Kein Sound-Schalter (Maxi, 14.10.: Sounds sind Standard; Schalter nur in Strg+K und im Handy-Menü).
+- **Sidebar:** Einklapp-Knopf + Logo · Suche (Strg K) · Übersicht, Inbox, Meine Aufgaben · HACKATHON: Roadmap, Pipeline, Aufgaben, Wissen · BEREICHE: 5 mit Bereichs-Zeichen (Ring = Fortschritt) und rechts der verantwortlichen Person als Mini-Avatar (gestrichelter Kreis = noch offen) · unten Avatar, Hell/Dunkel, Abmelden. Eingeklappt erscheinen die Bereichs-Zeichen ebenfalls. Kein Sound-Schalter (Maxi, 14.10.: Sounds sind Standard; Schalter nur in Strg+K und im Handy-Menü).
 - **Handy:** Tab-Leiste: Heute · Pipeline · **+** (Akzent-Kreis 52px) · Aufgaben · Inbox. Bottom Sheets, `env(safe-area-inset-bottom)`, Tippflächen mind. 44px, **kein Ziehen & Ablegen** (Status per Sheet).
 
 ## 6. Seiten (siehe Boards)
 1. **Übersicht** (`Richtung-A-Graphit.dc.html`)
    - Keine Begrüßung (Maxi, 14.10.), stattdessen eine Label-Zeile „Mittwoch, 14. Oktober · Phase 1 von 5 · noch 4 Tage Vorbereitung“.
-   - Countdown-Karte als **Live-Uhr** (Maxi, 14.10., Variante B): Tage groß in Michroma, daneben Std : Min : Sek. Jede Ziffer rollt beim Wechsel (300 ms), die Tage rollen beim Öffnen einmal hoch (0,7 s). Ziel: Sa 27.2.2027, 09:00 Wien. Screenreader hören nur die Tage. Darunter der Phasen-Stepper mit 5 Segmenten (Vorbereitung bis 18.10., Outreach bis 18.12., Jury bis 15.1., Anmeldung bis 23.2., Event 27.–28.2.); das aktuelle Segment füllt sich in `--accLine`.
+   - Countdown-Karte als **Live-Uhr** (Maxi, 14.10., Variante B): Tage groß in Michroma, daneben Std : Min : Sek. Jede Ziffer rollt beim Wechsel (300 ms), die Tage rollen beim Öffnen einmal hoch (0,7 s). Ziel: Sa 27.2.2027, 09:00 Wien. Screenreader hören nur die Tage. Darunter der Phasen-Stepper mit 5 Segmenten (Vorbereitung bis 18.10., Akquise bis 18.12., Bewerbung bis 22.1., Programm bis 26.2., Event 27.–28.2.; Zeitplan vom 14.10.); das aktuelle Segment füllt sich in `--accLine`.
    - Karte „Nächster Meilenstein“ mit Unterpunkten und „x von n erledigt“.
-   - 4 Zielzahl-Kacheln: Challenge-Partner x/4, Jury x/4, Venue x/1 plus Backup, Sponsoren mit Ziel offen.
+   - 4 Zielzahl-Kacheln: Track-Partner x/4, Jury x/4, Venue x/1 plus Backup, Sponsoren mit Ziel offen.
    - „Als Nächstes fällig“, gruppiert nach Tag.
    - „Heute nachfassen“ mit Leerzustand: „Noch nichts nachzufassen. Welle 1 startet am Mo, 19.10. …“, darunter die Nachfass-Runden 2.11., 16.11. und 30.11.
    - Bereiche-Raster mit „Verantwortlich offen“ und dem Knopf „Zuständigkeiten verteilen“.
 2. **Roadmap** (`Graphit-Roadmap.dc.html`)
    - Zeilen je Bereich plus Vorbereitung. Zeitachse 1.10.2026–28.2.2027 (151 Tage, Monate proportional).
-   - Rauten für Meilensteine, Balken für Zeiträume: M3 vom 19.10. bis 18.12., M2 vom 19.10. bis 30.11., Sponsoren vom 16.11. bis 18.12., Anmeldung vom 5.2. bis 23.2.
+   - Rauten für Meilensteine, Balken für Zeiträume: M3 vom 19.10. bis 18.12., M2 vom 19.10. bis 30.11., Sponsoren vom 16.11. bis 18.12., Bewerbung vom 30.11. bis 22.1. (Zeile Marketing & Teilnehmer)
    - Gestrichelte Linien für die Nachfass-Runden, Heute-Linie in Akzent.
    - Klick auf einen Meilenstein öffnet ein Detail-Panel mit Excel-Beschreibung und Unterpunkten.
    - Umschalter Zeitstrahl/Liste. Am Handy nur die Liste.
 3. **Pipeline** (`Graphit-Pipeline.dc.html`)
-   - Tabs je Typ, Umschalter Board/Liste, Zielbalken, Zähler „heute“ und „überfällig“.
+   - Tabs je Typ mit den Begriffen der Website (14.10.): Track-Partner · Sponsoren (Tech-Partner + Supporter) · Jury & Ecosystem · Venues. Umschalter Board/Liste, Zielbalken, Zähler „heute“ und „überfällig“.
    - **Liste = CRM-Tabelle** (Maxi, 14.10., Variante D nach Prüfschleife, nur Desktop; am Handy bleibt die Liste): Firma (Kürzel, Name, darunter Kategorie · Ort) · Stufe · Prio · Nachfassen · Zuständig · Warmer Kontakt bzw. bei Venues Kapazität (kurz). 44px-Zeilen, keine Rasterlinien, keine Pills, nie seitliches Scrollen: Bei wenig Platz (Container unter 900px, z. B. Detail offen) fällt die letzte Spalte weg, unter 700px auch Prio. Standard-Sortierung Nachfassen (Überfälliges oben), jeder Spaltenkopf sortiert. Kopf und Firmenspalte kleben, unten Zähler je Stufe.
-   - „Sponsor/Jury“ aus der Excel wird beim Import zu zwei Einträgen (Sponsoren und Jury), weil jede Anfrage eine eigene Stufe braucht.
+   - „Sponsor/Jury“ aus der Excel wird beim Import nach Kategorie zugeordnet, ein Eintrag pro Firma (14.10., ersetzt den Split): VC und Ecosystem → Jury & Ecosystem, Konzerne → Supporter. Einzelne Finaljuror:innen legt man von Hand an.
    - Spalten: Recherche → Kontaktiert → Im Gespräch → Zugesagt → Fix · Abgesagt (schmal).
    - Karte: Initialen, Name, Prio, „warm über X · Welle n“, Nachfass-Chip (heute = Akzent, überfällig = rot), Avatar.
    - Detail-Sheet:

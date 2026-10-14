@@ -7,6 +7,7 @@ import { readFileSync } from "node:fs";
 const readJson = (p) => JSON.parse(readFileSync(new URL(`../${p}`, import.meta.url), "utf8"));
 const q = (v) => (v === null || v === undefined ? "null" : `'${String(v).replaceAll("'", "''")}'`);
 
+// Startstand vom 13.10. (7 Bereiche laut Excel). Umbau auf 5 Bereiche: supabase/migrations/20261014150000_bereiche_zeitplan.sql
 // Bereichs-Farben laut docs/design/Design-System.md
 const AREAS = [
   ["partner", "Partner", "#a78bfa", true],

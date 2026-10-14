@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Tasks } from "@/components/tasks/tasks";
 
-export const metadata: Metadata = { title: "Meine Aufgaben · icons Hackathon PMO" };
+export const metadata: Metadata = { title: "Meine Aufgaben" };
 
 export default function MyTasksPage() {
   return (

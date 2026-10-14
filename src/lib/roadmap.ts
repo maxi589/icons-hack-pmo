@@ -26,5 +26,5 @@ export function axisEdge(isoDate: string) {
 // Zeiträume ohne eigenen Meilenstein. M2 und M3 kommen mit start_date aus der Datenbank.
 export const PLAN_BARS = [
   { areaId: "sponsoren", from: "2026-11-16", to: "2026-12-18", label: "Welle 3 Sponsoren bis zur Fixierung", faint: true },
-  { areaId: "teilnehmer", from: "2027-02-05", to: "2027-02-23", label: "Anmeldung (Luma) bis zur Auswahl", faint: false },
+  { areaId: "marketing", from: "2026-11-30", to: "2027-01-22", label: "Bewerbung (Luma) bis zur Auswahl", faint: false },
 ];

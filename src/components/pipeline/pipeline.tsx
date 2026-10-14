@@ -167,7 +167,8 @@ export function Pipeline() {
               value: t.id,
               label: (
                 <>
-                  {t.name} <span className="text-fg-3 tabular">{all.filter((o) => inTab(o, t.id)).length}</span>
+                  <span className="md:hidden">{t.short}</span>
+                  <span className="max-md:hidden">{t.name}</span> <span className="text-fg-3 tabular">{all.filter((o) => inTab(o, t.id)).length}</span>
                 </>
               ),
             }))}
@@ -296,7 +297,7 @@ export function Pipeline() {
             <div className="md:hidden">
               <OrgList orgs={visible} today={today} selectedId={selectedId} onOpen={open} />
             </div>
-            {visible.length === 0 && <p className="px-5 py-8 text-center text-[13.5px] text-fg-2">Keine Treffer. Suche oder Filter anpassen.</p>}
+            {visible.length === 0 && <p className="px-5 py-8 text-center text-[13.5px] text-fg-2">Keine Treffer.</p>}
           </div>
       )}
         </div>
@@ -400,9 +401,6 @@ function EmptyTab({ tabName, onNew }: { tabName: string; onNew: () => void }) {
   return (
     <div className="m-3.5 flex flex-col items-center gap-2.5 rounded-[14px] bg-card-2 px-4 py-12 text-center md:m-5">
       <p className="text-sm font-medium">Noch keine Einträge bei {tabName}</p>
-      <p className="max-w-[340px] text-[13px] leading-normal text-fg-2">
-        Die Partner- und Venue-Listen kommen beim Import am 27.–29.10. hierher. Einzelne Einträge kannst du jetzt schon anlegen.
-      </p>
       <button type="button" onClick={onNew} className="mt-1 inline-flex h-8 items-center rounded-[9px] bg-acc px-3 text-[13px] font-medium text-acc-text">
         + Firma
       </button>

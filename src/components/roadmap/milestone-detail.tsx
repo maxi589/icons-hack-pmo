@@ -1,18 +1,21 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { Check, ListTodo, RotateCcw } from "lucide-react";
+import { Check, ChevronDown, ListTodo, MessageSquare, RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { Chip, DueChip } from "@/components/chip";
 import { MilestoneChecklist } from "@/components/milestone-checklist";
 import { CopyLinkButton } from "@/components/copy-link-button";
+import { Feed } from "@/components/feed";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { formatShort } from "@/lib/dates";
 import type { Milestone } from "@/lib/data/use-milestones";
 
 // Ein Meilenstein im Detail: Kopf, Beschreibung aus der Excel, Unterpunkte, Status, Link-Icon in der Ecke.
-// Unter dem Zeitstrahl als Detail-Panel, in der Liste als Karte.
+// Unter dem Zeitstrahl als Detail-Panel (Verlauf + Kommentare offen), in der Liste als Karte (Kommentare
+// aufklappbar, damit nicht alle Verläufe gleichzeitig laden; die per Direktlink markierte Karte startet offen).
 
 const ghostBtn =
   "inline-flex h-8 items-center gap-1.5 rounded-[9px] px-3 text-[13px] font-medium text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)] transition-[background,color,scale] duration-150 hover:bg-hover hover:text-fg active:scale-[.97]";
@@ -26,6 +29,7 @@ export function MilestoneDetail({
   onSelect,
   highlighted = false,
   as: Tag = "section",
+  feed = "toggle",
 }: {
   milestone: Milestone;
   subs: Milestone[];
@@ -35,11 +39,14 @@ export function MilestoneDetail({
   onSelect?: (id: string) => void;
   highlighted?: boolean;
   as?: "section" | "article";
+  feed?: "open" | "toggle";
 }) {
   const { areaById, personById } = useTeam();
   const area = areaById(m.area_id);
   const owner = personById(area?.owner_id);
   const done = m.status === "erledigt";
+  const [feedOpen, setFeedOpen] = useState(highlighted);
+  const showFeed = feed === "open" || feedOpen;
 
   return (
     <Tag
@@ -103,17 +110,28 @@ export function MilestoneDetail({
             <ListTodo className="size-3.5" aria-hidden />
             Aufgaben dazu
           </Link>
+          {feed === "toggle" && (
+            <button type="button" onClick={() => setFeedOpen((o) => !o)} aria-expanded={feedOpen} className={ghostBtn}>
+              <MessageSquare className="size-3.5" aria-hidden />
+              Kommentare
+              <ChevronDown className={cn("size-3.5 transition-transform duration-200 motion-reduce:transition-none", feedOpen && "rotate-180")} aria-hidden />
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="flex min-w-0 flex-[1_1_280px] flex-col gap-2">
-        <h3 className="label-mono">Gehört dazu</h3>
-        {subs.length > 0 ? (
+      {subs.length > 0 && (
+        <div className="flex min-w-0 flex-[1_1_280px] flex-col gap-2">
+          <h3 className="label-mono">Gehört dazu</h3>
           <MilestoneChecklist items={subs} onToggle={onToggle} showDate showId />
-        ) : (
-          <p className="text-[13px] text-fg-3">Keine Unterpunkte.</p>
-        )}
-      </div>
+        </div>
+      )}
+
+      {showFeed && (
+        <div className="min-w-0 basis-full border-t border-line pt-4">
+          <Feed targetType="milestone" targetId={m.id} describe={(a) => a.action} />
+        </div>
+      )}
     </Tag>
   );
 }

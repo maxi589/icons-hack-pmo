@@ -125,10 +125,7 @@ function OwnerCard({ areaId }: { areaId: string }) {
         {owner ? (
           <span className="truncate text-[16.5px] font-semibold tracking-[-0.01em]">{owner.name}</span>
         ) : (
-          <span className="flex flex-col gap-0.5">
-            <span className="text-[15px] font-medium text-st-amber">Verantwortlich offen</span>
-            <span className="text-[13px] text-fg-2">Wer kümmert sich um {area.name}?</span>
-          </span>
+          <span className="text-[15px] font-medium text-st-amber">Noch offen</span>
         )}
       </div>
       <label className="relative mt-auto inline-flex w-full items-center sm:w-[200px]">
@@ -279,7 +276,7 @@ function MilestonesCard({
         </Link>
       </div>
       {sorted.length === 0 && (
-        <p className="border-t border-line px-4 py-6 text-[13.5px] text-fg-2">Diesem Bereich ist kein Meilenstein zugeordnet.</p>
+        <p className="border-t border-line px-4 py-6 text-[13.5px] text-fg-2">Keine Meilensteine.</p>
       )}
       <ul>
         {sorted.map((m) => {
@@ -396,7 +393,7 @@ function TasksCard({
 
       {open.length === 0 ? (
         <p className="border-t border-line px-4 py-6 text-[13.5px] leading-normal text-fg-2">
-          {tasks.length === 0 ? "Noch keine Aufgaben in diesem Bereich." : "Alles erledigt. Nichts offen in diesem Bereich."}
+          Keine offenen Aufgaben.
         </p>
       ) : (
         <ul>

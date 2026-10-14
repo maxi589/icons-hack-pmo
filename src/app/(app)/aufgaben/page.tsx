@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Tasks } from "@/components/tasks/tasks";
 
-export const metadata: Metadata = { title: "Aufgaben · icons Hackathon PMO" };
+export const metadata: Metadata = { title: "Aufgaben" };
 
 // Suspense, weil die Seite ihren Zustand aus der Adresse liest (?aufgabe=…&bereich=…).
 export default function TasksPage() {

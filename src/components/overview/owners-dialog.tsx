@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useTeam } from "@/components/app-shell/team-provider";
 
 // „Zuständigkeiten verteilen“: je Bereich eine verantwortliche Person. Speichert sofort, gilt live für alle.
@@ -21,9 +21,6 @@ export function OwnersDialog({ open, onOpenChange }: { open: boolean; onOpenChan
       <DialogContent className="gap-4 p-5 sm:max-w-[440px]">
         <div className="flex flex-col gap-1 pr-8">
           <DialogTitle className="text-base font-semibold">Zuständigkeiten verteilen</DialogTitle>
-          <DialogDescription className="text-[13px] leading-normal text-fg-2">
-            Wer kümmert sich um welchen Bereich? Jede Änderung gilt sofort für alle.
-          </DialogDescription>
         </div>
 
         <div className="flex flex-col">

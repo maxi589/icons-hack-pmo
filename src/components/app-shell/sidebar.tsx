@@ -13,6 +13,7 @@ import { usePalette, signOut } from "./command-palette";
 import { Avatar } from "@/components/avatar";
 import { AreaGlyph } from "@/components/area-glyph";
 import { useMilestones } from "@/lib/data/use-milestones";
+import { EVENT_NAME } from "@/lib/brand";
 import { useTeam } from "./team-provider";
 
 // Desktop-Sidebar (ab 768px). Ausgeklappt 220px, eingeklappt 60px-Icon-Band.
@@ -113,7 +114,7 @@ export function Sidebar() {
           </button>
           <Link href="/" className="flex items-baseline gap-2.5 rounded-md">
             <span className="font-display text-base tracking-[0.05em]">icons</span>
-            <span className="label-mono text-[10px]!">Hackathon 27</span>
+            <span className="label-mono text-[10px]!">{EVENT_NAME} 27</span>
           </Link>
         </div>
 

@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Knowledge } from "@/components/wissen/knowledge";
 
-export const metadata: Metadata = { title: "Wissen & Entscheidungen · icons Hackathon PMO" };
+export const metadata: Metadata = { title: "Wissen" };
 
 // Suspense, weil die Seite ihren Zustand aus der Adresse liest (?entscheidung=…, ?neu=1).
 export default function KnowledgePage() {

@@ -85,6 +85,7 @@ export function Roadmap() {
                     today={today}
                     onToggle={setMilestoneDone}
                     onSelect={select}
+                    feed="open"
                   />
                 </div>
               )}

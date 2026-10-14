@@ -51,8 +51,7 @@ export function LoginCard() {
         {firstTime && (
           <>
             <p className="rounded-lg bg-card-2 px-3 py-2.5 text-[13px] leading-snug text-fg-2">
-              <span className="font-medium text-fg">Willkommen!</span> Du bist zum ersten Mal hier. Wiederhole dein
-              Passwort, dann ist es gespeichert.
+              <span className="font-medium text-fg">Erstes Mal hier?</span> Passwort wiederholen, dann ist es gespeichert.
             </p>
             <Field label="Passwort wiederholen">
               <Input name="confirm" type="password" autoComplete="new-password" required autoFocus className="h-10" />
@@ -72,7 +71,7 @@ export function LoginCard() {
       </form>
 
       <p className="text-[12.5px] leading-snug text-fg-3">
-        Nur für das Orga-Team. Passwort vergessen? Schreib Maxi S.
+        Passwort vergessen? Schreib Maxi S.
       </p>
     </div>
   );
