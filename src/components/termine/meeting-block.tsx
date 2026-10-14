@@ -39,7 +39,10 @@ export function MeetingBlock({
   if (api.meetings === false || !today) return null;
   const mine = (api.meetings ?? []).filter(match);
   const upcoming = mine.filter((m) => endOf(m).getTime() >= now);
-  const past = mine.filter((m) => endOf(m).getTime() < now).slice(-2).reverse();
+  const past = mine
+    .filter((m) => endOf(m).getTime() < now)
+    .slice(-2)
+    .reverse();
   const list = [...upcoming, ...past];
 
   return (
@@ -66,13 +69,19 @@ export function MeetingBlock({
             const day = viennaParts(m.starts_at).date;
             const isPast = endOf(m).getTime() < now;
             return (
-              <li key={m.id} className="relative flex min-h-11 items-center gap-2.5 border-t border-line px-3.5 first:border-t-0 hover:bg-hover max-md:min-h-12">
+              <li
+                key={m.id}
+                className="relative flex min-h-11 items-center gap-2.5 border-t border-line px-3.5 first:border-t-0 hover:bg-hover max-md:min-h-12"
+              >
                 <span className={cn("w-[112px] shrink-0 text-[12px] tabular", isPast ? "text-fg-3" : "text-fg-2")}>
                   {day === today ? "heute" : formatShort(day)} · {timeRange(m).split("–")[0]}
                 </span>
                 <Link
                   href={meetingHref(m.id)}
-                  className={cn("min-w-0 flex-1 truncate rounded-sm text-[13.5px] after:absolute after:inset-0 max-md:text-[15px]", isPast && "text-fg-2")}
+                  className={cn(
+                    "min-w-0 flex-1 truncate rounded-sm text-[13.5px] after:absolute after:inset-0 max-md:text-[15px]",
+                    isPast && "text-fg-2"
+                  )}
                 >
                   {m.title}
                 </Link>

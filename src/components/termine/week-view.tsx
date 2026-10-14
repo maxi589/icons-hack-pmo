@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { viennaParts, timeRange, plusDays, type Meeting } from "@/lib/meetings";
 import type { MeetingDefaults } from "./new-meeting-dialog";
+import { MeetingMenu } from "./meeting-menu";
 
 // Wochenansicht (nur Desktop): Mo–So mit Zeitraster. Oben ganztägig Meilensteine und Nachfass-Runden (nur lesen).
 // Ziehen über die Zeit legt einen Termin an (15-min-Raster), ein Klick auf eine freie Stelle ebenso (1 h).
@@ -29,11 +30,12 @@ function layoutDay(list: Meeting[]): Placed[] {
     })
     .sort((a, b) => a.start - b.start || b.end - a.end);
   const out: Placed[] = [];
-  let cluster: (typeof items[number] & { col: number })[] = [];
+  let cluster: ((typeof items)[number] & { col: number })[] = [];
   let clusterEnd = -1;
   const flush = () => {
     const cols = Math.max(1, ...cluster.map((c) => c.col + 1));
-    for (const c of cluster) out.push({ m: c.m, top: (c.start / 60) * HOUR, height: Math.max(((c.end - c.start) / 60) * HOUR, 22), col: c.col, cols });
+    for (const c of cluster)
+      out.push({ m: c.m, top: (c.start / 60) * HOUR, height: Math.max(((c.end - c.start) / 60) * HOUR, 22), col: c.col, cols });
     cluster = [];
   };
   for (const it of items) {
@@ -61,6 +63,7 @@ export function WeekView({
   selected,
   onOpen,
   onCreate,
+  onDelete,
 }: {
   monday: string;
   today: string;
@@ -69,6 +72,7 @@ export function WeekView({
   selected: string | null;
   onOpen: (m: Meeting) => void;
   onCreate: (d: MeetingDefaults) => void;
+  onDelete: (m: Meeting) => void;
 }) {
   const { areaById } = useTeam();
   const days = Array.from({ length: 7 }, (_, i) => plusDays(monday, i));
@@ -82,7 +86,10 @@ export function WeekView({
   }, []);
 
   // Beim Wochenwechsel zum ersten Termin (spätestens 8:00) scrollen.
-  const first = Math.min(8 * 60, ...meetings.filter((m) => days.includes(viennaParts(m.starts_at).date)).map((m) => viennaParts(m.starts_at).minutes));
+  const first = Math.min(
+    8 * 60,
+    ...meetings.filter((m) => days.includes(viennaParts(m.starts_at).date)).map((m) => viennaParts(m.starts_at).minutes)
+  );
   useEffect(() => {
     if (scroller.current) scroller.current.scrollTop = Math.max(0, (first / 60) * HOUR - 12);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- nur beim Wochenwechsel, nicht bei jeder Änderung
@@ -127,7 +134,15 @@ export function WeekView({
                       className="flex h-[22px] min-w-0 items-center gap-1.5 rounded-[6px] bg-card-2 px-1.5 text-[11.5px] text-fg-2 shadow-[inset_0_0_0_1px_var(--line)] hover:text-fg"
                     >
                       {a.kind === "milestone" ? (
-                        <svg viewBox="0 0 24 24" className="size-[10px] shrink-0" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinejoin="round" aria-hidden>
+                        <svg
+                          viewBox="0 0 24 24"
+                          className="size-[10px] shrink-0"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.4"
+                          strokeLinejoin="round"
+                          aria-hidden
+                        >
                           <path d="M12 3 21 12 12 21 3 12z" />
                         </svg>
                       ) : (
@@ -191,31 +206,32 @@ export function WeekView({
                   const sel = m.id === selected;
                   const short = height < 40;
                   return (
-                    <button
-                      key={m.id}
-                      type="button"
-                      onClick={() => onOpen(m)}
-                      aria-current={sel ? "true" : undefined}
-                      className={cn(
-                        "absolute flex flex-col overflow-hidden rounded-[7px] border-l-[3px] px-1.5 text-left transition-shadow duration-150",
-                        short ? "justify-center py-0" : "py-1",
-                        sel ? "shadow-[0_0_0_2px_var(--accLine)]" : "shadow-[0_0_0_1px_var(--line2)] hover:shadow-[0_0_0_1px_var(--field)]"
-                      )}
-                      style={{
-                        top: top + 1,
-                        height: height - 2,
-                        left: `calc(${(col / cols) * 100}% + 3px)`,
-                        width: `calc(${100 / cols}% - 6px)`,
-                        borderLeftColor: area?.color ?? "var(--line2)",
-                        background: area ? `color-mix(in oklab, ${area.color} 13%, var(--card))` : "var(--card2)",
-                      }}
-                    >
-                      <span className="flex min-w-0 items-start gap-1 text-[12px] leading-tight font-medium">
-                        {m.meet_url && <Video className="mt-px size-3 shrink-0 text-fg-2" aria-label="mit Meet-Link" />}
-                        <span className={cn("min-w-0", short ? "truncate" : "line-clamp-2")}>{m.title}</span>
-                      </span>
-                      {!short && <span className="truncate text-[11px] text-fg-2 tabular">{timeRange(m)}</span>}
-                    </button>
+                    <MeetingMenu key={m.id} meeting={m} onOpen={() => onOpen(m)} onDelete={() => onDelete(m)}>
+                      <button
+                        type="button"
+                        onClick={() => onOpen(m)}
+                        aria-current={sel ? "true" : undefined}
+                        className={cn(
+                          "absolute flex flex-col overflow-hidden rounded-[7px] border-l-[3px] px-1.5 text-left transition-shadow duration-150",
+                          short ? "justify-center py-0" : "py-1",
+                          sel ? "shadow-[0_0_0_2px_var(--accLine)]" : "shadow-[0_0_0_1px_var(--line2)] hover:shadow-[0_0_0_1px_var(--field)]"
+                        )}
+                        style={{
+                          top: top + 1,
+                          height: height - 2,
+                          left: `calc(${(col / cols) * 100}% + 3px)`,
+                          width: `calc(${100 / cols}% - 6px)`,
+                          borderLeftColor: area?.color ?? "var(--line2)",
+                          background: area ? `color-mix(in oklab, ${area.color} 13%, var(--card))` : "var(--card2)",
+                        }}
+                      >
+                        <span className="flex min-w-0 items-start gap-1 text-[12px] leading-tight font-medium">
+                          {m.meet_url && <Video className="mt-px size-3 shrink-0 text-fg-2" aria-label="mit Meet-Link" />}
+                          <span className={cn("min-w-0", short ? "truncate" : "line-clamp-2")}>{m.title}</span>
+                        </span>
+                        {!short && <span className="truncate text-[11px] text-fg-2 tabular">{timeRange(m)}</span>}
+                      </button>
+                    </MeetingMenu>
                   );
                 })}
                 {ghost && (

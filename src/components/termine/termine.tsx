@@ -24,11 +24,12 @@ import { useOrganizations } from "@/lib/data/use-organizations";
 import { useTasks } from "@/lib/data/use-tasks";
 import { useKnowledge } from "@/lib/data/use-knowledge";
 import { logActivity } from "@/lib/data/use-feed";
-import { plusDays, timeRange, viennaParts, weekLabel, weekStart, type Meeting } from "@/lib/meetings";
+import { plusDays, timeRange, viennaParts, weekLabel, weekStart, type Meeting, joinUrl } from "@/lib/meetings";
 import { MeetingDetail } from "./meeting-detail";
 import { NewMeetingDialog, type MeetingDefaults } from "./new-meeting-dialog";
 import { useMeetingActions } from "./use-meeting-actions";
 import { WeekView, type AllDay } from "./week-view";
+import { MeetingMenu } from "./meeting-menu";
 
 // Termine (Plan Welle 1, Schritt 3): Team-Meetings und Partner-Calls an einem Ort, mit Agenda, Notizen, Unterlagen
 // und Ergebnissen. Desktop: Woche (Standard) oder Liste; Handy: Liste. Detail rechts, zweiter Klick schließt.
@@ -67,9 +68,16 @@ export function Termine() {
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   };
   const open = (m: Meeting) => setParams({ termin: m.id === selId ? null : m.id });
+  /** Löschen (Rechtsklick oder Symbol im Detail), mit Rückgängig */
+  const remove = (m: Meeting) => {
+    if (m.id === selId) close();
+    actions.remove(m);
+  };
   const close = () => setParams({ termin: null });
 
-  const actions = useMeetingActions(api, tasksApi, { onOpen: (m) => setParams({ termin: m.id, neu: null, woche: weekStart(viennaParts(m.starts_at).date) }) });
+  const actions = useMeetingActions(api, tasksApi, {
+    onOpen: (m) => setParams({ termin: m.id, neu: null, woche: weekStart(viennaParts(m.starts_at).date) }),
+  });
 
   if (api.meetings === null || !today || !milestones) {
     return (
@@ -122,10 +130,7 @@ export function Termine() {
       onNewDecision={() => setNewDecision(true)}
       onNext={() => actions.createNext(meeting)}
       onCalendar={() => actions.openCalendar(meeting)}
-      onDelete={() => {
-        close();
-        actions.remove(meeting);
-      }}
+      onDelete={() => remove(meeting)}
       onClose={close}
     />
   ) : null;
@@ -205,7 +210,7 @@ export function Termine() {
           {api.meetings === false && <p className="px-5 py-8 text-center text-[13.5px] text-st-red">Termine konnten nicht geladen werden.</p>}
           {list ? (
             <div className="min-h-0 flex-1 md:overflow-y-auto">
-              <MeetingList meetings={shown} today={today} selected={selId} onOpen={open} onNew={() => startDraft()} />
+              <MeetingList meetings={shown} today={today} selected={selId} onOpen={open} onDelete={remove} onNew={() => startDraft()} />
             </div>
           ) : (
             <WeekView
@@ -216,6 +221,7 @@ export function Termine() {
               selected={selId}
               onOpen={open}
               onCreate={(d) => startDraft(d)}
+              onDelete={remove}
             />
           )}
         </div>
@@ -280,12 +286,14 @@ function MeetingList({
   today,
   selected,
   onOpen,
+  onDelete,
   onNew,
 }: {
   meetings: Meeting[];
   today: string;
   selected: string | null;
   onOpen: (m: Meeting) => void;
+  onDelete: (m: Meeting) => void;
   onNew: () => void;
 }) {
   const [past, setPast] = useState(false);
@@ -308,7 +316,7 @@ function MeetingList({
   return (
     <div className="mx-auto flex w-full max-w-[900px] flex-col gap-4 px-3.5 pb-8 md:px-6 md:pt-5">
       {upcoming.length === 0 && <p className="rounded-[14px] bg-card-2 px-4 py-8 text-center text-[13.5px] text-fg-2">Keine kommenden Termine.</p>}
-      <DayGroups meetings={upcoming} today={today} selected={selected} onOpen={onOpen} />
+      <DayGroups meetings={upcoming} today={today} selected={selected} onOpen={onOpen} onDelete={onDelete} />
       {before.length > 0 && (
         <div className="flex flex-col gap-3">
           <button
@@ -320,14 +328,26 @@ function MeetingList({
             Vergangene <span className="font-normal text-fg-3 tabular">{before.length}</span>
             <ChevronDown className={cn("size-3.5 text-fg-3 transition-transform duration-200", past && "rotate-180")} aria-hidden />
           </button>
-          {past && <DayGroups meetings={before} today={today} selected={selected} onOpen={onOpen} />}
+          {past && <DayGroups meetings={before} today={today} selected={selected} onOpen={onOpen} onDelete={onDelete} />}
         </div>
       )}
     </div>
   );
 }
 
-function DayGroups({ meetings, today, selected, onOpen }: { meetings: Meeting[]; today: string; selected: string | null; onOpen: (m: Meeting) => void }) {
+function DayGroups({
+  meetings,
+  today,
+  selected,
+  onOpen,
+  onDelete,
+}: {
+  meetings: Meeting[];
+  today: string;
+  selected: string | null;
+  onOpen: (m: Meeting) => void;
+  onDelete: (m: Meeting) => void;
+}) {
   const { areaById, personById, me } = useTeam();
   const { orgs } = useOrganizations();
   const days = [...new Set(meetings.map((m) => viennaParts(m.starts_at).date))];
@@ -347,48 +367,57 @@ function DayGroups({ meetings, today, selected, onOpen }: { meetings: Meeting[];
                 const sub = [m.location, org?.name].filter(Boolean).join(" · ");
                 const others = m.attendees.map((id) => personById(id)).filter((p) => !!p);
                 return (
-                  <li
-                    key={m.id}
-                    className={cn(
-                      "relative flex min-h-14 items-center gap-3 border-t border-line px-3.5 py-2.5 first:border-t-0",
-                      m.id === selected ? "bg-active" : "hover:bg-hover"
-                    )}
-                  >
-                    <span className="w-[86px] shrink-0 text-[12.5px] text-fg-2 tabular max-md:w-[78px]">{timeRange(m)}</span>
-                    <span className="h-8 w-[3px] shrink-0 rounded-full bg-line-2" style={area ? { background: area.color } : undefined} aria-hidden />
-                    <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <button
-                        type="button"
-                        onClick={() => onOpen(m)}
-                        aria-current={m.id === selected ? "true" : undefined}
-                        className="flex min-w-0 items-center gap-1.5 rounded-sm text-left text-[14px] font-medium after:absolute after:inset-0 max-md:text-[15px]"
-                      >
-                        <span className="truncate">{m.title}</span>
-                        {me && m.attendees.includes(me.id) && <span className="sr-only">, du bist dabei</span>}
-                      </button>
-                      {(sub || area) && <span className="truncate text-[12.5px] text-fg-3">{[area?.name, sub].filter(Boolean).join(" · ")}</span>}
-                    </span>
-                    {m.meet_url && (
-                      <a
-                        href={m.meet_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="relative z-[1] grid size-8 shrink-0 place-items-center rounded-lg text-fg-3 hover:bg-active hover:text-fg max-md:size-10"
-                        aria-label={`„${m.title}“ beitreten`}
-                        title="Beitreten"
-                      >
-                        <Video className="size-4" aria-hidden />
-                      </a>
-                    )}
-                    <span className="flex shrink-0 -space-x-1.5 max-sm:hidden">
-                      {others.slice(0, 4).map((p) => (
-                        <span key={p.id} className="rounded-full shadow-[0_0_0_2px_var(--card)]">
-                          <Avatar person={p} size={22} />
-                        </span>
-                      ))}
-                      {others.length > 4 && <span className="grid size-[22px] place-items-center rounded-full bg-active text-[10px] text-fg-2">+{others.length - 4}</span>}
-                    </span>
-                  </li>
+                  <MeetingMenu key={m.id} meeting={m} onOpen={() => onOpen(m)} onDelete={() => onDelete(m)}>
+                    <li
+                      className={cn(
+                        "relative flex min-h-14 items-center gap-3 border-t border-line px-3.5 py-2.5 first:border-t-0",
+                        m.id === selected ? "bg-active" : "hover:bg-hover"
+                      )}
+                    >
+                      <span className="w-[86px] shrink-0 text-[12.5px] text-fg-2 tabular max-md:w-[78px]">{timeRange(m)}</span>
+                      <span
+                        className="h-8 w-[3px] shrink-0 rounded-full bg-line-2"
+                        style={area ? { background: area.color } : undefined}
+                        aria-hidden
+                      />
+                      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                        <button
+                          type="button"
+                          onClick={() => onOpen(m)}
+                          aria-current={m.id === selected ? "true" : undefined}
+                          className="flex min-w-0 items-center gap-1.5 rounded-sm text-left text-[14px] font-medium after:absolute after:inset-0 max-md:text-[15px]"
+                        >
+                          <span className="truncate">{m.title}</span>
+                          {me && m.attendees.includes(me.id) && <span className="sr-only">, du bist dabei</span>}
+                        </button>
+                        {(sub || area) && <span className="truncate text-[12.5px] text-fg-3">{[area?.name, sub].filter(Boolean).join(" · ")}</span>}
+                      </span>
+                      {joinUrl(m) && (
+                        <a
+                          href={joinUrl(m)!}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="relative z-[1] grid size-8 shrink-0 place-items-center rounded-lg text-fg-3 hover:bg-active hover:text-fg max-md:size-10"
+                          aria-label={`„${m.title}“ beitreten`}
+                          title="Beitreten"
+                        >
+                          <Video className="size-4" aria-hidden />
+                        </a>
+                      )}
+                      <span className="flex shrink-0 -space-x-1.5 max-sm:hidden">
+                        {others.slice(0, 4).map((p) => (
+                          <span key={p.id} className="rounded-full shadow-[0_0_0_2px_var(--card)]">
+                            <Avatar person={p} size={22} />
+                          </span>
+                        ))}
+                        {others.length > 4 && (
+                          <span className="grid size-[22px] place-items-center rounded-full bg-active text-[10px] text-fg-2">
+                            +{others.length - 4}
+                          </span>
+                        )}
+                      </span>
+                    </li>
+                  </MeetingMenu>
                 );
               })}
           </ul>

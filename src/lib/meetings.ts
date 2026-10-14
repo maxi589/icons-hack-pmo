@@ -1,6 +1,7 @@
 import { addDays, format, parseISO } from "date-fns";
 import { de } from "date-fns/locale";
 import { TIME_ZONE } from "./dates";
+import { normalizeUrl } from "./documents";
 
 // Termine (Plan Welle 1, Schritt 3). Beginn ist ein echter Zeitpunkt (timestamptz), angezeigt immer in Wien.
 // Deshalb rutscht nichts über die Zeitumstellung am 25.10.: 10:00 bleibt 10:00 Wiener Zeit.
@@ -112,8 +113,13 @@ export function openItems(markdown: string) {
  * Gäste über `add` (kommagetrennte Mails). Google verschickt dann Einladung und Erinnerung, das Tool keine Mails.
  */
 export function googleCalendarUrl(m: Meeting, opts: { link: string; guests: string[] }) {
-  const stamp = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-  const details = [m.meet_url ? `Meet: ${m.meet_url}` : "", `Agenda und Notizen: ${opts.link}`].filter(Boolean).join("\n");
+  const stamp = (d: Date) =>
+    d
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .replace(/\.\d{3}/, "");
+  const meet = joinUrl(m);
+  const details = [meet ? `Meet: ${meet}` : "", `Agenda und Notizen: ${opts.link}`].filter(Boolean).join("\n");
   const q = new URLSearchParams({
     action: "TEMPLATE",
     text: m.title,
@@ -121,8 +127,22 @@ export function googleCalendarUrl(m: Meeting, opts: { link: string; guests: stri
     details,
     ctz: TIME_ZONE,
   });
-  const where = m.location || m.meet_url;
+  const where = m.location || meet;
   if (where) q.set("location", where);
   if (opts.guests.length) q.set("add", opts.guests.join(","));
   return `https://calendar.google.com/calendar/render?${q.toString()}`;
 }
+
+/**
+ * Meet-Link aus eingefügtem Text: Google kopiert mit „Teilnahmeinformationen kopieren“ einen ganzen Block
+ * (Titel, Zeit, Link, Telefonnummer, PIN). Genommen wird der meet.google.com-Link, sonst der erste Link.
+ */
+export function meetUrlFrom(text: string): string | null {
+  const meet = text.match(/https?:\/\/meet\.google\.com\/[a-z0-9-]+/i) ?? text.match(/\bmeet\.google\.com\/[a-z0-9-]+/i);
+  if (meet) return normalizeUrl(meet[0]);
+  const any = text.match(/https?:\/\/\S+/i);
+  return normalizeUrl(any ? any[0] : text);
+}
+
+/** Link für „Beitreten“ (auch für ältere Einträge, in denen der ganze Google-Block steht). */
+export const joinUrl = (m: Pick<Meeting, "meet_url">) => (m.meet_url ? meetUrlFrom(m.meet_url) : null);

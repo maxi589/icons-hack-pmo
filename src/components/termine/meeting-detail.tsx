@@ -13,11 +13,21 @@ import { StatusCheck } from "@/components/tasks/status-check";
 import { PeoplePicker } from "@/components/wissen/pickers";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { formatLong } from "@/lib/dates";
-import { normalizeUrl } from "@/lib/documents";
 import type { Decision } from "@/lib/data/use-knowledge";
 import type { Organization } from "@/lib/pipeline";
 import type { Task } from "@/lib/tasks";
-import { DURATIONS, durationLabel, fromVienna, meetingHref, timeRange, viennaParts, type Meeting, type MeetingPatch } from "@/lib/meetings";
+import {
+  DURATIONS,
+  durationLabel,
+  fromVienna,
+  meetingHref,
+  timeRange,
+  viennaParts,
+  type Meeting,
+  type MeetingPatch,
+  joinUrl,
+  meetUrlFrom,
+} from "@/lib/meetings";
 
 // Termin-Detail (rechts 460px, am Handy als Bottom Sheet): Wann · Wo · Wer · Firma · Bereich, Agenda und Notizen im
 // gemeinsamen Editor, Unterlagen (Dokumente am Termin), Ergebnisse (Aufgaben und Entscheidungen aus dem Termin), Verlauf.
@@ -90,6 +100,15 @@ export function MeetingDetail({
           <CopyLinkButton path={meetingHref(m.id)} label="Link zu diesem Termin kopieren" />
           <button
             type="button"
+            onClick={onDelete}
+            title="Termin löschen"
+            className="grid size-8 shrink-0 place-items-center rounded-lg text-fg-3 transition-colors duration-150 hover:bg-hover hover:text-st-red max-md:size-11"
+            aria-label="Termin löschen"
+          >
+            <Trash2 className="size-4" aria-hidden />
+          </button>
+          <button
+            type="button"
             onClick={onClose}
             className="grid size-8 shrink-0 place-items-center rounded-lg text-fg-3 hover:bg-hover hover:text-fg max-md:size-11"
             aria-label="Detail schließen"
@@ -98,9 +117,9 @@ export function MeetingDetail({
           </button>
         </div>
         <div className="flex flex-wrap gap-1.5">
-          {m.meet_url && (
+          {joinUrl(m) && (
             <a
-              href={m.meet_url}
+              href={joinUrl(m)!}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex h-8 items-center gap-1.5 rounded-[9px] bg-acc px-3 text-[12.5px] font-medium text-acc-text transition-[scale] duration-150 active:scale-[.97] max-md:h-11 max-md:text-[14px]"
@@ -163,7 +182,17 @@ export function MeetingDetail({
         </PropRow>
         <PropRow label="Meet-Link" htmlFor={f("meet")}>
           {/* Der Meet-Link kommt aus Google (Google hängt beim Eintragen selbst einen an), sonst gibt es zwei Calls. */}
-          <EditText id={f("meet")} value={m.meet_url} placeholder="aus Google einfügen" onSave={(v) => onUpdate({ meet_url: v ? normalizeUrl(v) ?? v : null })} />
+          <EditText
+            id={f("meet")}
+            value={joinUrl(m) ?? m.meet_url}
+            placeholder="aus Google einfügen"
+            onSave={(v) => {
+              // Ganzen Google-Block eingefügt? Nur den Link nehmen; ohne Link nichts ändern.
+              const url = v ? meetUrlFrom(v) : null;
+              if (v && !url) return;
+              onUpdate({ meet_url: url });
+            }}
+          />
         </PropRow>
         <PropRow label="Wer">
           <div className="py-1">
@@ -261,15 +290,24 @@ export function MeetingDetail({
         {tasks.length + decisions.length > 0 && (
           <ul className="overflow-hidden rounded-[10px] shadow-[0_0_0_1px_var(--line)]">
             {decisions.map((d) => (
-              <li key={d.id} className="relative flex min-h-11 items-center gap-2.5 border-t border-line px-3.5 first:border-t-0 hover:bg-hover max-md:min-h-12">
+              <li
+                key={d.id}
+                className="relative flex min-h-11 items-center gap-2.5 border-t border-line px-3.5 first:border-t-0 hover:bg-hover max-md:min-h-12"
+              >
                 <Gavel className="size-3.5 shrink-0 text-fg-3" aria-label="Entscheidung" />
-                <Link href={`/dokumente?entscheidung=${d.id}`} className="min-w-0 flex-1 truncate rounded-sm text-[13.5px] after:absolute after:inset-0 max-md:text-[15px]">
+                <Link
+                  href={`/dokumente?entscheidung=${d.id}`}
+                  className="min-w-0 flex-1 truncate rounded-sm text-[13.5px] after:absolute after:inset-0 max-md:text-[15px]"
+                >
                   {d.title}
                 </Link>
               </li>
             ))}
             {tasks.map((t) => (
-              <li key={t.id} className="relative flex min-h-11 items-center gap-2.5 border-t border-line px-3.5 first:border-t-0 hover:bg-hover max-md:min-h-12">
+              <li
+                key={t.id}
+                className="relative flex min-h-11 items-center gap-2.5 border-t border-line px-3.5 first:border-t-0 hover:bg-hover max-md:min-h-12"
+              >
                 <StatusCheck status={t.status} title={t.title} onToggle={() => onToggleTask(t)} />
                 <Link
                   href={`/aufgaben?aufgabe=${t.id}`}
@@ -286,22 +324,13 @@ export function MeetingDetail({
         )}
       </section>
 
-      <div className="flex justify-end px-[18px] pt-2">
-        <button
-          type="button"
-          onClick={onDelete}
-          className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-[12.5px] text-fg-3 transition-colors duration-150 hover:bg-hover hover:text-st-red max-md:min-h-11"
-        >
-          <Trash2 className="size-3.5" aria-hidden />
-          Termin löschen
-        </button>
-      </div>
-
-      <div className="px-[18px] pt-2 pb-6">
+      <div className="px-[18px] pt-3.5 pb-6">
         <Feed
           targetType="meeting"
           targetId={m.id}
-          describe={(a) => (a.action === "created" ? "hat den Termin angelegt" : a.action === "next_created" ? "hat den nächsten Termin angelegt" : a.action)}
+          describe={(a) =>
+            a.action === "created" ? "hat den Termin angelegt" : a.action === "next_created" ? "hat den nächsten Termin angelegt" : a.action
+          }
         />
       </div>
     </div>

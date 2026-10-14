@@ -14,7 +14,7 @@ import { formatShort } from "@/lib/dates";
 import { shiftFollowUp, TABS } from "@/lib/pipeline";
 import { targetHref } from "@/lib/links";
 import { play } from "@/lib/sounds";
-import { endOf, meetingHref, timeRange, viennaParts, type Meeting } from "@/lib/meetings";
+import { endOf, meetingHref, timeRange, viennaParts, type Meeting, joinUrl } from "@/lib/meetings";
 import { useNow } from "@/lib/use-today";
 import type { Org, Task } from "./use-overview-data";
 
@@ -102,14 +102,18 @@ export function TodayCard({ tasks, orgs, meetings, today }: { tasks: Task[]; org
         .update({ status: done ? "erledigt" : "offen", done_at: done ? new Date().toISOString() : null })
         .eq("id", i.id);
     } else if (i.kind === "follow") {
-      await supabase.from("organizations").update({ next_follow_up: done ? shiftFollowUp(null, today, 7) : i.date }).eq("id", i.id);
+      await supabase
+        .from("organizations")
+        .update({ next_follow_up: done ? shiftFollowUp(null, today, 7) : i.date })
+        .eq("id", i.id);
     } else {
       await setRead([i.id], done);
     }
   };
 
   const log = (i: Item, done: boolean) => {
-    if (i.kind === "task") logActivity("task", i.id, me.id, "status_changed", done ? { from: "offen", to: "erledigt" } : { from: "erledigt", to: "offen" });
+    if (i.kind === "task")
+      logActivity("task", i.id, me.id, "status_changed", done ? { from: "offen", to: "erledigt" } : { from: "erledigt", to: "offen" });
     if (i.kind === "follow" && done) logActivity("organization", i.id, me.id, "followed_up", { date: i.date, next: shiftFollowUp(null, today, 7) });
   };
 
@@ -121,7 +125,10 @@ export function TodayCard({ tasks, orgs, meetings, today }: { tasks: Task[]; org
     play("taskDone");
     if (i.kind === "mention") return;
     toast({
-      text: i.kind === "task" ? `„${i.title}“ erledigt` : `${i.title.replace(/ nachfassen$/, "")} nachgefasst · wieder am ${formatShort(shiftFollowUp(null, today, 7))}`,
+      text:
+        i.kind === "task"
+          ? `„${i.title}“ erledigt`
+          : `${i.title.replace(/ nachfassen$/, "")} nachgefasst · wieder am ${formatShort(shiftFollowUp(null, today, 7))}`,
       onAction: () => uncheck(i),
       onExpire: () => {
         if (entries.current.get(i.key) !== entry) return;
@@ -171,9 +178,9 @@ export function TodayCard({ tasks, orgs, meetings, today }: { tasks: Task[]; org
                 </Link>
                 <span className="text-[12px] text-fg-3 tabular">{timeRange(m)}</span>
               </span>
-              {m.meet_url && (
+              {joinUrl(m) && (
                 <a
-                  href={m.meet_url}
+                  href={joinUrl(m)!}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="relative z-[1] grid size-11 shrink-0 place-items-center rounded-[9px] text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)]"
@@ -198,7 +205,13 @@ export function TodayCard({ tasks, orgs, meetings, today }: { tasks: Task[]; org
                   type="button"
                   onClick={() => (done ? uncheck(i) : check(i))}
                   aria-pressed={done}
-                  aria-label={done ? `„${i.title}“ wieder öffnen` : i.kind === "mention" ? `„${i.title}“ als gelesen markieren` : `„${i.title}“ als erledigt markieren`}
+                  aria-label={
+                    done
+                      ? `„${i.title}“ wieder öffnen`
+                      : i.kind === "mention"
+                        ? `„${i.title}“ als gelesen markieren`
+                        : `„${i.title}“ als erledigt markieren`
+                  }
                   className={cn(
                     "relative z-[1] grid size-[26px] shrink-0 place-items-center rounded-full transition-[background,box-shadow,scale] duration-150 active:scale-90",
                     "before:absolute before:-inset-[9px] before:content-['']",
@@ -208,17 +221,14 @@ export function TodayCard({ tasks, orgs, meetings, today }: { tasks: Task[]; org
                   {done && <Check className="size-3.5" strokeWidth={3} aria-hidden />}
                 </button>
                 <span className="flex min-w-0 flex-1 flex-col gap-1">
-                  <Link href={i.href} className={cn("line-clamp-2 rounded-sm text-[15px] leading-snug after:absolute after:inset-0", done && "text-fg-3 line-through")}>
+                  <Link
+                    href={i.href}
+                    className={cn("line-clamp-2 rounded-sm text-[15px] leading-snug after:absolute after:inset-0", done && "text-fg-3 line-through")}
+                  >
                     {i.title}
                   </Link>
                   <span className="flex min-w-0 items-center gap-1.5">
-                    {i.kind === "mention" ? (
-                      <Chip>Erwähnung</Chip>
-                    ) : (
-                      <Chip tone={i.late ? "red" : "today"}>
-                        {i.late ? "überfällig" : "heute"}
-                      </Chip>
-                    )}
+                    {i.kind === "mention" ? <Chip>Erwähnung</Chip> : <Chip tone={i.late ? "red" : "today"}>{i.late ? "überfällig" : "heute"}</Chip>}
                     {i.meta && <span className="truncate text-[12px] text-fg-3">{i.meta}</span>}
                   </span>
                 </span>

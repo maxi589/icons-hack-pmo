@@ -130,15 +130,15 @@ export function NewMeetingDialog({
             <PeoplePicker label="Wer ist dabei" value={whoValue} onChange={setWho} />
           </div>
           <label className="flex flex-col gap-1.5">
-              <span className={label}>Bereich</span>
-              <select value={area ?? defaults.area_id ?? ""} onChange={(e) => setArea(e.target.value)} className={field}>
-                <option value="">Keiner</option>
-                {allAreas.map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.name}
-                  </option>
-                ))}
-              </select>
+            <span className={label}>Bereich</span>
+            <select value={area ?? defaults.area_id ?? ""} onChange={(e) => setArea(e.target.value)} className={field}>
+              <option value="">Keiner</option>
+              {allAreas.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
+              ))}
+            </select>
           </label>
           {error && (
             <p role="alert" className="text-[13px] text-st-red">
