@@ -13,6 +13,7 @@ import { MeetingMenu } from "./meeting-menu";
 
 // Wochenansicht (nur Desktop): Mo–So mit Zeitraster. Oben ganztägig Meilensteine und Nachfass-Runden (nur lesen).
 // Ziehen über die Zeit legt einen Termin an (15-min-Raster), ein Klick auf eine freie Stelle ebenso (1 h).
+// Termin ziehen verschiebt ihn (auch auf einen anderen Tag), unteren Rand ziehen ändert die Dauer; ein Klick öffnet das Detail.
 
 const HOUR = 48; // px je Stunde
 const SNAP = 15; // min
@@ -53,6 +54,19 @@ function layoutDay(list: Meeting[]): Placed[] {
   return out;
 }
 
+/** Termin verschieben bzw. Dauer ziehen; `moved` unterscheidet Ziehen von einem Klick. */
+type Move = {
+  m: Meeting;
+  mode: "move" | "resize";
+  x: number;
+  y: number;
+  from: { day: string; start: number; dur: number };
+  day: string;
+  start: number;
+  dur: number;
+  moved: boolean;
+};
+
 const hhmm = (min: number) => `${String(Math.floor(min / 60)).padStart(2, "0")}:${String(min % 60).padStart(2, "0")}`;
 
 export function WeekView({
@@ -64,6 +78,7 @@ export function WeekView({
   onOpen,
   onCreate,
   onDelete,
+  onMove,
 }: {
   monday: string;
   today: string;
@@ -73,12 +88,23 @@ export function WeekView({
   onOpen: (m: Meeting) => void;
   onCreate: (d: MeetingDefaults) => void;
   onDelete: (m: Meeting) => void;
+  /** Verschoben bzw. Dauer geändert (Wiener Datum, Minuten seit Mitternacht, Dauer) */
+  onMove: (m: Meeting, date: string, minutes: number, duration: number) => void;
 }) {
   const { areaById } = useTeam();
   const days = Array.from({ length: 7 }, (_, i) => plusDays(monday, i));
   const scroller = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState<{ day: string; from: number; to: number } | null>(null);
   const [now, setNow] = useState(() => viennaParts(new Date()).minutes);
+  const grid = useRef<HTMLDivElement>(null);
+  // Zusätzlich in einer Ref, damit Loslassen den neuesten Stand kennt, auch wenn noch nicht neu gezeichnet wurde.
+  const [move, setMoveState] = useState<Move | null>(null);
+  const moveRef = useRef<Move | null>(null);
+  const setMove = (v: Move | null) => {
+    moveRef.current = v;
+    setMoveState(v);
+  };
+  const suppressClick = useRef(false);
 
   useEffect(() => {
     const id = setInterval(() => setNow(viennaParts(new Date()).minutes), 60_000);
@@ -164,7 +190,7 @@ export function WeekView({
 
       {/* Zeitraster */}
       <div ref={scroller} className="min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]">
-        <div className="relative grid grid-cols-[52px_repeat(7,minmax(0,1fr))]" style={{ height: 24 * HOUR }}>
+        <div ref={grid} className="relative grid grid-cols-[52px_repeat(7,minmax(0,1fr))]" style={{ height: 24 * HOUR }}>
           <div className="relative" aria-hidden>
             {Array.from({ length: 23 }, (_, i) => (
               <span key={i} className="absolute right-2 -translate-y-1/2 text-[11px] text-fg-3 tabular" style={{ top: (i + 1) * HOUR }}>
@@ -175,6 +201,7 @@ export function WeekView({
           {days.map((d) => {
             const placed = layoutDay(meetings.filter((m) => viennaParts(m.starts_at).date === d));
             const ghost = drag?.day === d ? drag : null;
+            const moving = move?.moved && move.day === d ? move : null;
             return (
               <div
                 key={d}
@@ -205,14 +232,57 @@ export function WeekView({
                   const area = areaById(m.area_id);
                   const sel = m.id === selected;
                   const short = height < 40;
+                  const dragged = move?.moved && move.m.id === m.id;
                   return (
                     <MeetingMenu key={m.id} meeting={m} onOpen={() => onOpen(m)} onDelete={() => onDelete(m)}>
                       <button
                         type="button"
-                        onClick={() => onOpen(m)}
+                        onClick={() => {
+                          if (suppressClick.current) {
+                            suppressClick.current = false;
+                            return;
+                          }
+                          onOpen(m);
+                        }}
+                        onPointerDown={(e) => {
+                          if (e.button !== 0 || e.pointerType === "touch") return;
+                          e.stopPropagation();
+                          e.currentTarget.setPointerCapture(e.pointerId);
+                          const p = viennaParts(m.starts_at);
+                          const from = { day: p.date, start: p.minutes, dur: m.duration_min };
+                          const mode = (e.target as HTMLElement).closest("[data-resize]") ? "resize" : "move";
+                          setMove({ m, mode, x: e.clientX, y: e.clientY, from, ...from, moved: false });
+                        }}
+                        onPointerMove={(e) => {
+                          const move = moveRef.current;
+                          if (!move || move.m.id !== m.id) return;
+                          const dy = e.clientY - move.y;
+                          const moved = move.moved || Math.abs(dy) > 4 || Math.abs(e.clientX - move.x) > 4;
+                          const delta = Math.round(((dy / HOUR) * 60) / SNAP) * SNAP;
+                          if (move.mode === "resize") {
+                            const dur = Math.min(24 * 60 - move.from.start, Math.max(SNAP, move.from.dur + delta));
+                            setMove({ ...move, dur, moved });
+                            return;
+                          }
+                          const rect = grid.current!.getBoundingClientRect();
+                          const col = Math.min(6, Math.max(0, Math.floor((e.clientX - rect.left - 52) / ((rect.width - 52) / 7))));
+                          const start = Math.min(24 * 60 - move.from.dur, Math.max(0, move.from.start + delta));
+                          setMove({ ...move, day: days[col], start, moved });
+                        }}
+                        onPointerUp={() => {
+                          const move = moveRef.current;
+                          if (!move || move.m.id !== m.id) return;
+                          setMove(null);
+                          if (!move.moved) return;
+                          suppressClick.current = true;
+                          const f = move.from;
+                          if (move.day !== f.day || move.start !== f.start || move.dur !== f.dur) onMove(m, move.day, move.start, move.dur);
+                        }}
+                        onPointerCancel={() => setMove(null)}
                         aria-current={sel ? "true" : undefined}
                         className={cn(
-                          "absolute flex flex-col overflow-hidden rounded-[7px] border-l-[3px] px-1.5 text-left transition-shadow duration-150",
+                          "absolute flex cursor-grab flex-col overflow-hidden rounded-[7px] border-l-[3px] px-1.5 text-left transition-shadow duration-150 active:cursor-grabbing",
+                          dragged && "opacity-40",
                           short ? "justify-center py-0" : "py-1",
                           sel ? "shadow-[0_0_0_2px_var(--accLine)]" : "shadow-[0_0_0_1px_var(--line2)] hover:shadow-[0_0_0_1px_var(--field)]"
                         )}
@@ -230,6 +300,7 @@ export function WeekView({
                           <span className={cn("min-w-0", short ? "truncate" : "line-clamp-2")}>{m.title}</span>
                         </span>
                         {!short && <span className="truncate text-[11px] text-fg-2 tabular">{timeRange(m)}</span>}
+                        <span data-resize className="absolute inset-x-0 bottom-0 h-2 cursor-ns-resize" aria-hidden />
                       </button>
                     </MeetingMenu>
                   );
@@ -240,6 +311,17 @@ export function WeekView({
                     style={{ top: (ghost.from / 60) * HOUR + 1, height: ((ghost.to - ghost.from) / 60) * HOUR - 2 }}
                   >
                     {hhmm(ghost.from)}–{hhmm(ghost.to)}
+                  </div>
+                )}
+                {moving && (
+                  <div
+                    className="pointer-events-none absolute inset-x-[3px] z-[2] flex flex-col overflow-hidden rounded-[7px] border border-dashed border-acc-line bg-card px-1.5 py-1 shadow-[0_8px_24px_rgba(0,0,0,.18)]"
+                    style={{ top: (moving.start / 60) * HOUR + 1, height: Math.max((moving.dur / 60) * HOUR, 22) - 2 }}
+                  >
+                    <span className="truncate text-[12px] leading-tight font-medium">{moving.m.title}</span>
+                    <span className="truncate text-[11px] text-fg-2 tabular">
+                      {hhmm(moving.start)}–{hhmm(Math.min(moving.start + moving.dur, 24 * 60 - 1))}
+                    </span>
                   </div>
                 )}
                 {d === today && (

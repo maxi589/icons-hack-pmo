@@ -24,7 +24,7 @@ import { useOrganizations } from "@/lib/data/use-organizations";
 import { useTasks } from "@/lib/data/use-tasks";
 import { useKnowledge } from "@/lib/data/use-knowledge";
 import { logActivity } from "@/lib/data/use-feed";
-import { plusDays, timeRange, viennaParts, weekLabel, weekStart, type Meeting, joinUrl } from "@/lib/meetings";
+import { plusDays, timeRange, viennaParts, weekLabel, weekStart, type Meeting, joinUrl, fromVienna } from "@/lib/meetings";
 import { MeetingDetail } from "./meeting-detail";
 import { NewMeetingDialog, type MeetingDefaults } from "./new-meeting-dialog";
 import { useMeetingActions } from "./use-meeting-actions";
@@ -222,6 +222,12 @@ export function Termine() {
               onOpen={open}
               onCreate={(d) => startDraft(d)}
               onDelete={remove}
+              onMove={(m, date, minutes, duration) =>
+                actions.update(m, {
+                  starts_at: fromVienna(date, `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`),
+                  duration_min: duration,
+                })
+              }
             />
           )}
         </div>

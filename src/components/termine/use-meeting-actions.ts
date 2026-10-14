@@ -6,7 +6,17 @@ import { logActivity, notifyAssignment } from "@/lib/data/use-feed";
 import { attendeeEmails, type useMeetings } from "@/lib/data/use-meetings";
 import type { useTasks } from "@/lib/data/use-tasks";
 import { formatShort } from "@/lib/dates";
-import { fromVienna, googleCalendarUrl, meetingHref, openItems, plusDays, timeRange, viennaParts, type Meeting, type MeetingPatch } from "@/lib/meetings";
+import {
+  fromVienna,
+  googleCalendarUrl,
+  meetingHref,
+  openItems,
+  plusDays,
+  timeRange,
+  viennaParts,
+  type Meeting,
+  type MeetingPatch,
+} from "@/lib/meetings";
 import type { NewMeetingInput } from "./new-meeting-dialog";
 
 // Termin-Aktionen mit Hinweis + „Rückgängig“. Wer eingetragen wird, bekommt einen Inbox-Eintrag (wie bei Zuweisungen).
@@ -47,9 +57,16 @@ export function useMeetingActions(
     const moved = (patch.starts_at && patch.starts_at !== m.starts_at) || (patch.duration_min && patch.duration_min !== m.duration_min);
     if (moved) {
       const next = { ...m, ...patch };
-      toast({ text: `Jetzt ${formatShort(viennaParts(next.starts_at).date)}, ${timeRange(next)}. Google-Termin auch anpassen.` });
+      toast({
+        text: `Jetzt ${formatShort(viennaParts(next.starts_at).date)}, ${timeRange(next)}. Google-Termin auch anpassen.`,
+        onAction: () => api.update(m.id, { starts_at: m.starts_at, duration_min: m.duration_min }),
+      });
     }
-    if (patch.attendees) notify(m, patch.attendees.filter((id) => !m.attendees.includes(id)));
+    if (patch.attendees)
+      notify(
+        m,
+        patch.attendees.filter((id) => !m.attendees.includes(id))
+      );
     if (patch.organization_id !== undefined && patch.organization_id !== m.organization_id) linkOrg({ ...m, ...patch }, patch.organization_id);
   };
 
