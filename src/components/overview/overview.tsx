@@ -43,7 +43,7 @@ export function Overview() {
   const phase = currentPhase(today);
 
   return (
-    <div className="mx-auto flex w-full max-w-[1080px] flex-col gap-4 px-3.5 pt-2 pb-8 md:gap-5 md:px-8 md:pt-8 md:pb-12">
+    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-3.5 pt-2 pb-8 md:gap-5 md:px-8 md:pt-8 md:pb-12">
       {/* Ohne Begrüßung (Maxi, 14.10.): eine Zeile mit Datum und Restzeit der Phase */}
       <h1 className="sr-only">Übersicht</h1>
       <p className="label-mono -mb-1 pt-1 md:pt-0">
@@ -402,7 +402,7 @@ function AreasSection({ milestones, today }: { milestones: Milestone[]; today: s
 function OverviewSkeleton() {
   const block = "rounded-[14px] bg-card-2";
   return (
-    <div className="mx-auto flex w-full max-w-[1080px] flex-col gap-4 px-3.5 pt-2 pb-8 md:gap-5 md:px-8 md:pt-8" aria-busy="true" aria-label="Übersicht lädt">
+    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-3.5 pt-2 pb-8 md:gap-5 md:px-8 md:pt-8" aria-busy="true" aria-label="Übersicht lädt">
       <div className="flex flex-col gap-2 pb-1.5">
         <div className="h-7 w-56 rounded-md bg-card-2" />
         <div className="h-4 w-72 rounded-md bg-card-2" />

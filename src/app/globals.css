@@ -14,11 +14,11 @@
   color-scheme: light;
 
   /* Flächen */
-  --bg: #f1f1f2;
-  --panel: #f9f9fa;
+  --bg: #f5f5f6;
+  --panel: #ffffff;
   --card: #ffffff;
-  --card2: #f6f6f7;
-  --col: #efeff1;
+  --card2: #f7f7f8;
+  --col: #f4f4f5;
 
   /* Linien: --line/--line2 nur Dekoration, --field für Eingabefelder (mind. 3:1) */
   --line: rgba(0, 0, 0, 0.09);
@@ -100,11 +100,11 @@
 .dark {
   color-scheme: dark;
 
-  --bg: #0c0c0d;
-  --panel: #121214;
-  --card: #18181a;
-  --card2: #1e1e21;
-  --col: #0b0b0d;
+  --bg: #050506;
+  --panel: #0a0a0b;
+  --card: #0f0f11;
+  --card2: #161618;
+  --col: #060607;
 
   --line: rgba(255, 255, 255, 0.09);
   --line2: rgba(255, 255, 255, 0.13);

@@ -22,7 +22,7 @@ Auftraggeber ist Maxi S (kein Entwickler): Deutsch, Ergebnis zuerst, einfache Sp
 - shadcn-Skill bzw. -MCP nutzen. **Keinen beUI-MCP**, keine beUI-Bausteine.
 
 ## Design (Kurzfassung, Details in `docs/design/Design-System.md`)
-- **Graphit + Kobalt** (14.10.): Graphit-Flächen (dunkel = schwarz), Akzent Kobalt #0f5ba5 aus der Event-Website statt Lime. Hell und dunkel gleichwertig, Standard ist die Systemeinstellung. Werte und Prüfergebnisse in `docs/design/palette.json`.
+- **Graphit + Kobalt** (14.10.): Graphit-Flächen (dunkel = schwarz), Akzent Kobalt #0f5ba5 aus der Event-Website statt Lime. Seit 14.10. hell reinweiße Hauptfläche, dunkel fast schwarz; Inhalt max. 1440px breit. Hell und dunkel gleichwertig, Standard ist die Systemeinstellung. Werte und Prüfergebnisse in `docs/design/palette.json`.
 - Alle Farben nur über die Tokens in `src/app/globals.css`, keine frei erfundenen Werte. Tailwind-Namen: `bg-bg`, `bg-panel`, `bg-card`, `bg-card-2`, `bg-col`, `border-line`, `border-line-2`, `border-field`, `text-fg` / `text-fg-2` / `text-fg-3`, `bg-hover`, `bg-active`, `bg-acc` + `text-acc-text`, `text-acc-line`, Status `*-st-gray|blue|amber|green|red`, Bereiche `bg-area-*`. Schrift `font-display` = Michroma, Hilfsklassen `tabular` und `label-mono`.
 - Hell/Dunkel über die Klasse `.dark` auf `<html>` (Inline-Skript in `src/app/layout.tsx`, Wahl im Cookie `theme`, sonst Systemeinstellung).
 - Daten-Hilfen in `src/lib/dates.ts` (`todayInVienna`, `daysUntil`) statt eigener Datumsrechnung.
@@ -59,7 +59,7 @@ Auftraggeber ist Maxi S (kein Entwickler): Deutsch, Ergebnis zuerst, einfache Sp
 - Nur über soundcn: `npx shadcn add @soundcn/<name>`. Auswahl und Lautstärken laut Design-System, Abschnitt 7.
 - **Nie einen Sound der Kategorie `warcraft` installieren.** Die Registry kennzeichnet sie fälschlich als CC0.
 - Ton ist nie das einzige Feedback. Keine Töne bei eingehenden Nachrichten.
-- Code: Sounds in `src/lib/sounds/` (nach `add` dorthin verschieben, soundcn legt sie flach in `src/lib` ab). Abspielen von überall mit `play("taskDone")`, Momente und Lautstärken stehen in `src/lib/sounds/index.ts`. Schalter „Sounds“/„Fun-Modus“ über `SoundProvider` (`user_settings`): Schalter im Handy-Menü, am Desktop über Strg+K. **Kein Lautsprecher-Knopf in der Sidebar** (Maxi, 14.10.: Sounds sind Standard, stumm geht übers Gerät).
+- Code: Sounds in `src/lib/sounds/` (nach `add` dorthin verschieben, soundcn legt sie flach in `src/lib` ab). Abspielen von überall mit `play("taskDone")`, Momente und Lautstärken stehen in `src/lib/sounds/index.ts`. **Sounds sind immer an, ohne Schalter und ohne Fun-Modus** (Maxi, 14.10.). `SoundProvider` lädt die Sounds nur vor. Stumm geht übers Gerät.
 - Wow-Moment „Meilenstein erledigt“: `celebrateMilestone()` aus `src/components/milestone-celebration.tsx`, ausgelöst zentral in `use-milestones.ts` (nur ganze Meilensteine; Unterpunkte bekommen den Haken-Ton).
 
 ## Daten und Sicherheit

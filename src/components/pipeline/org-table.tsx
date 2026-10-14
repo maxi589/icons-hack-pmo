@@ -11,8 +11,10 @@ import { followState, initials, STAGES, type Organization, type Stage } from "@/
 // Pipeline als CRM-Tabelle (nur Desktop, Maxi 14.10.: Variante „D“ nach Prüfschleife).
 // Standard: sortiert nach Nachfassen, Überfälliges oben. Jeder Spaltenkopf sortiert per Klick.
 // Kopf klebt beim Scrollen, unten Zähler. Bewusst ohne Rasterlinien und Pills.
-// Kein seitliches Scrollen: Die Tabelle misst ihre eigene Breite (Container-Abfrage) und blendet bei wenig Platz
-// (z. B. Detail offen) zuerst „Warmer Kontakt“/„Kapazität“ aus, danach „Prio“.
+// Feste Spaltenbreiten mit gleichem Abstand (Maxi, 14.10.: „überall gleich“), freier Platz sammelt sich rechts in
+// einer leeren Füllspalte. So bleiben die Spalten stehen, wenn rechts das Detail aufgeht.
+// Kein seitliches Scrollen: Die Tabelle misst ihre eigene Breite (Container-Abfrage). Wird es eng, fällt zuerst die
+// Füllspalte weg (Firma nimmt den Rest; Summe der festen Spalten 1020px, passt neben das offene Detail ab ~1700px Fenster), dann „Warmer Kontakt“/„Kapazität“, dann „Prio“.
 // Venues zeigen nur die Kapazität kurz; Übernachtung, Preis und Lage stehen im Detail.
 
 type SortKey = "name" | "stage" | "prio" | "follow" | "owner" | "extra";
@@ -87,6 +89,7 @@ export function OrgTable({
   };
 
   // Spalten, die bei wenig Platz verschwinden bzw. schrumpfen (Breite der Tabelle, nicht des Fensters)
+  const hideFill = "@max-[1020px]:hidden";
   const hideExtra = "@max-[900px]:hidden";
   const hidePrio = "@max-[700px]:hidden";
 
@@ -95,12 +98,13 @@ export function OrgTable({
       <table className="w-full table-fixed border-separate border-spacing-0 text-[13px]">
         <thead className="text-[12px] text-fg-3">
           <tr>
-            {head("name", venue ? "Venue" : "Firma", "z-[3] pl-[18px]")}
-            {head("stage", "Stufe", "w-[132px]")}
+            {head("name", venue ? "Venue" : "Firma", "z-[3] w-[300px] pl-[18px] @max-[1020px]:w-auto")}
+            {head("stage", "Stufe", "w-[128px]")}
             {head("prio", "Prio", cn("w-[60px]", hidePrio))}
             {head("follow", "Nachfassen", "w-[176px]")}
-            {head("owner", "Zuständig", "w-[150px]")}
-            {head("extra", venue ? "Kapazität" : "Warmer Kontakt", cn("w-[210px]", hideExtra))}
+            {head("owner", "Zuständig", "w-[136px]")}
+            {head("extra", venue ? "Kapazität" : "Warmer Kontakt", cn("w-[220px]", hideExtra))}
+            <th aria-hidden className={cn("sticky top-0 z-[2] h-9 border-b border-line bg-panel", hideFill)} />
           </tr>
         </thead>
         <tbody>
@@ -169,6 +173,7 @@ export function OrgTable({
                 <td className={cn(cell, hideExtra, "text-fg-2")} title={(venue ? o.capacity : warmText(o)) || undefined}>
                   <span className="block truncate">{venue ? shortCap(o.capacity) : warmText(o)}</span>
                 </td>
+                <td aria-hidden className={cn("h-11 border-b border-line", hideFill)} />
               </tr>
             );
           })}

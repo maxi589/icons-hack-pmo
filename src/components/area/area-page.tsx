@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Check, ChevronDown } from "lucide-react";
@@ -13,15 +14,16 @@ import { useTeam } from "@/components/app-shell/team-provider";
 import { StatusCheck } from "@/components/tasks/status-check";
 import { play } from "@/lib/sounds";
 import { useToday } from "@/lib/use-today";
-import { daysBetween, formatShort } from "@/lib/dates";
+import { daysBetween, formatShort, TIME_ZONE, todayInVienna } from "@/lib/dates";
 import { useMilestones, type Milestone } from "@/lib/data/use-milestones";
 import { useTasks } from "@/lib/data/use-tasks";
 import { useOrganizations } from "@/lib/data/use-organizations";
+import { useAreaNotes } from "@/lib/data/use-area-notes";
 import { logActivity } from "@/lib/data/use-feed";
 import { followState, inTab, STAGES, TABS, type Organization, type TabId } from "@/lib/pipeline";
 import { sortTasks, taskStatusName, type Task, type TaskStatus } from "@/lib/tasks";
 
-// Bereichs-Seite (Umfang v1): verantwortliche Person, Fortschritt, Meilensteine und Aufgaben eines Teilprojekts.
+// Bereichs-Seite (Umfang v1): verantwortliche Person, Fortschritt, Notizen, Meilensteine und Aufgaben eines Teilprojekts.
 // Bereiche mit Pipeline (Partner, Sponsoren, Jury, Venue) zeigen dazu ihr Ziel aus der Pipeline.
 
 const card = "rounded-[14px] bg-card shadow-card";
@@ -73,7 +75,7 @@ export function AreaPage({ id }: { id: string }) {
   return (
     <>
       <PageHeader title={area.name} action={{ label: "Aufgabe", onClick: newTask }} />
-      <div className="mx-auto flex w-full max-w-[1080px] flex-col gap-4 px-3.5 pt-2 pb-8 md:gap-5 md:px-8 md:pt-8 md:pb-12">
+      <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-3.5 pt-2 pb-8 md:gap-5 md:px-8 md:pt-8 md:pb-12">
         <h1 className="flex items-center gap-2.5 pb-1.5 text-[21px] font-semibold tracking-[-0.025em] md:sr-only">
           <span className="group">
             <AreaGlyph color={area.color} progress={own.length ? own.filter((m) => m.status === "erledigt").length / own.length : 0} size={22} />
@@ -81,14 +83,16 @@ export function AreaPage({ id }: { id: string }) {
           {area.name}
         </h1>
 
-        <div className="flex flex-wrap gap-4">
-          <OwnerCard areaId={id} />
-          <ProgressCard own={own} tasks={areaTasks} tab={tab} orgs={orgs ?? []} today={today} />
-        </div>
+        {/* Kopf-Leiste wie die Eigenschaften eines Projekts in Linear: Verantwortlich · Pipeline-Ziel · Meilensteine · Aufgaben */}
+        <SummaryStrip areaId={id} own={own} tasks={areaTasks} tab={tab} orgs={orgs ?? []} today={today} />
 
-        <div className="flex flex-wrap items-start gap-4">
-          <MilestonesCard milestones={milestones} own={own} today={today} onToggle={setMilestoneDone} />
-          <TasksCard areaId={id} tasks={areaTasks} milestones={milestones} today={today} onToggle={toggleTask} onNew={newTask} />
+        {/* Links die Notizen als Ablage, rechts was zu tun ist. Am Handy erst Meilensteine/Aufgaben, Notizen unten. */}
+        <div className="grid gap-4 md:gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+          <NotesCard areaId={id} areaName={area.name} />
+          <div className="flex min-w-0 flex-col items-stretch gap-4 self-start max-lg:order-first md:gap-5">
+            <MilestonesCard milestones={milestones} own={own} today={today} onToggle={setMilestoneDone} />
+            <TasksCard areaId={id} tasks={areaTasks} milestones={milestones} today={today} onToggle={toggleTask} onNew={newTask} />
+          </div>
         </div>
       </div>
     </>
@@ -96,9 +100,75 @@ export function AreaPage({ id }: { id: string }) {
 }
 
 // ---------------------------------------------------------------
-// Verantwortliche Person (speichert sofort, live für alle)
+// Kopf-Leiste: eine Karte, Felder durch feine Linien getrennt (gap-px auf Linienfarbe)
 // ---------------------------------------------------------------
-function OwnerCard({ areaId }: { areaId: string }) {
+function Bar({ value, total }: { value: number; total: number }) {
+  return (
+    <div className="h-[3px] overflow-hidden rounded-sm bg-line-2">
+      <div
+        className="h-full rounded-sm bg-acc-line transition-[width] duration-300 ease-out"
+        style={{ width: `${total ? (value / total) * 100 : 0}%` }}
+      />
+    </div>
+  );
+}
+
+const field = "flex min-w-0 flex-col gap-2.5 bg-card px-5 py-4";
+
+function Count({ value, total, suffix }: { value: number; total: number | null; suffix?: string }) {
+  return (
+    <span className="flex items-baseline gap-1.5">
+      <span className="text-[22px] leading-none font-medium tracking-[-0.03em] tabular">{value}</span>
+      <span className="text-[13px] text-fg-3 tabular">{total === null ? suffix : `/ ${total}`}</span>
+    </span>
+  );
+}
+
+function SummaryStrip({
+  areaId,
+  own,
+  tasks,
+  tab,
+  orgs,
+  today,
+}: {
+  areaId: string;
+  own: Milestone[];
+  tasks: Task[];
+  tab: TabId | null;
+  orgs: Organization[];
+  today: string;
+}) {
+  const msDone = own.filter((m) => m.status === "erledigt").length;
+  const taskDone = tasks.filter((t) => t.status === "erledigt").length;
+
+  return (
+    <section
+      aria-label="Überblick"
+      className={cn(
+        card,
+        "grid grid-cols-2 gap-px overflow-hidden bg-line",
+        tab ? "md:grid-cols-[minmax(0,1fr)_minmax(0,1.9fr)_minmax(0,1fr)_minmax(0,1fr)]" : "md:grid-cols-3"
+      )}
+    >
+      <OwnerField areaId={areaId} />
+      {tab && <PipelineField tab={tab} orgs={orgs} today={today} />}
+      <div className={field}>
+        <h2 className="label-mono">Meilensteine</h2>
+        <Count value={msDone} total={own.length} />
+        <Bar value={msDone} total={own.length} />
+      </div>
+      <div className={field}>
+        <h2 className="label-mono">Aufgaben</h2>
+        {tasks.length ? <Count value={taskDone} total={tasks.length} /> : <Count value={0} total={null} suffix="noch keine" />}
+        <Bar value={taskDone} total={tasks.length} />
+      </div>
+    </section>
+  );
+}
+
+/** Verantwortliche Person: speichert sofort, live für alle. */
+function OwnerField({ areaId }: { areaId: string }) {
   const { areaById, people, personById, setAreaOwner } = useTeam();
   const toast = useToast();
   const area = areaById(areaId)!;
@@ -110,22 +180,18 @@ function OwnerCard({ areaId }: { areaId: string }) {
   };
 
   return (
-    <section className={cn(card, "flex min-w-0 flex-[1_1_300px] flex-col gap-4 px-5 py-[18px] md:px-6 md:py-[22px]")}>
+    <div className={cn(field, "max-md:col-span-2")}>
       <h2 className="label-mono">Verantwortlich</h2>
-      <div className="flex min-w-0 items-center gap-3">
-        <Avatar person={owner} size={36} />
-        {owner ? (
-          <span className="truncate text-[16.5px] font-semibold tracking-[-0.01em]">{owner.name}</span>
-        ) : (
-          <span className="text-[15px] font-medium text-st-amber">Noch offen</span>
-        )}
-      </div>
-      <label className="relative mt-auto inline-flex w-full items-center sm:w-[200px]">
+      <label className="relative -mx-2 flex min-w-0 items-center gap-2.5 rounded-[9px] px-2 transition-colors duration-150 hover:bg-hover">
+        <Avatar person={owner} size={24} />
         <span className="sr-only">Verantwortliche Person für {area.name}</span>
         <select
           value={area.owner_id ?? ""}
           onChange={(e) => change(e.target.value)}
-          className="h-9 w-full cursor-pointer appearance-none rounded-[9px] border border-field bg-card pr-8 pl-3 text-[13.5px] text-fg transition-colors duration-150 hover:bg-hover focus-visible:outline-solid max-md:h-11 max-md:text-base"
+          className={cn(
+            "h-9 min-w-0 flex-1 cursor-pointer appearance-none truncate bg-transparent pr-6 text-[15px] font-semibold tracking-[-0.01em] focus-visible:outline-solid max-md:h-11 max-md:text-base",
+            !owner && "font-medium text-st-amber"
+          )}
         >
           <option value="">Noch offen</option>
           {people.map((p) => (
@@ -134,61 +200,13 @@ function OwnerCard({ areaId }: { areaId: string }) {
             </option>
           ))}
         </select>
-        <ChevronDown className="pointer-events-none absolute right-2.5 size-3.5 text-fg-3" aria-hidden />
+        <ChevronDown className="pointer-events-none absolute right-2 size-3.5 text-fg-3" aria-hidden />
       </label>
-    </section>
-  );
-}
-
-// ---------------------------------------------------------------
-// Fortschritt: Pipeline-Ziel (falls vorhanden), Meilensteine, Aufgaben
-// ---------------------------------------------------------------
-function Bar({ value, total }: { value: number; total: number }) {
-  return (
-    <div className="h-[3px] flex-1 overflow-hidden rounded-sm bg-line-2">
-      <div
-        className="h-full rounded-sm bg-acc-line transition-[width] duration-300 ease-out"
-        style={{ width: `${total ? (value / total) * 100 : 0}%` }}
-      />
     </div>
   );
 }
 
-function ProgressCard({ own, tasks, tab, orgs, today }: { own: Milestone[]; tasks: Task[]; tab: TabId | null; orgs: Organization[]; today: string }) {
-  const msDone = own.filter((m) => m.status === "erledigt").length;
-  const taskDone = tasks.filter((t) => t.status === "erledigt").length;
-
-  return (
-    <section className={cn(card, "flex min-w-0 flex-[1.45_1_440px] flex-col gap-4 px-5 py-[18px] md:px-6 md:py-[22px]")}>
-      <h2 className="label-mono">Fortschritt</h2>
-      {tab && <PipelineGoal tab={tab} orgs={orgs} today={today} />}
-      <div className="flex flex-col gap-3">
-        <ProgressRow label="Meilensteine" value={msDone} total={own.length} />
-        <ProgressRow label="Aufgaben" value={taskDone} total={tasks.length} empty="Noch keine Aufgaben" />
-      </div>
-    </section>
-  );
-}
-
-function ProgressRow({ label, value, total, empty }: { label: string; value: number; total: number; empty?: string }) {
-  return (
-    <div className="flex items-center gap-3 text-[13px]">
-      <span className="w-[92px] shrink-0 text-fg-2">{label}</span>
-      {total === 0 && empty ? (
-        <span className="text-fg-3">{empty}</span>
-      ) : (
-        <>
-          <Bar value={value} total={total} />
-          <span className="w-[104px] shrink-0 text-right text-fg-3 tabular">
-            {value} von {total} erledigt
-          </span>
-        </>
-      )}
-    </div>
-  );
-}
-
-function PipelineGoal({ tab, orgs, today }: { tab: TabId; orgs: Organization[]; today: string }) {
+function PipelineField({ tab, orgs, today }: { tab: TabId; orgs: Organization[]; today: string }) {
   const def = TABS.find((t) => t.id === tab)!;
   const list = orgs.filter((o) => inTab(o, tab));
   const won = list.filter((o) => def.goalStages.includes(o.stage)).length;
@@ -201,48 +219,118 @@ function PipelineGoal({ tab, orgs, today }: { tab: TabId; orgs: Organization[]; 
   })).filter((s) => s.n > 0);
 
   return (
-    <Link
-      href={`/pipeline?tab=${tab}`}
-      className="flex flex-col gap-3 rounded-[10px] px-3.5 py-3 shadow-[0_0_0_1px_var(--line)] transition-[background,box-shadow] duration-150 hover:bg-hover hover:shadow-[0_0_0_1px_var(--line2)]"
-    >
-      <span className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <span className="text-[13px] text-fg-2">{tab === "venues" ? def.goalLabel : `${def.goalLabel} zugesagt`}</span>
-        <span className="flex items-baseline gap-1.5">
-          <span className="text-[26px] leading-none font-medium tracking-[-0.04em] tabular">{won}</span>
-          <span className="text-[14px] text-fg-3 tabular">{def.goal ? `/ ${def.goal}` : "Ziel offen"}</span>
-        </span>
-      </span>
-      {def.goal && (
-        <span className="flex gap-1" aria-hidden>
-          {Array.from({ length: def.goal }, (_, i) => (
-            <span key={i} className={cn("h-1 flex-1 rounded-sm", i < won ? "bg-acc-line" : "bg-line-2")} />
-          ))}
-        </span>
-      )}
-      <span className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12.5px] text-fg-2">
-        {stages.length === 0 && <span className="text-fg-3">Noch keine Einträge in der Pipeline</span>}
-        {stages.map((s) => (
-          <span key={s.id} className="inline-flex items-center gap-1.5 whitespace-nowrap">
-            <span className={cn("size-[7px] rounded-full", s.dot)} aria-hidden />
-            {s.name} <span className="text-fg-3 tabular">{s.n}</span>
-          </span>
-        ))}
-        {(dueToday > 0 || overdue > 0) && (
-          <span className="flex gap-1.5">
-            {dueToday > 0 && <Chip tone="today">{dueToday} heute nachfassen</Chip>}
-            {overdue > 0 && (
-              <Chip tone="red">
-                {overdue} überfällig
-              </Chip>
-            )}
-          </span>
-        )}
-        <span className="ml-auto text-fg-3">
+    <Link href={`/pipeline?tab=${tab}`} className={cn(field, "group/p transition-colors duration-150 hover:bg-hover max-md:col-span-2")}>
+      <span className="flex items-center justify-between gap-3">
+        <h2 className="label-mono truncate">{tab === "venues" ? def.goalLabel : `${def.goalLabel} zugesagt`}</h2>
+        <span className="text-fg-3 transition-transform duration-150 group-hover/p:translate-x-0.5">
           <span aria-hidden>→</span>
           <span className="sr-only">Zur Pipeline</span>
         </span>
       </span>
+      <span className="flex flex-wrap items-baseline gap-x-4 gap-y-1.5">
+        <Count value={won} total={def.goal ?? null} suffix="Ziel offen" />
+        <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-fg-2">
+          {stages.length === 0 && <span className="text-fg-3">Noch keine Einträge</span>}
+          {stages.map((s) => (
+            <span key={s.id} className="inline-flex items-center gap-1.5 whitespace-nowrap">
+              <span className={cn("size-[7px] rounded-full", s.dot)} aria-hidden />
+              {s.name} <span className="text-fg-3 tabular">{s.n}</span>
+            </span>
+          ))}
+          {dueToday > 0 && <Chip tone="today">{dueToday} heute</Chip>}
+          {overdue > 0 && <Chip tone="red">{overdue} überfällig</Chip>}
+        </span>
+      </span>
+      {def.goal ? (
+        <span className="flex gap-1" aria-hidden>
+          {Array.from({ length: def.goal }, (_, i) => (
+            <span key={i} className={cn("h-[3px] flex-1 rounded-sm", i < won ? "bg-acc-line" : "bg-line-2")} />
+          ))}
+        </span>
+      ) : (
+        <span className="h-[3px]" aria-hidden />
+      )}
     </Link>
+  );
+}
+
+// ---------------------------------------------------------------
+// Notizen: freies Textfeld als Ablage (Maxi, 14.10.), speichert von selbst
+// ---------------------------------------------------------------
+const timeFmt = new Intl.DateTimeFormat("de-AT", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
+
+function NotesCard({ areaId, areaName }: { areaId: string; areaName: string }) {
+  const { me, personById } = useTeam();
+  const today = useToday();
+  const { data, save } = useAreaNotes(areaId);
+  const [draft, setDraft] = useState<string | null>(null);
+  const [state, setState] = useState<"idle" | "saving" | "saved" | "error">("idle");
+  const pending = useRef<string | null>(null);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const flush = useCallback(async () => {
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = null;
+    const value = pending.current;
+    if (value === null) return;
+    pending.current = null;
+    setState("saving");
+    const ok = await save(value, me?.id ?? null);
+    setState(ok ? "saved" : "error");
+  }, [save, me]);
+
+  // Beim Verlassen der Seite nichts verlieren.
+  useEffect(() => () => void flush(), [flush]);
+
+  if (data === false) return null;
+
+  // Solange man schreibt (draft gesetzt), gilt der eigene Text; sonst der gespeicherte (auch fremde Änderungen live).
+  const value = draft ?? data?.notes ?? "";
+
+  const onChange = (next: string) => {
+    setDraft(next);
+    pending.current = next;
+    setState("idle");
+    if (timer.current) clearTimeout(timer.current);
+    timer.current = setTimeout(flush, 800);
+  };
+
+  let meta = "";
+  if (state === "saving") meta = "Speichert …";
+  else if (state === "saved" && draft !== null) meta = "Gespeichert";
+  else if (state === "error") meta = "Nicht gespeichert";
+  else if (data?.updatedAt) {
+    const day = todayInVienna(new Date(data.updatedAt));
+    const when = day === today ? `heute, ${timeFmt.format(new Date(data.updatedAt))}` : formatShort(day);
+    const who = personById(data.updatedBy)?.name;
+    meta = who ? `${who} · ${when}` : when;
+  }
+
+  return (
+    <section className={cn(card, "flex min-w-0 flex-col overflow-hidden transition-shadow duration-150 has-[textarea:focus-visible]:shadow-[0_0_0_2px_var(--accLine)]")}>
+      <div className="flex items-center justify-between gap-3 px-4 pt-4 pb-3">
+        <h2 className="text-[14px] font-semibold">Notizen</h2>
+        <span className={cn("text-[12px] text-fg-3 tabular", state === "error" && "text-st-red")} aria-live="polite">
+          {meta}
+        </span>
+      </div>
+      <label className="sr-only" htmlFor={`notes-${areaId}`}>
+        Notizen zu {areaName}
+      </label>
+      <textarea
+        id={`notes-${areaId}`}
+        value={value}
+        disabled={data === null}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={async () => {
+          await flush();
+          // Nach dem Speichern wieder dem gespeicherten Stand folgen (fremde Änderungen erscheinen live).
+          if (pending.current === null) setDraft(null);
+        }}
+        placeholder="Absprachen, Kontakte, Links, Ideen …"
+        className="min-h-[320px] w-full flex-1 resize-none border-t border-line bg-transparent px-4 py-3.5 text-[14px] leading-relaxed text-fg [field-sizing:content] placeholder:text-fg-3 focus-visible:outline-none max-md:text-base lg:min-h-[460px]"
+      />
+    </section>
   );
 }
 
@@ -263,7 +351,7 @@ function MilestonesCard({
   const sorted = [...own].sort((a, b) => a.due_date.localeCompare(b.due_date) || a.sort - b.sort);
 
   return (
-    <section className={cn(card, "min-w-0 flex-[1_1_420px] overflow-hidden")}>
+    <section className={cn(card, "min-w-0 overflow-hidden")}>
       <div className="flex items-center justify-between px-4 pt-4 pb-3">
         <h2 className="text-[14px] font-semibold">Meilensteine</h2>
         <Link href="/roadmap" className="rounded-md text-[12.5px] text-fg-2 hover:text-fg">
@@ -379,7 +467,7 @@ function TasksCard({
   const done = tasks.length - open.length;
 
   return (
-    <section className={cn(card, "min-w-0 flex-[1_1_420px] overflow-hidden")}>
+    <section className={cn(card, "min-w-0 overflow-hidden")}>
       <div className="flex items-center justify-between gap-2 px-4 pt-4 pb-3">
         <h2 className="flex items-center gap-2 text-[14px] font-semibold">
           Aufgaben
@@ -449,18 +537,15 @@ export function AreaSkeleton() {
     <>
       <PageHeader title="Bereich" />
       <div
-        className="mx-auto flex w-full max-w-[1080px] flex-col gap-4 px-3.5 pt-2 pb-8 md:gap-5 md:px-8 md:pt-8"
+        className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-3.5 pt-2 pb-8 md:gap-5 md:px-8 md:pt-8"
         aria-busy="true"
         aria-label="Bereich lädt"
       >
         <div className="h-7 w-44 rounded-md bg-card-2 md:hidden" />
-        <div className="flex flex-wrap gap-4">
-          <div className={cn(block, "h-[180px] min-w-0 flex-[1_1_300px]")} />
-          <div className={cn(block, "h-[180px] min-w-0 flex-[1.45_1_440px]")} />
-        </div>
-        <div className="flex flex-wrap gap-4">
-          <div className={cn(block, "h-[260px] min-w-0 flex-[1_1_420px]")} />
-          <div className={cn(block, "h-[260px] min-w-0 flex-[1_1_420px]")} />
+        <div className={cn(block, "h-[104px]")} />
+        <div className="grid gap-4 md:gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+          <div className={cn(block, "h-[460px]")} />
+          <div className={cn(block, "h-[460px]")} />
         </div>
       </div>
     </>

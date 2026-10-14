@@ -1,11 +1,11 @@
 {
  "name": "Graphit + Kobalt",
  "light": {
-  "bg": "#f1f1f2",
-  "panel": "#f9f9fa",
+  "bg": "#f5f5f6",
+  "panel": "#ffffff",
   "card": "#ffffff",
-  "card2": "#f6f6f7",
-  "col": "#efeff1",
+  "card2": "#f7f7f8",
+  "col": "#f4f4f5",
   "line": "rgba(0, 0, 0, 0.09)",
   "line2": "rgba(0, 0, 0, 0.13)",
   "field": "#7c7c85",
@@ -32,11 +32,11 @@
   "shadow-cmdk": "0 24px 64px rgba(0, 0, 0, 0.45)"
  },
  "dark": {
-  "bg": "#0c0c0d",
-  "panel": "#121214",
-  "card": "#18181a",
-  "card2": "#1e1e21",
-  "col": "#0b0b0d",
+  "bg": "#050506",
+  "panel": "#0a0a0b",
+  "card": "#0f0f11",
+  "card2": "#161618",
+  "col": "#060607",
   "line": "rgba(255, 255, 255, 0.09)",
   "line2": "rgba(255, 255, 255, 0.13)",
   "field": "#6b6b72",
@@ -9260,5 +9260,6 @@
  "checksSummary": {
   "total": 1005,
   "fails": 0
- }
+ },
+ "flaechen_15_10": "Flächen heller/dunkler (Maxi, 14.10.). Nachgerechnet: 160 WCAG-Prüfungen (Text, Status, Akzentlinie, Feldrand, Bereichsfarben auf bg/panel/card/card2/col, hell und dunkel), 0 Fehler. Die älteren APCA/ΔE-Prüfungen unten beziehen sich auf die Flächen vom 14.10."
 }

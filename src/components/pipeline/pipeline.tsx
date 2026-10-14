@@ -123,6 +123,8 @@ export function Pipeline() {
 
   const patch = (org: Organization) => (p: OrgPatch) => update(org.id, p);
   const open = (id: string) => setParams({ firma: id });
+  /** Klick auf die schon offene Firma schließt das Detail wieder. */
+  const toggle = (id: string) => setParams({ firma: id === selectedId ? null : id });
   const close = () => setParams({ firma: null });
 
   if (!orgs || !today) {
@@ -249,7 +251,7 @@ export function Pipeline() {
                     const st = STAGES.find((s) => s.id === col.id)!;
                     const count = visible.filter((o) => o.stage === st.id).length;
                     return (
-                      <KanbanBoard key={col.id} id={col.id} className={st.id === "abgesagt" ? "w-[176px] shrink-0" : "w-[208px] shrink-0"}>
+                      <KanbanBoard key={col.id} id={col.id} className={st.id === "abgesagt" ? "max-w-[240px] min-w-[176px] flex-[0.8]" : "max-w-[300px] min-w-[208px] flex-1"}>
                         <KanbanHeader>
                           <span className={cn("size-2 rounded-full", st.dot)} aria-hidden />
                           <span className="text-[12.5px] font-semibold whitespace-nowrap">{st.name}</span>
@@ -268,7 +270,7 @@ export function Pipeline() {
                             const org = all.find((o) => o.id === item.id)!;
                             return (
                               <KanbanCard key={item.id} id={item.id}>
-                                <OrgCard org={org} today={today} selected={org.id === selectedId} onOpen={() => open(org.id)} />
+                                <OrgCard org={org} today={today} selected={org.id === selectedId} onOpen={() => toggle(org.id)} />
                               </KanbanCard>
                             );
                           }}
@@ -281,7 +283,7 @@ export function Pipeline() {
             )}
             {view === "list" && visible.length > 0 && (
               <div className="hidden h-full md:block">
-                <OrgTable orgs={visible} today={today} venue={tab === "venues"} selectedId={selectedId} onOpen={open} />
+                <OrgTable orgs={visible} today={today} venue={tab === "venues"} selectedId={selectedId} onOpen={toggle} />
               </div>
             )}
             {/* Handy: immer die Liste (Tabellen sind dort zu eng) */}

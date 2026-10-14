@@ -120,6 +120,8 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
   };
 
   const open = (id: string) => setParams({ aufgabe: id });
+  /** Klick auf die schon offene Aufgabe schließt das Detail wieder. */
+  const toggle = (id: string) => setParams({ aufgabe: id === selectedId ? null : id });
   const close = () => setParams({ aufgabe: null });
 
   if (!tasks || !milestones || !today || (mine && !me)) {
@@ -228,7 +230,7 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
                     const st = TASK_STATUSES.find((s) => s.id === col.id)!;
                     const count = visible.filter((t) => t.status === st.id).length;
                     return (
-                      <KanbanBoard key={col.id} id={col.id} className="w-[290px] shrink-0">
+                      <KanbanBoard key={col.id} id={col.id} className="max-w-[440px] min-w-[290px] flex-1">
                         <KanbanHeader>
                           <span className={cn("size-2 rounded-full", st.dot)} aria-hidden />
                           <span className="text-[12.5px] font-semibold">{st.name}</span>
@@ -247,7 +249,7 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
                             const task = all.find((t) => t.id === item.id)!;
                             return (
                               <KanbanCard key={item.id} id={item.id}>
-                                <TaskCard task={task} today={today} milestones={msList} selected={task.id === selectedId} onOpen={() => open(task.id)} />
+                                <TaskCard task={task} today={today} milestones={msList} selected={task.id === selectedId} onOpen={() => toggle(task.id)} />
                               </KanbanCard>
                             );
                           }}
@@ -267,7 +269,7 @@ export function Tasks({ mine = false }: { mine?: boolean }) {
                 showDone={showDone}
                 onShowDone={() => setShowDone((v) => !v)}
                 selectedId={selectedId}
-                onOpen={open}
+                onOpen={toggle}
                 onToggle={(t) => changeStatus(t, t.status === "erledigt" ? "offen" : "erledigt")}
               />
             </div>

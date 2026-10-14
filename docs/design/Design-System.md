@@ -22,11 +22,13 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
 
 | Token | Dunkel | Hell | Verwendung |
 |---|---|---|---|
-| `--bg` | #0c0c0d | #f1f1f2 | App-Hintergrund, Sidebar |
-| `--panel` | #121214 | #f9f9fa | Hauptfläche |
-| `--card` | #18181a | #ffffff | Karten |
-| `--card2` | #1e1e21 | #f6f6f7 | Gruppenköpfe, Leerzustände |
-| `--col` | #0b0b0d | #efeff1 | Kanban-Spalte (Mulde) |
+| `--bg` | #050506 | #f5f5f6 | App-Hintergrund, Sidebar |
+| `--panel` | #0a0a0b | #ffffff | Hauptfläche |
+| `--card` | #0f0f11 | #ffffff | Karten |
+| `--card2` | #161618 | #f7f7f8 | Gruppenköpfe, Leerzustände |
+| `--col` | #060607 | #f4f4f5 | Kanban-Spalte (Mulde) |
+
+**Flächen neu (Maxi, 14.10.: „weißer bzw. schwärzer, Boxen nicht so fremd“):** hell ist die Hauptfläche reinweiß und Karten heben sich nur über den feinen Ring ab (wie Vercel/Linear), dunkel fast schwarz mit Karten knapp darüber (Kontrast Karte/Fläche 1,03:1). Alle Text-, Status-, Bereichs- und Feldfarben auf allen Flächen nachgerechnet: 160 Prüfungen, 0 Fehler (WCAG; schwächste Werte: hell `--text3` 5,84:1, Bereichsfarben ≥ 3,65:1).
 | `--field` | #6b6b72 | #7c7c85 | Ränder von Eingabefeldern (≥ 3:1) |
 | `--text` | #e4e4e8 | #18181b | Haupttext (dunkel bewusst nicht reinweiß: 14,3:1) |
 | `--text2` | #bbbbc2 | #52525b | Nebentext |
@@ -45,7 +47,7 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
 
 **Login:** Schimmer in #4f8fd9 (0,18 Mitte, 0,06 bei 45 %), Schein unterm Mauszeiger 0,06. **App-Icons:** Schwarz #0c0c0d, Schrift #e4e4e8, Strich #4f8fd9.
 
-**Status-Chips (Maxi, 14.10.):** kein „Oval mit Punkt“ mehr. Chips sind Pillen mit Wort und einem ruhigen Farbverlauf in der Statusfarbe (Klassen `chip-tone`/`chip-amber|red|green`, `chip-today` in `globals.css`). Nur „heute“ (Kobalt) und „überfällig“ (rot) bewegen sich: Ein Lichtstreifen läuft alle 3,2 s einmal durch (Rot +14 %, Text bleibt über 4,5:1). Legenden-Chips mit 0 Einträgen bleiben still (`still`). Bei „Bewegung reduzieren“ im System steht alles still. Tönung im Hellmodus höchstens Amber 7 %, Grün 10 %, Rot 12 % (sonst Text unter 4,5:1, nachgerechnet 14.10.).
+**Status-Chips (Maxi, 14.10.):** kein „Oval mit Punkt“ mehr. Chips sind Pillen mit Wort und einem ruhigen Farbverlauf in der Statusfarbe (Klassen `chip-tone`/`chip-amber|red|green`, `chip-today` in `globals.css`). Nur „heute“ (Kobalt) und „überfällig“ (rot) bewegen sich, mit dem Tinten-Sweep (siehe oben). Legenden-Chips mit 0 Einträgen bleiben still (`still`). Bei „Bewegung reduzieren“ im System steht alles still. Tönung im Hellmodus höchstens Amber 7 %, Grün 10 %, Rot 12 % (sonst Text unter 4,5:1, nachgerechnet 14.10.).
 
 **Bereichs-Zeichen (14.10.):** statt Punkt ein kleiner Ring in Bereichsfarbe mit Kern (`AreaGlyph`). Der Ring füllt sich mit dem Anteil erledigter Meilensteine des Bereichs, zeichnet sich beim Erscheinen (300 ms) und wächst beim Drüberfahren leicht.
 
@@ -64,8 +66,8 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
 - **Fokus:** `:focus-visible` mit 2px `--accLine` und 2px Abstand.
 
 ## 5. Layout
-- **Desktop:** Sidebar 220px (Maxi, 14.10.: enger), auf ein 60px-Icon-Band einklappbar. Der Knopf zum Ein-/Ausklappen sitzt in beiden Zuständen an exakt derselben Stelle oben links. Hauptpanel eingerückt (8px), Radius 14, Ring. Übersicht-Inhalt max. 1080px breit, mittig. Pipeline über die volle Breite, rechts Detail-Sheet mit 400px.
-- **Sidebar:** Einklapp-Knopf + Logo · Suche (Strg K) · Übersicht, Inbox, Meine Aufgaben · HACKATHON: Roadmap, Pipeline, Aufgaben, Wissen · BEREICHE: 5 mit Bereichs-Zeichen (Ring = Fortschritt) und rechts der verantwortlichen Person als Mini-Avatar (gestrichelter Kreis = noch offen) · unten Avatar, Hell/Dunkel, Abmelden. Eingeklappt erscheinen die Bereichs-Zeichen ebenfalls. Kein Sound-Schalter (Maxi, 14.10.: Sounds sind Standard; Schalter nur in Strg+K und im Handy-Menü).
+- **Desktop:** Sidebar 220px (Maxi, 14.10.: enger), auf ein 60px-Icon-Band einklappbar. Der Knopf zum Ein-/Ausklappen sitzt in beiden Zuständen an exakt derselben Stelle oben links. Hauptpanel eingerückt (8px), Radius 14, Ring. Inhalt von Übersicht, Bereichen und Wissen max. 1440px breit, mittig (Maxi, 14.10.: Breite besser nutzen; vorher 1080px). Pipeline über die volle Breite, rechts Detail-Sheet mit 400px.
+- **Sidebar:** Einklapp-Knopf + Logo · Suche (Strg K) · Übersicht, Inbox, Meine Aufgaben · HACKATHON: Roadmap, Pipeline, Aufgaben, Wissen · BEREICHE: 5 mit Bereichs-Zeichen (Ring = Fortschritt) und rechts der verantwortlichen Person als Mini-Avatar (gestrichelter Kreis = noch offen) · unten Avatar, Hell/Dunkel, Abmelden. Eingeklappt erscheinen die Bereichs-Zeichen ebenfalls. Kein Sound-Schalter (Maxi, 14.10.: Sounds sind immer an, auch kein Schalter in Strg+K oder im Handy-Menü).
 - **Handy:** Tab-Leiste: Heute · Pipeline · **+** (Akzent-Kreis 52px) · Aufgaben · Inbox. Bottom Sheets, `env(safe-area-inset-bottom)`, Tippflächen mind. 44px, **kein Ziehen & Ablegen** (Status per Sheet).
 
 ## 6. Seiten (siehe Boards)
@@ -85,7 +87,7 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
    - Umschalter Zeitstrahl/Liste. Am Handy nur die Liste.
 3. **Pipeline** (`Graphit-Pipeline.dc.html`)
    - Tabs je Typ mit den Begriffen der Website (14.10.): Track-Partner · Sponsoren (Tech-Partner + Supporter) · Jury & Ecosystem · Venues. Umschalter Board/Liste, Zielbalken, Zähler „heute“ und „überfällig“.
-   - **Liste = CRM-Tabelle** (Maxi, 14.10., Variante D nach Prüfschleife, nur Desktop; am Handy bleibt die Liste): Firma (Kürzel, Name, darunter Kategorie · Ort) · Stufe · Prio · Nachfassen · Zuständig · Warmer Kontakt bzw. bei Venues Kapazität (kurz). 44px-Zeilen, keine Rasterlinien, keine Pills, nie seitliches Scrollen: Bei wenig Platz (Container unter 900px, z. B. Detail offen) fällt die letzte Spalte weg, unter 700px auch Prio. Standard-Sortierung Nachfassen (Überfälliges oben), jeder Spaltenkopf sortiert. Kopf und Firmenspalte kleben, unten Zähler je Stufe.
+   - **Liste = CRM-Tabelle** (Maxi, 14.10., Variante D nach Prüfschleife, nur Desktop; am Handy bleibt die Liste): Firma (Kürzel, Name, darunter Kategorie · Ort) · Stufe · Prio · Nachfassen · Zuständig · Warmer Kontakt bzw. bei Venues Kapazität (kurz). 44px-Zeilen, keine Rasterlinien, keine Pills. **Feste Spaltenbreiten mit gleichem Abstand** (Maxi, 14.10.), freier Platz sammelt sich rechts in einer leeren Füllspalte; dadurch bleiben die Spalten stehen, wenn das Detail aufgeht. Nie seitliches Scrollen: unter 1020px Tabellenbreite fällt die Füllspalte weg (Firma nimmt den Rest), unter 900px die letzte Spalte, unter 700px auch Prio. **Erneuter Klick auf die offene Zeile schließt das Detail** (gilt auch für Aufgaben und Wissen). Standard-Sortierung Nachfassen (Überfälliges oben), jeder Spaltenkopf sortiert. Kopf und Firmenspalte kleben, unten Zähler je Stufe.
    - „Sponsor/Jury“ aus der Excel wird beim Import nach Kategorie zugeordnet, ein Eintrag pro Firma (14.10., ersetzt den Split): VC und Ecosystem → Jury & Ecosystem, Konzerne → Supporter. Einzelne Finaljuror:innen legt man von Hand an.
    - Spalten: Recherche → Kontaktiert → Im Gespräch → Zugesagt → Fix · Abgesagt (schmal).
    - Karte: Initialen, Name, Prio, „warm über X · Welle n“, Nachfass-Chip (heute = Akzent, überfällig = rot), Avatar.
@@ -100,7 +102,11 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
 4. **Befehlsleiste** (Strg+K, im Übersicht-Board klickbar)
    - Gruppen: Zuletzt · Aktionen (Neue Aufgabe C, Firma F, Entscheidung E) · Gehe zu (G R …).
    - Tastenkürzel stehen rechts in Kästchen.
-5. **Handy** (`Graphit-Handy.dc.html`)
+5. **Bereichs-Seite** (Maxi, 14.10.)
+   - Oben eine Kopf-Leiste wie die Eigenschaften eines Projekts in Linear: Verantwortlich (Auswahl direkt im Feld) · Pipeline-Ziel (falls vorhanden, mit Stufen und heute/überfällig) · Meilensteine x/n · Aufgaben x/n.
+   - Darunter links **Notizen** (freies Textfeld als Ablage, speichert von selbst nach 0,8 s bzw. beim Verlassen, zeigt „wer · wann“), rechts Meilensteine und Aufgaben. Am Handy Notizen unten.
+   - Gleichzeitiges Schreiben: Wer zuletzt speichert, gewinnt. Fremde Änderungen erscheinen live, solange man selbst nicht tippt.
+6. **Handy** (`Graphit-Handy.dc.html`)
    - „Heute für dich“ zum Abhaken, mit +2 T.
    - Status-Sheet: Stufen als 48px-Zeilen, Nachfass-Chips, Knopf „Speichern“.
    - Firmen-Detail mit Kommentaren, @-Vorschlagsliste und unten fixiertem Eingabefeld.
@@ -115,8 +121,6 @@ Quelle soundcn (`npx shadcn add @soundcn/use-sound @soundcn/<name>`), alle Kenne
 | Meilenstein erledigt | `jingles-pizzi-10` | 0,35 | an |
 | Karte ablegen | `drop-002` / `drop-003` im Wechsel, Tempo ±4 % | 0,12 | an |
 | Strg+K öffnen / schließen | `maximize-008` / `minimize-008` | 0,11 | an |
-| Klick / Schalter | `click-003` (= click-soft) / `switch-006` | 0,14 / 0,25 | Fun-Modus |
-| Tippen | `click-002`, Tempo ±4 % | 0,17 | Fun-Modus |
 | Erwähnung, Fehler | `question-002` / `error-008` | 0,16 / 0,55 | aus (nur bei eigenen Aktionen, nie bei eingehenden Nachrichten) |
 
 Umsetzung:
@@ -124,7 +128,7 @@ Umsetzung:
 - Ein zentraler Lautstärkeregler (GainNode).
 - `play("taskDone")` mit eigener Lautstärke je Moment.
 - Höchstens ein Abspielen pro Sound alle 60–80ms.
-- Schalter „Sounds“ und „Fun-Modus“ im Profil (in der Datenbank, nicht nur im Browser).
+- **Kein Schalter und kein Fun-Modus** (Maxi, 14.10.: „sieht kindisch aus“). Sounds sind immer an, stumm geht über das Gerät. Die Tabelle `user_settings` bleibt ungenutzt in der Datenbank.
 - Der Ton ist nie das einzige Feedback.
 - Das iPhone darf über den Stummschalter stummschalten (nicht umgehen).
 

@@ -112,7 +112,7 @@ export function Knowledge() {
       <PageHeader title="Wissen" action={{ label: "Entscheidung", onClick: () => setParams({ neu: "1" }) }} />
       <div className="flex min-h-0 flex-1">
         <div className="min-w-0 flex-1 md:overflow-auto">
-          <div className="mx-auto grid w-full max-w-[1080px] gap-5 px-3.5 pt-2 pb-8 md:grid-cols-[minmax(0,1fr)_300px] md:px-6 md:pt-6">
+          <div className="mx-auto grid w-full max-w-[1440px] gap-5 px-3.5 pt-2 pb-8 md:grid-cols-[minmax(0,1fr)_300px] md:px-6 md:pt-6">
             {/* Entscheidungen */}
             <section className="flex min-w-0 flex-col gap-3" aria-labelledby="dec-title">
               <div className="flex flex-wrap items-center gap-2.5">
@@ -180,7 +180,7 @@ export function Knowledge() {
                       {visible
                         .filter((d) => d.decided_on.startsWith(m))
                         .map((d) => (
-                          <DecisionRow key={d.id} d={d} topics={topics} selected={d.id === selectedId} onOpen={() => setParams({ entscheidung: d.id })} />
+                          <DecisionRow key={d.id} d={d} topics={topics} selected={d.id === selectedId} onOpen={() => setParams({ entscheidung: d.id === selectedId ? null : d.id })} />
                         ))}
                     </ul>
                   </div>
