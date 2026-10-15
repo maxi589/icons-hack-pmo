@@ -81,7 +81,7 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
    - Karte „Nächster Meilenstein“ mit Unterpunkten und „x von n erledigt“.
    - 4 Zielzahl-Kacheln: Track-Partner x/4, Jury x/4, Venue x/1 plus Backup, Sponsoren mit Ziel offen.
    - „Als Nächstes fällig“, gruppiert nach Tag.
-   - „Heute nachfassen“ mit Leerzustand: „Noch nichts nachzufassen. Welle 1 startet am Mo, 19.10. …“, darunter die Nachfass-Runden 2.11., 16.11. und 30.11.
+   - „Heute nachfassen“ mit Leerzustand: „Noch nichts nachzufassen. Welle 1 startet am Mo, 19.10. …“, darunter die Nachfass-Runden 2.11., 16.11. und 30.11. **Kreis abhaken = nachgefasst** (Maxi, 15.10., wie „Heute für dich“ am Handy): nächstes Nachfassen in 7 Tagen, Zeile verschwindet sofort, Hinweis mit Rückgängig, danach „hat nachgefasst, nächstes Mal …“ im Verlauf der Firma.
    - Bereiche-Raster mit „Verantwortlich offen“ und dem Knopf „Zuständigkeiten verteilen“.
    - „Als Nächstes“ zeigt die Unterpunkte des nächsten Meilensteins nicht noch einmal (stehen in dessen Karte).
    - **Handy (15.10.):** Label-Zeile mit Datum („Do, 15. Oktober · noch 3 Tage Vorbereitung“). Countdown nur die Uhr in einer Zeile (Tage 42px, Uhr 20px), ohne Label, Zieldatum und Phasen-Balken (Maxi: „unnötigen Fülltext weg“). „Nächster Meilenstein“ mit eingeklappten Unterpunkten (Zeile „0 von 4“ klappt auf). „Heute nachfassen“ nur am Desktop (eigene Fälle stehen in „Heute für dich“). Karten am Handy Radius 12, Abstände 12px. Zielzahlen als eine Karte „Ziele“ mit vier Zeilen (Name, Frist, Balken, Wert), Bereiche als Liste (Zeichen, Name, x/n · nächste Frist, Verantwortliche/r).
@@ -100,12 +100,13 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
    - Karte: Initialen, Name, Prio, „warm über X · Welle n“, Nachfass-Chip (heute = Akzent, überfällig = rot), Avatar.
    - Detail-Sheet:
      - Stufe plus Primärknopf „Weiter zu ‚…‘“
-     - Eigenschaften (entschlackt 14.10.): Zuständig, Nachfassen (Datum rot/Kobalt je nach Status, +2 T und +1 W in einer Zeile), Prio, Warm über (bestehende Verbindung klein darunter, nicht bei Venues), Ansprechperson, E-Mail / Tel., Website. Venues zusätzlich Block „Eckdaten“: Kapazität, Übernachtung, Preis/Deal, Lage. Dann Notizen. Kein „Mehr“, keine Welle, keine Rollen im Detail (Maxi: nicht overengineeren). Leere Felder zeigen „–“, keine Beispieltexte. Website-Symbol im Kopf, wenn gesetzt.
+     - Eigenschaften (entschlackt 14.10.): Zuständig, Nachfassen (Datum rot/Kobalt je nach Status, +2 T und +1 W in einer Zeile; ist es heute fällig oder überfällig, steht davor **✓ Nachgefasst** (Handy nur ✓): nächstes Mal in 7 Tagen, Rückgängig, Verlaufseintrag; wird es eng, rutschen die Knöpfe in eine zweite Zeile), Prio, Warm über (bestehende Verbindung klein darunter, nicht bei Venues), Ansprechperson, E-Mail / Tel., Website. Venues zusätzlich Block „Eckdaten“: Kapazität, Übernachtung, Preis/Deal, Lage. Dann Notizen. Kein „Mehr“, keine Welle, keine Rollen im Detail (Maxi: nicht overengineeren). Leere Felder zeigen „–“, keine Beispieltexte. Website-Symbol im Kopf, wenn gesetzt.
      - Das Detail-Panel steht rechts über die volle Höhe unter der Kopfzeile; Tabs und Filter stehen nur über der Liste (gilt auch für Aufgaben und Dokumente).
      - „Link kopieren“ überall nur als Link-Symbol in der Ecke.
      - Verlauf aus Systemereignissen und Kommentaren
      - Kommentarfeld mit @
    - Nach einer Änderung erscheint der Hinweis „X → Stufe · Rückgängig“, 5 s, mit Ablauf-Linie. Er ersetzt Sicherheitsfragen.
+   - **Automatisches Nachfassen (Maxi, 15.10.):** Wer eine Firma ohne Nachfass-Datum auf „Kontaktiert“ setzt (Board, Detail, Handy-Sheet), bekommt heute + 7 Tage dazu; Hinweis „X → Kontaktiert · nachfassen Do, 22.10.“, Rückgängig nimmt beides zurück. Ein gesetztes Datum bleibt.
 4. **Befehlsleiste** (Strg+K, im Übersicht-Board klickbar)
    - Gruppen: Zuletzt · Aktionen (Neue Aufgabe C, Firma F, Entscheidung E) · Gehe zu (G R …).
    - Tastenkürzel stehen rechts in Kästchen.

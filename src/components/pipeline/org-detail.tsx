@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ExternalLink, X } from "lucide-react";
+import { Check, ChevronDown, ExternalLink, X } from "lucide-react";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { EditText, miniButton as mini, PropRow, SelectBox } from "@/components/detail-fields";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,7 @@ import { formatDayMonth, formatShort, todayInVienna } from "@/lib/dates";
 import type { OrgPatch } from "@/lib/data/use-organizations";
 import { DocBlock } from "@/components/dokumente/doc-block";
 import { MeetingBlock } from "@/components/termine/meeting-block";
+import { useFollowedUp } from "./use-followed-up";
 import {
   followState,
   initials,
@@ -41,6 +42,7 @@ export function OrgDetail({
   onClose: () => void;
 }) {
   const { me, people, personById } = useTeam();
+  const followedUp = useFollowedUp();
   const next = nextStage(org.stage);
   const follow = followState(org, today);
   const stage = STAGES.find((s) => s.id === org.stage)!;
@@ -169,7 +171,8 @@ export function OrgDetail({
           </span>
         </PropRow>
         <PropRow label="Nachfassen" htmlFor={f("follow")}>
-          <span className="flex items-center gap-1">
+          {/* flex-wrap: Ist „Nachgefasst“ da und wird es eng (Detail 400px), rutschen die Knöpfe in eine zweite Zeile */}
+          <span className="flex flex-wrap items-center gap-1">
             <input
               id={f("follow")}
               type="date"
@@ -188,6 +191,18 @@ export function OrgDetail({
               </span>
             )}
             <span className="ml-auto flex shrink-0 gap-1">
+              {/* Fällig (heute/überfällig): abhaken = nachgefasst, nächstes Mal in 7 Tagen, mit Verlaufseintrag */}
+              {(follow?.tone === "today" || follow?.tone === "red") && (
+                <button
+                  type="button"
+                  className={cn(mini, "gap-1 px-2 text-acc-line")}
+                  title="Nachgefasst, wieder in 7 Tagen"
+                  onClick={() => followedUp(org, today, (d) => onUpdate({ next_follow_up: d }))}
+                >
+                  <Check className="size-3.5" strokeWidth={2.5} aria-hidden />
+                  <span className="max-md:sr-only">Nachgefasst</span>
+                </button>
+              )}
               <button type="button" className={mini} title="Um 2 Tage verschieben" onClick={() => onUpdate({ next_follow_up: shiftFollowUp(org.next_follow_up, today, 2) })}>
                 +2 T
               </button>

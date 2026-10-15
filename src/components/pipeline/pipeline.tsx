@@ -23,6 +23,7 @@ import {
   followState,
   inTab,
   initials,
+  shiftFollowUp,
   STAGES,
   stageName,
   TABS,
@@ -115,16 +116,19 @@ export function Pipeline() {
   const overdue = inThisTab.filter((o) => followState(o, today)?.tone === "red").length;
   const nextRound = FOLLOW_UP_ROUNDS.find((d) => d >= today);
 
-  /** Stufe ändern: sofort speichern, 5 s „Rückgängig“, danach Eintrag im Verlauf. */
+  /** Stufe ändern: sofort speichern, 5 s „Rückgängig“, danach Eintrag im Verlauf.
+   *  Auf „Kontaktiert“ ohne Nachfass-Datum kommt automatisch heute + 7 Tage dazu (Maxi, 15.10.), sonst würde die Firma
+   *  nie „überfällig“. Ein schon gesetztes Datum bleibt. „Rückgängig“ nimmt beides zurück. */
   const changeStage = (org: Organization, to: Stage) => {
     const from = org.stage;
     if (from === to) return;
-    update(org.id, { stage: to });
+    const autoFollow = to === "kontaktiert" && !org.next_follow_up ? shiftFollowUp(null, today, 7) : null;
+    update(org.id, autoFollow ? { stage: to, next_follow_up: autoFollow } : { stage: to });
     // Zusage ist ein Erfolg; von Fix zurück auf Zugesagt nicht.
     if (to === "fix" || (to === "zugesagt" && from !== "fix")) play("dealWon");
     toast({
-      text: `${org.name} → ${stageName(to)}`,
-      onAction: () => update(org.id, { stage: from }),
+      text: `${org.name} → ${stageName(to)}${autoFollow ? ` · nachfassen ${formatShort(autoFollow)}` : ""}`,
+      onAction: () => update(org.id, autoFollow ? { stage: from, next_follow_up: null } : { stage: from }),
       onExpire: () => logActivity("organization", org.id, me?.id ?? null, "stage_changed", { from, to }),
     });
   };

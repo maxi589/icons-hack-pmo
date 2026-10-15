@@ -19,6 +19,9 @@ import { endOf, meetingHref, viennaParts, type Meeting } from "@/lib/meetings";
 import { daysBetween, EVENT_START, EVENT_START_UTC, formatDayMonth, formatHeaderDate, formatLong, formatShort, relativeDays, TIME_ZONE } from "@/lib/dates";
 import { currentPhase, phaseFill, PHASES, WAVE_1 } from "@/lib/phases";
 import { MilestoneChecklist } from "@/components/milestone-checklist";
+import { StatusCheck } from "@/components/tasks/status-check";
+import { useFollowedUp } from "@/components/pipeline/use-followed-up";
+import { createClient } from "@/lib/supabase/client";
 import { OwnersDialog } from "./owners-dialog";
 import { TodayCard } from "./today-card";
 import { useOverviewData, type Milestone, type Org, type Task } from "./use-overview-data";
@@ -358,9 +361,23 @@ function DueCard({ milestones, tasks, meetings, today }: { milestones: Milestone
 // ---------------------------------------------------------------
 // Heute nachfassen
 // ---------------------------------------------------------------
+// Kreis abhaken = nachgefasst (Maxi, 15.10., wie „Heute für dich“ am Handy): nächstes Mal in 7 Tagen, Verlaufseintrag.
 function FollowUpCard({ orgs, today }: { orgs: Org[]; today: string }) {
   const { personById } = useTeam();
+  const followedUp = useFollowedUp();
+  // Abgehakte Zeilen verschwinden sofort, solange die Live-Daten noch das alte Datum zeigen; „Rückgängig“ holt sie zurück.
+  const [done, setDone] = useState<Record<string, string | null>>({});
+  const save = (o: Org) => (date: string | null) => {
+    setDone((d) => {
+      const next = { ...d };
+      if (date === o.next_follow_up) delete next[o.id];
+      else next[o.id] = o.next_follow_up;
+      return next;
+    });
+    void createClient().from("organizations").update({ next_follow_up: date }).eq("id", o.id);
+  };
   const due = orgs
+    .filter((o) => !(o.id in done && done[o.id] === o.next_follow_up))
     .filter((o) => o.next_follow_up && o.next_follow_up <= today && o.stage !== "fix" && o.stage !== "abgesagt")
     .sort((a, b) => a.next_follow_up!.localeCompare(b.next_follow_up!));
 
@@ -377,9 +394,7 @@ function FollowUpCard({ orgs, today }: { orgs: Org[]; today: string }) {
             const late = o.next_follow_up! < today;
             return (
               <li key={o.id} className="relative flex min-h-11 items-center gap-2.5 border-t border-line px-3 text-[13.5px] first:border-t-0 hover:bg-hover md:min-h-10">
-                <span className="grid size-6 shrink-0 place-items-center rounded-md bg-active text-[10px] font-semibold text-fg-2" aria-hidden>
-                  {o.name.slice(0, 2).toUpperCase()}
-                </span>
+                <StatusCheck status="offen" title={`${o.name} nachfassen`} onToggle={() => followedUp(o, today, save(o))} />
                 <Link href={`/pipeline?firma=${o.id}`} className="min-w-0 flex-1 truncate rounded-sm after:absolute after:inset-0">
                   {o.name}
                 </Link>
