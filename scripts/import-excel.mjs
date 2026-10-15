@@ -9,6 +9,12 @@
 //
 // Optional: --dir <Ordner> (Standard: OneDrive-Projektordner), --partner <datei>, --venues <datei>, --json <datei> (nur Trockenlauf).
 // --write bricht ab, wenn schon importierte Zeilen in der Datenbank stehen oder die Excel Fehler hat.
+//
+// Status „zurückgesetzt“ (Maxi, 15.10.): Die Status in den Excels stimmen nicht, niemand hat schon etwas gemacht.
+// Standard ist deshalb: alle Firmen und Venues auf Recherche, kein Nachfass-Datum (auch nicht aus den Venue-„Deadlines“),
+// keine Absagen. Übernommen werden Name, Typ/Rolle, Kategorie, Standort, Kontaktdaten, Notizen, Venue-Eckdaten und
+// Prio/Owner, soweit eingetragen (im Trockenlauf mit Maxi prüfen).
+//   --mit-status   Status und Nachfass-Daten doch übernehmen (nur falls das Team die Excel bis zum Import als Statusliste pflegt)
 
 import fs from "node:fs";
 import path from "node:path";
@@ -25,6 +31,7 @@ const PARTNER_FILE = arg("--partner") ?? path.join(DIR, "Partner.xlsx");
 const VENUE_FILE = arg("--venues") ?? path.join(DIR, "Venue_Tracker_Hackathon_2027.xlsx");
 const SRC_PARTNER = "Partner.xlsx Z. ";
 const SRC_VENUE = "Venue-Tracker Z. ";
+const WITH_STATUS = args.includes("--mit-status");
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SECRET_KEY;
@@ -186,13 +193,13 @@ function readPartners(owner) {
     ];
     if (!roles.length) problems.push(`${where}: Type fehlt`);
 
-    const stage = PARTNER_STAGE[norm(c("status"))];
+    const stage = WITH_STATUS ? PARTNER_STAGE[norm(c("status"))] : "recherche";
     if (!stage) problems.push(`${where}: Status „${c("status")}“ unbekannt`);
 
     const contactRaw = text(c("contact"));
     const existing = contactRaw ? CONTACT[norm(contactRaw)] ?? contactRaw : null;
     if (contactRaw && !CONTACT[norm(contactRaw)]) hints.push(`${where}: Bestehender Kontakt „${contactRaw}“ unverändert übernommen`);
-    const followUp = dateOf(c("follow_up"), where) ?? (FOLLOW_UP_STAGES.includes(stage) ? FIRST_ROUND : null);
+    const followUp = WITH_STATUS ? (dateOf(c("follow_up"), where) ?? (FOLLOW_UP_STAGES.includes(stage) ? FIRST_ROUND : null)) : null;
 
     out.push({
       name,
@@ -280,7 +287,7 @@ function readVenues(owner) {
     }
     raw.push({ r, status: c("status"), owner: c("owner"), prio: c("prio"), deadline: c("deadline") });
 
-    const statusKey = norm(c("status"));
+    const statusKey = WITH_STATUS ? norm(c("status")) : "offen";
     const stage = VENUE_STAGE[statusKey];
     if (!stage) problems.push(`${where}: Status „${c("status")}“ unbekannt`);
     const { name, location, extra } = splitVenueName(full);
@@ -294,7 +301,7 @@ function readVenues(owner) {
       prio: prioOf(c("prio"), where),
       stage: stage ?? "recherche",
       lost_reason: statusKey === "verworfen" ? "verworfen" : null,
-      next_follow_up: stage === "abgesagt" ? null : dateOf(c("deadline"), where),
+      next_follow_up: !WITH_STATUS || stage === "abgesagt" ? null : dateOf(c("deadline"), where),
       capacity: text(c("capacity")),
       overnight: text(c("overnight")),
       price: text(c("price")),
@@ -416,6 +423,11 @@ console.log(`  Kapazität ${v.filter((o) => o.capacity).length} · Übernachtung
 if (hints.length) console.log(`\nHinweise (${hints.length}):\n  ` + hints.join("\n  "));
 if (problems.length) console.log(`\nFEHLER (${problems.length}), Import nicht möglich:\n  ` + problems.join("\n  "));
 console.log(`\nGesamt: ${all.length} Einträge (${p.length} Partner + ${v.length} Venues)`);
+console.log(
+  WITH_STATUS
+    ? "Status: aus der Excel übernommen (--mit-status)"
+    : "Status: zurückgesetzt (alles Recherche, kein Nachfassen, keine Absagen). Prio/Owner werden übernommen, soweit eingetragen."
+);
 
 if (!args.includes("--write")) {
   // --json <datei>: zugeordnete Einträge für Entwürfe und Belastungstests (enthält Kontaktdaten, nur in den Temp-Ordner)
