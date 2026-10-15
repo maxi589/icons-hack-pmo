@@ -14,7 +14,8 @@ import { switch006Sound } from "./switch-006";
 
 // Sounds (Design-System, Abschnitt 7). Alle aus soundcn, Kenney CC0. Nie `warcraft`.
 // Ein Modul für die ganze App: `play("taskDone")` geht von überall, auch außerhalb von React.
-// Sounds sind immer an, ohne Schalter; stumm geht über das Gerät.
+// Standard: an. Schalter „Töne“ (Maxi, 15.10., auf Empfehlung von Claude) gilt pro Gerät (localStorage, wie Hell/Dunkel),
+// z. B. Laptop in der Bibliothek stumm, Handy an. Zu finden im Profil, im Handy-Menü und in Strg+K.
 // Präsenz „Voll“ (Maxi, 14.10., auf dem Sound-Board gewählt): auch Klicks, Umschalten, Detail auf/zu,
 // Hinweise und Tippen haben einen leisen Ton. Abhaken = Favoriten-Mix aus click-003 + drop-003.
 
@@ -102,9 +103,39 @@ function start(ctx: AudioContext, sound: SoundAsset, volume: number, vary = 0, d
     .catch(() => {});
 }
 
+// ---------------------------------------------------------------
+// Schalter „Töne“ (pro Gerät)
+// ---------------------------------------------------------------
+const OFF_KEY = "sounds-off";
+export const SOUNDS_EVENT = "soundschange";
+let off: boolean | null = null;
+
+/** Sind Töne auf diesem Gerät an? (Ohne Speicher, z. B. im privaten Fenster: an.) */
+export function soundsOn() {
+  if (typeof window === "undefined") return true;
+  if (off === null) {
+    try {
+      off = localStorage.getItem(OFF_KEY) === "1";
+    } catch {
+      off = false;
+    }
+  }
+  return !off;
+}
+
+export function setSoundsOn(on: boolean) {
+  off = !on;
+  try {
+    if (on) localStorage.removeItem(OFF_KEY);
+    else localStorage.setItem(OFF_KEY, "1");
+  } catch {}
+  window.dispatchEvent(new Event(SOUNDS_EVENT));
+  if (on) play("toggle");
+}
+
 export function play(name: SoundName) {
   const moment: Moment = MOMENTS[name];
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || !soundsOn()) return;
 
   const now = performance.now();
   if (now - (lastPlayed.get(name) ?? -Infinity) < MIN_GAP_MS) return;

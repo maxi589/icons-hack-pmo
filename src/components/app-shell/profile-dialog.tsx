@@ -9,6 +9,7 @@ import { useToast } from "@/components/toast";
 import { createClient } from "@/lib/supabase/client";
 import { changePassword, invitePerson } from "@/lib/account-actions";
 import { MIN_PASSWORD } from "@/lib/auth";
+import { SoundToggle } from "@/components/sound-toggle";
 import { useTeam } from "./team-provider";
 
 // Profil (Klick auf den eigenen Avatar, Strg+K „Profil“, Handy-Menü): Passwort ändern und Team mit Einladen.
@@ -69,6 +70,10 @@ export function ProfileDialog() {
             <p className="truncate text-[13px] text-fg-3">{mine?.email ?? " "}</p>
           </div>
         </div>
+        <section className="flex items-center justify-between gap-3">
+          <h3 className="label-mono">Töne auf diesem Gerät</h3>
+          <SoundToggle />
+        </section>
         <PasswordSection key={open ? "open" : "closed"} />
         <TeamSection key={open ? "team-open" : "team-closed"} members={members} meId={me?.id} onInvited={load} />
       </DialogContent>

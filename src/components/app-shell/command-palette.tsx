@@ -18,8 +18,11 @@ import {
   Plus,
   Sun,
   UserRound,
+  Volume2,
+  VolumeX,
   type LucideIcon,
 } from "lucide-react";
+import { useSoundsOn } from "@/components/sound-toggle";
 import { openFeedback } from "@/components/feedback/feedback-panel";
 import { openProfile } from "./profile-dialog";
 import {
@@ -37,7 +40,7 @@ import { setTheme, useThemeChoice } from "@/components/theme-toggle";
 import { useTeam } from "./team-provider";
 import { NAV_ALL, NEW_ACTIONS } from "@/lib/nav";
 import { toggleSidebar } from "@/lib/sidebar";
-import { play } from "@/lib/sounds";
+import { play, setSoundsOn } from "@/lib/sounds";
 import { createClient } from "@/lib/supabase/client";
 import { DECISION_TYPE, docType } from "@/lib/documents";
 import { matchesAll, searchAll, searchWords, type Hit, type HitType } from "@/lib/search";
@@ -117,6 +120,7 @@ function Palette({ mode, close }: { mode: Mode; close: () => void }) {
   const router = useRouter();
   const { areas } = useTeam();
   const theme = useThemeChoice();
+  const sounds = useSoundsOn();
   const [search, setSearch] = useState("");
   const [found, setFound] = useState<{ q: string; hits: Hit[] }>({ q: "", hits: [] });
 
@@ -231,6 +235,10 @@ function Palette({ mode, close }: { mode: Mode; close: () => void }) {
                   {theme === value && <Check className="text-acc-line" aria-label="aktiv" />}
                 </CommandItem>
               ))}
+              <CommandItem value={`Töne Sound Ton ${sounds ? "aus" : "an"}`} onSelect={run(() => setSoundsOn(!sounds))}>
+                {sounds ? <VolumeX aria-hidden /> : <Volume2 aria-hidden />}
+                <span className="flex-1">{sounds ? "Töne aus" : "Töne an"}</span>
+              </CommandItem>
             </CommandGroup>
             <CommandGroup heading="Sonstiges">
               <CommandItem value="Sidebar ein- oder ausklappen" onSelect={run(toggleSidebar)} className="max-md:hidden">
