@@ -67,7 +67,8 @@ export function OrgDetail({
             {initials(org.name)}
           </span>
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <h2 className="truncate text-base font-semibold tracking-[-0.01em]">{org.name}</h2>
+            {/* Umbrechen statt abschneiden: Venue-Namen aus der Liste sind bis 56 Zeichen lang (gemessen 15.10.) */}
+            <h2 className="text-base leading-snug font-semibold tracking-[-0.01em] break-words">{org.name}</h2>
             <span className="truncate text-[12px] text-fg-3">
               {[org.roles.map((r) => ROLE_NAMES[r]).join(", "), org.category, !isVenue && org.location]
                 .filter(Boolean)

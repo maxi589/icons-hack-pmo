@@ -10,6 +10,7 @@
 // Optional: --dir <Ordner> (Standard: OneDrive-Projektordner), --partner <datei>, --venues <datei>.
 // --write bricht ab, wenn schon importierte Zeilen in der Datenbank stehen oder die Excel Fehler hat.
 
+import fs from "node:fs";
 import path from "node:path";
 import { createClient } from "@supabase/supabase-js";
 import { readWorkbook, excelDate } from "./lib/xlsx.mjs";
@@ -406,6 +407,8 @@ if (problems.length) console.log(`\nFEHLER (${problems.length}), Import nicht m�
 console.log(`\nGesamt: ${all.length} Eintr채ge (${p.length} Partner + ${v.length} Venues)`);
 
 if (!args.includes("--write")) {
+  // --json <datei>: zugeordnete Eintr채ge f체r Entw체rfe und Belastungstests (enth채lt Kontaktdaten, nur in den Temp-Ordner)
+  if (arg("--json")) fs.writeFileSync(arg("--json"), JSON.stringify(all, null, 1));
   console.log("Trockenlauf: nichts geschrieben. Zum Schreiben: --write");
   process.exit(problems.length ? 1 : 0);
 }

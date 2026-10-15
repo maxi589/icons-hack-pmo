@@ -1,15 +1,19 @@
 "use client";
 
+import { createContext, useContext } from "react";
 import { Video } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { useTeam } from "@/components/app-shell/team-provider";
-import { useOrganizations } from "@/lib/data/use-organizations";
 import { joinUrl, timeRange, type Meeting } from "@/lib/meetings";
+import type { Organization } from "@/lib/pipeline";
 import { MeetingMenu } from "./meeting-menu";
 
 // Eine Termin-Zeile (Liste am Desktop, Woche am Handy): Uhrzeit · Bereichsstrich · Titel (darunter Bereich, Ort, Firma)
 // · Beitreten · Teilnehmende. Rechtsklick bzw. langes Drücken öffnet das Menü (Öffnen, Link kopieren, Löschen).
+// Die Firmen kommen einmal von der Seite (MeetingOrgs), nicht je Zeile: sonst lädt jede Zeile die ganze Pipeline
+// und öffnet einen eigenen Live-Kanal (gemessen 15.10.: 22 Abfragen für eine Handy-Woche).
+export const MeetingOrgs = createContext<Organization[] | null>(null);
 
 export function MeetingRow({
   meeting: m,
@@ -23,7 +27,7 @@ export function MeetingRow({
   onDelete: () => void;
 }) {
   const { areaById, personById, me } = useTeam();
-  const { orgs } = useOrganizations();
+  const orgs = useContext(MeetingOrgs);
   const area = areaById(m.area_id);
   const org = orgs?.find((o) => o.id === m.organization_id);
   const sub = [area?.name, m.location, org?.name].filter(Boolean).join(" · ");

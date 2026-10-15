@@ -27,7 +27,9 @@ function layoutDay(list: Meeting[]): Placed[] {
   const items = list
     .map((m) => {
       const start = viennaParts(m.starts_at).minutes;
-      return { m, start, end: Math.min(start + m.duration_min, 24 * 60) };
+      // Für das Nebeneinander zählt die sichtbare Höhe (mind. 22px ≈ 28 min), sonst überdecken sich kurze Termine
+      const end = Math.min(start + Math.max(m.duration_min, (22 / HOUR) * 60), 24 * 60);
+      return { m, start, end, realEnd: Math.min(start + m.duration_min, 24 * 60) };
     })
     .sort((a, b) => a.start - b.start || b.end - a.end);
   const out: Placed[] = [];
@@ -36,7 +38,7 @@ function layoutDay(list: Meeting[]): Placed[] {
   const flush = () => {
     const cols = Math.max(1, ...cluster.map((c) => c.col + 1));
     for (const c of cluster)
-      out.push({ m: c.m, top: (c.start / 60) * HOUR, height: Math.max(((c.end - c.start) / 60) * HOUR, 22), col: c.col, cols });
+      out.push({ m: c.m, top: (c.start / 60) * HOUR, height: Math.max(((c.realEnd - c.start) / 60) * HOUR, 22), col: c.col, cols });
     cluster = [];
   };
   for (const it of items) {
@@ -280,6 +282,7 @@ export function WeekView({
                         }}
                         onPointerCancel={() => setMove(null)}
                         aria-current={sel ? "true" : undefined}
+                        title={`${m.title} · ${timeRange(m)}`}
                         className={cn(
                           "absolute flex cursor-grab flex-col overflow-hidden rounded-[7px] border-l-[3px] px-1.5 text-left transition-shadow duration-150 active:cursor-grabbing",
                           dragged && "opacity-40",

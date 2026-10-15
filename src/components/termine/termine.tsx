@@ -28,7 +28,7 @@ import { MeetingDetail } from "./meeting-detail";
 import { NewMeetingDialog, type MeetingDefaults } from "./new-meeting-dialog";
 import { useMeetingActions } from "./use-meeting-actions";
 import { WeekView, type AllDay } from "./week-view";
-import { MeetingRow } from "./meeting-row";
+import { MeetingOrgs, MeetingRow } from "./meeting-row";
 import { MobileWeek } from "./mobile-week";
 
 // Termine (Plan Welle 1, Schritt 3): Team-Meetings und Partner-Calls an einem Ort, mit Agenda, Notizen, Unterlagen
@@ -141,6 +141,7 @@ export function Termine() {
   ) : null;
 
   return (
+    <MeetingOrgs value={orgs}>
     <div className="flex min-h-0 flex-1 flex-col">
       <PageHeader title="Termine" action={{ label: "Termin", onClick: () => startDraft() }} />
       <div className="relative flex min-h-0 flex-1">
@@ -292,6 +293,7 @@ export function Termine() {
         </>
       )}
     </div>
+    </MeetingOrgs>
   );
 }
 
