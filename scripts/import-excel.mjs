@@ -15,6 +15,7 @@
 // keine Absagen. Übernommen werden Name, Typ/Rolle, Kategorie, Standort, Kontaktdaten, Notizen, Venue-Eckdaten und
 // Prio/Owner, soweit eingetragen (im Trockenlauf mit Maxi prüfen).
 //   --mit-status   Status und Nachfass-Daten doch übernehmen (nur falls das Team die Excel bis zum Import als Statusliste pflegt)
+// Anpassungen (Prio, Zuständig) aus <DIR>/daten/Import-Anpassungen.json gehen vor der Excel (anderer Pfad: --anpassungen <datei>).
 
 import fs from "node:fs";
 import path from "node:path";
@@ -361,6 +362,37 @@ try {
   else console.error(e.message);
   process.exit(1);
 }
+// Anpassungen mit Hausverstand (Maxi, 15.10.): Venue-Prio geprüft, Zuständige fair verteilt. Die Datei liegt im
+// OneDrive-Ordner (nicht im Repo), damit das Team sie lesen und ändern kann; sie geht vor der Excel.
+// Aufbau: { "venues": { "<Name wie im Tool>": { "prio": "A", "owner": "Tim" } } }. Unbekannte Namen blockieren --write.
+const ADJUST_FILE = arg("--anpassungen") ?? path.join(DIR, "daten", "Import-Anpassungen.json");
+const prioChanges = [];
+if (fs.existsSync(ADJUST_FILE)) {
+  const adj = JSON.parse(fs.readFileSync(ADJUST_FILE, "utf8"));
+  const personId = Object.fromEntries(people.map((p) => [norm(p.name), p.id]));
+  let n = 0;
+  for (const [name, a] of Object.entries(adj.venues ?? {})) {
+    const where = `Anpassungen „${name}“`;
+    const o = venues.rows.find((x) => norm(x.name) === norm(name));
+    if (!o) {
+      problems.push(`${where}: diese Venue gibt es in der Excel nicht`);
+      continue;
+    }
+    if (a.prio !== undefined) {
+      const prio = prioOf(a.prio, where);
+      if (prio !== o.prio) prioChanges.push(`${o.name}: ${o.prio ?? "–"} → ${prio ?? "–"}`);
+      o.prio = prio;
+    }
+    if (a.owner !== undefined) {
+      const id = personId[norm(a.owner)];
+      if (!id) problems.push(`${where}: „${a.owner}“ ist keine Person aus dem Team`);
+      else o.owner_id = id;
+    }
+    n++;
+  }
+  hints.push(`Anpassungen aus ${path.basename(ADJUST_FILE)}: ${n} Venues (Prio, Zuständig)`);
+}
+
 // Doppelte Namen innerhalb der Partner-Liste und gegenüber bestehenden Einträgen (ohne frühere Importe)
 const seen = new Map();
 for (const o of partners.rows) {
@@ -415,6 +447,16 @@ console.log(`\nVenue-Tracker: ${venues.raw.length} Venues zum Import (Z. ${Math.
 line("Status → Stufe", tally(venues.raw.map((x) => x.status)), tally(v.map((o) => STAGE_NAME[o.stage])));
 line("Owner → zuständig", tally(venues.raw.map((x) => x.owner)), tally(v.map((o) => personName[o.owner_id] ?? o.existing_contact)));
 line("Prio", tally(venues.raw.map((x) => x.prio)), tally(v.map((o) => o.prio)));
+if (prioChanges.length) console.log(`    Prio geändert: ${prioChanges.join(" · ")}`);
+console.log(
+  `    Zuständig je Person: ${people
+    .map((pp) => {
+      const mine = v.filter((o) => o.owner_id === pp.id);
+      return mine.length ? `${pp.name} ${mine.length} (${["A", "B", "C"].map((k) => `${k}${mine.filter((o) => o.prio === k).length}`).join(" ")})` : null;
+    })
+    .filter(Boolean)
+    .join(" · ")}`
+);
 line("Deadline → Nachf.", tally(venues.raw.map((x) => x.deadline)), tally(v.map((o) => o.next_follow_up)));
 console.log("  Name und Lage getrennt:");
 for (const o of v.filter((o) => o.location)) console.log(`    ${o.name}  |  Lage: ${o.location}`);
