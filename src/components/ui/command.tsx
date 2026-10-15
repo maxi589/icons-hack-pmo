@@ -7,7 +7,7 @@ import { SearchIcon } from "lucide-react"
 import { cn } from "cn"
 
 // Befehlsleiste im Graphit-Stil (Board „Übersicht“): Suchzeile 52px, Gruppen mit Mono-Label,
-// Zeilen 38px, Kürzel rechts in Kästchen. Basis ist cmdk, der Dialog kommt von Base UI.
+// Zeilen 38px, Esc rechts im Kästchen. Basis ist cmdk, der Dialog kommt von Base UI.
 
 function CommandDialog({
   title = "Befehlsleiste",
@@ -110,14 +110,4 @@ function Kbd({ className, ...props }: React.ComponentProps<"kbd">) {
   )
 }
 
-function CommandShortcut({ keys }: { keys: string[] }) {
-  return (
-    <span className="ml-auto flex gap-1" aria-hidden>
-      {keys.map((k) => (
-        <Kbd key={k}>{k}</Kbd>
-      ))}
-    </span>
-  )
-}
-
-export { Command, CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, CommandShortcut, Kbd }
+export { Command, CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem, Kbd }

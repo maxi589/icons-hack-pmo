@@ -33,7 +33,7 @@ import { MobileWeek } from "./mobile-week";
 
 // Termine (Plan Welle 1, Schritt 3): Team-Meetings und Partner-Calls an einem Ort, mit Agenda, Notizen, Unterlagen
 // und Ergebnissen. Desktop: Woche (Standard) oder Liste; Handy: Liste. Detail rechts, zweiter Klick schließt.
-// Adresse: ?termin=<id> (teilbar), ?woche=<Montag>, ?ansicht=liste, ?neu=1 (Taste T).
+// Adresse: ?termin=<id> (teilbar), ?woche=<Montag>, ?ansicht=liste, ?neu=1.
 
 export function Termine() {
   const today = useToday();

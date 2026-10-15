@@ -6,7 +6,7 @@ import { useTeam } from "@/components/app-shell/team-provider";
 import { PeoplePicker } from "@/components/wissen/pickers";
 import { DURATIONS, durationLabel } from "@/lib/meetings";
 
-// „+ Termin“ (Taste T): nötig sind nur Titel und Zeit, der Rest ist freiwillig und lässt sich im Detail ergänzen.
+// „+ Termin“: nötig sind nur Titel und Zeit, der Rest ist freiwillig und lässt sich im Detail ergänzen.
 // Kein Meet-Link hier: Er kommt aus Google, nachdem man den Termin dort eingetragen hat.
 // Vorbelegung aus der Wochenansicht (gezogener Zeitraum) bzw. aus Bereich oder Firma.
 

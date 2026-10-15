@@ -6,7 +6,7 @@ import { useTeam } from "@/components/app-shell/team-provider";
 import type { Milestone } from "@/lib/data/use-milestones";
 import { milestoneOptions } from "@/lib/tasks";
 
-// „+ Aufgabe“ (Taste C): Titel, Zuständig (vorbelegt mit dir), Fällig, Bereich, Meilenstein.
+// „+ Aufgabe“: Titel, Zuständig (vorbelegt mit dir), Fällig, Bereich, Meilenstein.
 // Vorbelegung aus den aktiven Filtern der Seite, damit die neue Aufgabe gleich sichtbar bleibt.
 
 const field =

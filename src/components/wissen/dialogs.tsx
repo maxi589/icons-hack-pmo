@@ -13,7 +13,7 @@ const submitCls =
   "h-10 rounded-[10px] bg-acc text-[14px] font-medium text-acc-text transition-[scale,opacity] duration-150 active:scale-[.97] disabled:opacity-50";
 
 // ---------------------------------------------------------------
-// Neue Entscheidung (Taste E): was, warum, wann (heute), wer (du), Bereich, Thema
+// Neue Entscheidung: was, warum, wann (heute), wer (du), Bereich, Thema
 // ---------------------------------------------------------------
 export function NewDecisionDialog({
   open,

@@ -33,7 +33,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandShortcut,
   Kbd,
 } from "@/components/ui/command";
 import { setTheme, useThemeChoice } from "@/components/theme-toggle";
@@ -45,7 +44,7 @@ import { createClient } from "@/lib/supabase/client";
 import { DECISION_TYPE, docType } from "@/lib/documents";
 import { matchesAll, searchAll, searchWords, type Hit, type HitType } from "@/lib/search";
 
-// Befehlsleiste (Strg+K) plus Tastenkürzel: G dann Buchstabe = Gehe zu, C/F/E = Neu anlegen.
+// Befehlsleiste (Strg+K). Weitere Tastenkürzel gibt es bewusst nicht (Maxi, 15.10.: „braucht niemand“).
 // Ab zwei Zeichen sucht sie zusätzlich in allen Inhalten (lib/search.ts); ein Treffer öffnet das Detail.
 
 type Mode = "all" | "new";
@@ -61,15 +60,8 @@ export async function signOut() {
   window.location.replace("/login");
 }
 
-function isTyping(target: EventTarget | null) {
-  const el = target as HTMLElement | null;
-  return !!el && (el.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(el.tagName));
-}
-
 export function CommandProvider({ children }: { children: React.ReactNode }) {
-  const router = useRouter();
   const [state, setState] = useState<{ open: boolean; mode: Mode }>({ open: false, mode: "all" });
-  const gPressed = useRef(0);
 
   const open = useCallback((mode: Mode = "all") => setState({ open: true, mode }), []);
 
@@ -85,26 +77,11 @@ export function CommandProvider({ children }: { children: React.ReactNode }) {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setState((s) => ({ open: !s.open, mode: "all" }));
-        return;
       }
-      if (e.ctrlKey || e.metaKey || e.altKey || isTyping(e.target) || document.querySelector("[role=dialog]")) return;
-      const key = e.key.toUpperCase();
-      if (Date.now() - gPressed.current < 1000) {
-        gPressed.current = 0;
-        const item = NAV_ALL.find((n) => n.key === key);
-        if (item) router.push(item.href);
-        return;
-      }
-      if (key === "G") {
-        gPressed.current = Date.now();
-        return;
-      }
-      const action = NEW_ACTIONS.find((a) => a.key === key);
-      if (action) router.push(action.href);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [router]);
+  }, []);
 
   return (
     <PaletteContext value={{ open }}>
@@ -173,7 +150,6 @@ function Palette({ mode, close }: { mode: Mode; close: () => void }) {
         <CommandItem key={a.href} value={a.label} onSelect={go(a.href)}>
           <Plus aria-hidden />
           <span className="flex-1">{a.label}</span>
-          <CommandShortcut keys={[a.key]} />
         </CommandItem>
       ))}
     </CommandGroup>
@@ -197,11 +173,10 @@ function Palette({ mode, close }: { mode: Mode; close: () => void }) {
         {mode === "all" && (
           <>
             <CommandGroup heading="Gehe zu">
-              {NAV_ALL.map(({ href, label, Icon, key }) => (
+              {NAV_ALL.map(({ href, label, Icon }) => (
                 <CommandItem key={href} value={label} onSelect={go(href)}>
                   <Icon aria-hidden />
                   <span className="flex-1">{label}</span>
-                  <CommandShortcut keys={["G", key]} />
                 </CommandItem>
               ))}
             </CommandGroup>
