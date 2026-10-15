@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { Chip } from "@/components/chip";
 import { useTeam, type Person } from "@/components/app-shell/team-provider";
+import { formatShort, todayInVienna } from "@/lib/dates";
 import { followState, initials, STAGES, type Organization, type Stage } from "@/lib/pipeline";
 
 // Pipeline als CRM-Tabelle (nur Desktop, Maxi 14.10.: Variante „D“ nach Prüfschleife).
@@ -14,11 +15,13 @@ import { followState, initials, STAGES, type Organization, type Stage } from "@/
 // Feste Spaltenbreiten mit gleichem Abstand (Maxi, 14.10.: „überall gleich“), freier Platz sammelt sich rechts in
 // einer leeren Füllspalte. So bleiben die Spalten stehen, wenn rechts das Detail aufgeht.
 // Kein seitliches Scrollen: Die Tabelle misst ihre eigene Breite (Container-Abfrage). Wird es eng, fällt rechts zuerst
-// „Warmer Kontakt“/„Kapazität“ weg (unter 1020px), dann „Prio“ (unter 800px).
-// Erst unter 740px schrumpft die Firmenspalte (Füllspalte weg).
-// Venues zeigen nur die Kapazität kurz; Übernachtung, Preis und Lage stehen im Detail.
+// „Geändert“ weg (unter 1304px), dann „Ansprechperson“/„Preis“ (unter 1200px), dann „Warmer Kontakt“/„Kapazität“
+// (unter 1020px), dann „Prio“ (unter 800px). Erst unter 740px schrumpft die Firmenspalte (Füllspalte weg).
+// Die beiden rechten Spalten (Maxi, 15.10.: weniger leerer Platz rechts) erscheinen nur, wenn Platz ist; mit offenem
+// Detail fallen sie weg, die linken Spalten bleiben stehen.
+// Venues zeigen Kapazität und Preis kurz; Übernachtung und Lage stehen im Detail.
 
-type SortKey = "name" | "stage" | "prio" | "follow" | "owner" | "extra";
+type SortKey = "name" | "stage" | "prio" | "follow" | "owner" | "extra" | "contact" | "changed";
 
 const STAGE_ORDER: Record<Stage, number> = { recherche: 0, kontaktiert: 1, im_gespraech: 2, zugesagt: 3, fix: 4, abgesagt: 5 };
 const PRIO_ORDER = { A: 0, B: 1, C: 2 } as const;
@@ -26,6 +29,8 @@ const PRIO_ORDER = { A: 0, B: 1, C: 2 } as const;
 const warmText = (o: Organization) => [o.warm_via && `über ${o.warm_via}`, o.existing_contact].filter(Boolean).join(" · ");
 /** „Festsaal 180, Mi…“ → „Festsaal 180“ (voller Text als Tooltip). */
 const shortCap = (c: string | null) => (c ? c.split(/[,;(]/)[0].trim() : "");
+/** Zusatzspalte: Ansprechperson (Firmen) bzw. Preis/Deal (Venues). */
+const contactText = (o: Organization, venue: boolean) => (venue ? o.price : o.contact_person)?.trim() ?? "";
 
 function value(o: Organization, key: SortKey, venue: boolean, personById: (id: string | null) => Person | null): string | number {
   switch (key) {
@@ -42,6 +47,10 @@ function value(o: Organization, key: SortKey, venue: boolean, personById: (id: s
       return personById(o.owner_id)?.name ?? "~";
     case "extra":
       return venue ? Number.parseInt((o.capacity ?? "").replace(/\D+/g, " ").trim().split(" ")[0] ?? "", 10) || 0 : warmText(o) || "~";
+    case "contact":
+      return contactText(o, venue).toLowerCase() || "~";
+    case "changed":
+      return o.updated_at;
   }
 }
 
@@ -93,6 +102,8 @@ export function OrgTable({
   const hideFill = "@max-[740px]:hidden";
   const hideExtra = "@max-[1020px]:hidden";
   const hidePrio = "@max-[800px]:hidden";
+  const hideContact = "@max-[1200px]:hidden";
+  const hideChanged = "@max-[1304px]:hidden";
 
   return (
     <div className="@container flex min-h-full flex-col">
@@ -105,6 +116,8 @@ export function OrgTable({
             {head("follow", "Nachfassen", "w-[176px]")}
             {head("owner", "Zuständig", "w-[136px]")}
             {head("extra", venue ? "Kapazität" : "Warmer Kontakt", cn("w-[220px]", hideExtra))}
+            {head("contact", venue ? "Preis" : "Ansprechperson", cn("w-[180px]", hideContact))}
+            {head("changed", "Geändert", cn("w-[104px]", hideChanged))}
             <th aria-hidden className={cn("sticky top-0 z-[2] h-9 border-b border-line bg-panel", hideFill)} />
           </tr>
         </thead>
@@ -115,6 +128,8 @@ export function OrgTable({
             const f = follow[i];
             const owner = personById(o.owner_id);
             const sub = [o.category, o.location].filter(Boolean).join(" · ");
+            const contact = contactText(o, venue);
+            const changed = todayInVienna(new Date(o.updated_at));
             const cell = "h-11 overflow-hidden border-b border-line px-3 whitespace-nowrap";
             return (
               <tr
@@ -174,6 +189,10 @@ export function OrgTable({
                 <td className={cn(cell, hideExtra, "text-fg-2")} title={(venue ? o.capacity : warmText(o)) || undefined}>
                   <span className="block truncate">{venue ? shortCap(o.capacity) : warmText(o)}</span>
                 </td>
+                <td className={cn(cell, hideContact, "text-fg-2")} title={contact || undefined}>
+                  {contact ? <span className="block truncate">{contact}</span> : <span className="text-fg-3">–</span>}
+                </td>
+                <td className={cn(cell, hideChanged, "text-fg-2 tabular")}>{changed === today ? "heute" : formatShort(changed)}</td>
                 <td aria-hidden className={cn("h-11 border-b border-line", hideFill)} />
               </tr>
             );

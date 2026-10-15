@@ -30,6 +30,8 @@ export type Organization = {
   price: string | null;
   source: string | null;
   created_at: string;
+  /** Letzte Änderung (Trigger in der Datenbank), Spalte „Geändert“ in der Tabelle */
+  updated_at: string;
 };
 
 /** Farbe als Tailwind-Klasse (Punkt) und Text-Klasse; Status nie nur über Farbe, immer mit Wort. */
