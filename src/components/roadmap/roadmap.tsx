@@ -173,7 +173,7 @@ function CompactList({
                 const next = done ? undefined : subs.find((s) => s.status !== "erledigt" && s.due_date < m.due_date);
                 const urgent = !done && daysBetween(today, m.due_date) <= 7;
                 return (
-                  <li key={m.id} className={cn("relative flex items-start gap-3 border-t border-line px-3.5 py-3 first:border-t-0", done && "opacity-60")}>
+                  <li key={m.id} className={cn("relative flex items-start gap-3 border-t border-line px-3.5 py-2.5 first:border-t-0", done && "opacity-60")}>
                     <span
                       className={cn("mt-[6px] size-[11px] shrink-0 rotate-45 rounded-[2px]", done ? "" : "border-[1.5px]")}
                       style={done ? { background: area?.color } : { borderColor: area?.color }}

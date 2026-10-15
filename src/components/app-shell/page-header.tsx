@@ -21,16 +21,17 @@ export function MobileTitle({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="flex min-h-[52px] items-center gap-2 px-3.5 pt-1 pb-1.5 md:hidden">
-      <h1 className="flex min-w-0 flex-1 items-center gap-2 text-[21px] font-semibold tracking-[-0.025em]">{title}</h1>
+    <div className="flex min-h-12 items-center gap-2 px-3.5 pb-1 md:hidden">
+      <h1 className="flex min-w-0 flex-1 items-center gap-2 text-[20px] font-semibold tracking-[-0.025em]">{title}</h1>
       {children}
       {action && (
+        // Fläche 36px hoch, Tippfläche per ::after auf 44px erweitert
         <button
           type="button"
           onClick={action.onClick}
-          className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-[10px] bg-acc pr-3.5 pl-3 text-[14px] font-medium text-acc-text transition-[scale] duration-150 active:scale-[.97]"
+          className="relative inline-flex h-9 shrink-0 items-center gap-1 rounded-[9px] pr-3 pl-2.5 text-[13.5px] font-medium text-acc-text transition-[scale] duration-150 after:absolute after:inset-x-0 after:-inset-y-1 active:scale-[.97] bg-acc"
         >
-          <Plus className="size-4" strokeWidth={2.4} aria-hidden />
+          <Plus className="size-[15px]" strokeWidth={2.4} aria-hidden />
           {action.label}
         </button>
       )}

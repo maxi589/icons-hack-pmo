@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { de } from "date-fns/locale";
-import { Check, Video } from "lucide-react";
+import { Check, ChevronDown, Video } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { AreaGlyph } from "@/components/area-glyph";
@@ -13,6 +13,7 @@ import { Countdown } from "@/components/countdown";
 import { RasterField } from "@/components/raster-field";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { useNow, useToday } from "@/lib/use-today";
+import { useIsMobile } from "@/lib/use-is-mobile";
 import { useMeetings } from "@/lib/data/use-meetings";
 import { endOf, meetingHref, viennaParts, type Meeting } from "@/lib/meetings";
 import { daysBetween, EVENT_START, EVENT_START_UTC, formatDayMonth, formatHeaderDate, formatLong, formatShort, relativeDays, TIME_ZONE } from "@/lib/dates";
@@ -24,7 +25,7 @@ import { useOverviewData, type Milestone, type Org, type Task } from "./use-over
 
 // Übersicht (Board „Richtung A Graphit“): Wo stehen wir? Was ist als Nächstes dran? Wer ist zuständig?
 
-const card = "rounded-[14px] bg-card shadow-card";
+const card = "rounded-[12px] bg-card shadow-card md:rounded-[14px]";
 
 /** „bis Sa 27.2., 09:00“ aus Datum und Startzeit des Events */
 const EVENT_UNTIL = `bis ${format(parseISO(EVENT_START), "EEEEEE d.M.", { locale: de })}, ${new Intl.DateTimeFormat("de-AT", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(EVENT_START_UTC)}`;
@@ -46,7 +47,7 @@ export function Overview() {
   const phase = currentPhase(today);
 
   return (
-    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-3.5 pt-2 pb-8 md:gap-5 md:px-8 md:pt-8 md:pb-12">
+    <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 px-3.5 pt-1.5 pb-6 md:gap-5 md:px-8 md:pt-8 md:pb-12">
       {/* Ohne Begrüßung (Maxi, 14.10.): eine Zeile mit Datum und Restzeit der Phase */}
       <h1 className="sr-only">Übersicht</h1>
       <p className="label-mono -mb-1 pt-1 md:pt-0">
@@ -55,7 +56,7 @@ export function Overview() {
         {phaseLeft(today, phase)}
       </p>
 
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-3 md:gap-4">
         <CountdownCard today={today} phase={phase} />
         <TodayCard tasks={data.tasks} orgs={data.orgs} meetings={meetings || []} today={today} />
         <NextMilestoneCard milestones={data.milestones} today={today} onToggle={setMilestoneDone} />
@@ -63,9 +64,12 @@ export function Overview() {
 
       <GoalTiles orgs={data.orgs} milestones={data.milestones} />
 
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-3 md:gap-4">
         <DueCard milestones={data.milestones} tasks={data.tasks} meetings={meetings || []} today={today} />
-        <FollowUpCard orgs={data.orgs} today={today} />
+        {/* Handy: eigene Nachfass-Fälle stehen in „Heute für dich“, das ganze Team in der Pipeline (15.10.) */}
+        <div className="flex min-w-0 flex-[1_1_320px] max-md:hidden">
+          <FollowUpCard orgs={data.orgs} today={today} />
+        </div>
       </div>
 
       <AreasSection milestones={data.milestones} />
@@ -78,15 +82,13 @@ export function Overview() {
 // ---------------------------------------------------------------
 function CountdownCard({ today, phase }: { today: string; phase: number }) {
   return (
-    <section className={cn(card, "relative isolate flex min-w-0 flex-[1.45_1_440px] flex-col justify-between gap-[18px] overflow-hidden px-5 py-4 md:gap-[22px] md:px-6 md:py-[22px]")}>
+    <section className={cn(card, "relative isolate flex min-w-0 flex-[1.45_1_440px] flex-col justify-between gap-[22px] overflow-hidden px-4 py-3.5 md:px-6 md:py-[22px]")}>
       <RasterField />
-      <div className="flex items-baseline justify-between gap-2">
-        <h2 className="label-mono">Countdown</h2>
-        <span className="text-[12.5px] text-fg-2 md:hidden">{EVENT_UNTIL}</span>
-      </div>
+      {/* Handy (15.10.): nur die Uhr. Phase steht in der Zeile darüber, Label und Phasen-Balken wären Fülltext. */}
+      <h2 className="label-mono max-md:sr-only">Countdown</h2>
       <Countdown />
       <p className="-mt-2 text-[13px] text-fg-2 max-md:hidden">{EVENT_UNTIL}</p>
-      <ol className="grid grid-cols-5 gap-1.5" aria-label="Phasen">
+      <ol className="grid grid-cols-5 gap-1.5 max-md:hidden" aria-label="Phasen">
         {PHASES.map((p, i) => (
           <li key={p.name} className="flex flex-col gap-2" aria-current={i === phase ? "step" : undefined}>
             <div className="h-1 overflow-hidden rounded-sm bg-line-2">
@@ -119,6 +121,8 @@ function NextMilestoneCard({
   onToggle: (id: string, done: boolean) => Promise<boolean>;
 }) {
   const next = milestones.find((m) => !m.parent_id && m.status !== "erledigt");
+  const [openSubs, setOpenSubs] = useState(false);
+  const isMobile = useIsMobile();
 
   if (!next) {
     return (
@@ -134,27 +138,40 @@ function NextMilestoneCard({
   const allDone = children.length > 0 && done === children.length;
 
   return (
-    <section className={cn(card, "flex min-w-0 flex-[1_1_320px] flex-col gap-3.5 px-5 py-[18px] md:px-6 md:py-[22px]")}>
+    <section className={cn(card, "flex min-w-0 flex-[1_1_320px] flex-col gap-3.5 px-4 py-3.5 max-md:gap-2.5 md:px-6 md:py-[22px]")}>
       <div className="flex items-center justify-between gap-2">
         <h2 className="label-mono">Nächster Meilenstein</h2>
         <DueChip due={next.due_date} today={today} />
       </div>
-      <Link href={`/roadmap?m=${next.id}`} className="rounded-md text-[16.5px] leading-[1.35] font-semibold tracking-[-0.01em] hover:underline hover:decoration-line-2 hover:underline-offset-4">
+      <Link href={`/roadmap?m=${next.id}`} className="rounded-md text-[16.5px] leading-[1.35] font-semibold tracking-[-0.01em] hover:underline hover:decoration-line-2 hover:underline-offset-4 max-md:text-[15.5px]">
         <span className="font-mono text-[13px] font-medium text-fg-3">{next.id} </span>
         {next.title}
       </Link>
 
-      {children.length > 0 && <MilestoneChecklist items={children} onToggle={onToggle} />}
+      {/* Handy (15.10.): Unterpunkte eingeklappt, die Zeile mit Fortschritt öffnet sie */}
+      {children.length > 0 && (
+        <div className={cn(!openSubs && "max-md:hidden")}>
+          <MilestoneChecklist items={children} onToggle={onToggle} />
+        </div>
+      )}
 
       {children.length > 0 && (
-        <div className="flex items-center gap-2.5 text-[12.5px] text-fg-3 tabular">
-          <div className="h-[3px] flex-1 overflow-hidden rounded-sm bg-line-2">
-            <div className="h-full rounded-sm bg-acc-line transition-[width] duration-300 ease-out" style={{ width: `${(done / children.length) * 100}%` }} />
-          </div>
-          <span className="sr-only">
-            {done} von {children.length} erledigt
+        <button
+          type="button"
+          onClick={() => setOpenSubs((o) => !o)}
+          aria-expanded={openSubs}
+          className="-my-2 flex min-h-11 items-center gap-2.5 text-[12.5px] text-fg-3 tabular md:pointer-events-none md:my-0 md:min-h-0"
+          tabIndex={isMobile ? 0 : -1}
+        >
+          <span className="h-[3px] flex-1 overflow-hidden rounded-sm bg-line-2">
+            <span className="block h-full rounded-sm bg-acc-line transition-[width] duration-300 ease-out" style={{ width: `${(done / children.length) * 100}%` }} />
           </span>
-        </div>
+          <span className="md:sr-only">
+            {done} von {children.length}
+            <span className="sr-only"> erledigt</span>
+          </span>
+          <ChevronDown className={cn("size-4 transition-transform duration-200 md:hidden", openSubs && "rotate-180")} aria-hidden />
+        </button>
       )}
 
       {allDone && (
@@ -193,9 +210,9 @@ function GoalTiles({ orgs, milestones }: { orgs: Org[]; milestones: Milestone[] 
     <>
       {/* Handy (15.10.): eine Karte mit vier Zeilen statt vier Kacheln */}
       <Link href="/pipeline" className={cn(card, "flex flex-col md:hidden")}>
-        <span className="label-mono px-4 pt-3.5 pb-1">Ziele</span>
+        <span className="label-mono px-4 pt-3 pb-1">Ziele</span>
         {goals.map((g) => (
-          <span key={g.label} className="flex min-h-[52px] items-center gap-3 border-t border-line px-4 py-2 nth-[2]:border-t-0">
+          <span key={g.label} className="flex min-h-12 items-center gap-3 border-t border-line px-4 py-1.5 nth-[2]:border-t-0">
             <span className="flex min-w-0 flex-1 flex-col">
               <span className="truncate text-[15px] font-medium">{g.short}</span>
               {g.note && <span className="truncate text-[12.5px] text-fg-3">{g.note}</span>}
@@ -282,7 +299,7 @@ function DueCard({ milestones, tasks, meetings, today }: { milestones: Milestone
 
   return (
     <section className={cn(card, "min-w-0 flex-[1.45_1_440px] overflow-hidden")}>
-      <div className="flex items-center justify-between px-4 pt-4 pb-3">
+      <div className="flex items-center justify-between px-4 pt-3 pb-2.5 md:pt-4 md:pb-3">
         <h2 className="text-[14px] font-semibold">Als Nächstes</h2>
         <Link href="/aufgaben" className="rounded-md text-[12.5px] text-fg-2 hover:text-fg">
           Alle Aufgaben
@@ -296,7 +313,7 @@ function DueCard({ milestones, tasks, meetings, today }: { milestones: Milestone
             {g.items.map((it) => {
               const area = areaById(it.areaId);
               return (
-                <li key={it.key} className="relative flex min-h-10 items-center gap-3 border-t border-line px-4 text-[13.5px] has-[a]:hover:bg-hover">
+                <li key={it.key} className="relative flex min-h-10 items-center gap-3 border-t border-line px-4 text-[13.5px] has-[a]:hover:bg-hover max-md:min-h-11 max-md:text-[14.5px]">
                   {it.kind === "meeting" ? (
                     <Video className="size-[13px] shrink-0 text-fg-3" aria-label="Termin" />
                   ) : it.kind === "milestone" ? (
@@ -415,7 +432,7 @@ function AreasSection({ milestones }: { milestones: Milestone[] }) {
           const next = own.find((m) => m.status !== "erledigt");
           const owner = personById(a.owner_id);
           return (
-            <li key={a.id} className="relative flex min-h-[52px] items-center gap-3 border-t border-line px-4 first:border-t-0">
+            <li key={a.id} className="relative flex min-h-12 items-center gap-3 border-t border-line px-4 first:border-t-0">
               <AreaGlyph color={a.color} progress={own.length ? done / own.length : 0} size={14} />
               <span className="flex min-w-0 flex-1 flex-col">
                 <Link href={`/bereiche/${a.id}`} className="truncate rounded-sm text-[15px] font-medium after:absolute after:inset-0">

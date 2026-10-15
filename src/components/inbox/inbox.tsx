@@ -58,7 +58,7 @@ export function Inbox() {
       <PageHeader title="Inbox" />
       <div className="mx-auto flex w-full max-w-[760px] flex-col gap-4 px-3.5 pt-2 pb-8 md:px-6 md:pt-6">
         <div className="flex flex-wrap items-center gap-2.5">
-          <h1 className="mr-auto text-[21px] font-semibold tracking-[-0.025em] md:sr-only">Inbox</h1>
+          <h1 className="mr-auto text-[20px] font-semibold tracking-[-0.025em] md:sr-only">Inbox</h1>
           {unread > 0 && (
             <button
               type="button"
@@ -72,7 +72,7 @@ export function Inbox() {
         </div>
 
         {items.length === 0 ? (
-          <div className="flex flex-col items-center gap-2.5 rounded-[14px] bg-card-2 px-4 py-12 text-center max-md:bg-card max-md:shadow-card">
+          <div className="flex flex-col items-center gap-2.5 rounded-[14px] bg-card-2 px-4 py-12 text-center max-md:bg-card max-md:py-8 max-md:shadow-card">
             <p className="text-sm font-medium">Noch nichts in deiner Inbox</p>
           </div>
         ) : (

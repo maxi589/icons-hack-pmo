@@ -160,8 +160,8 @@ export function TodayCard({ tasks, orgs, meetings, today }: { tasks: Task[]; org
   };
 
   return (
-    <section className="w-full overflow-hidden rounded-[18px] bg-card shadow-card md:hidden" aria-labelledby="today-title">
-      <div className="flex items-center justify-between px-3.5 pt-3.5 pb-2.5">
+    <section className="w-full overflow-hidden rounded-[12px] bg-card shadow-card md:hidden" aria-labelledby="today-title">
+      <div className="flex items-center justify-between px-3.5 pt-3 pb-2">
         <h2 id="today-title" className="text-[15px] font-semibold">
           Heute für dich
         </h2>
@@ -200,7 +200,7 @@ export function TodayCard({ tasks, orgs, meetings, today }: { tasks: Task[]; org
           {rows.map((i) => {
             const done = !!checked[i.key];
             return (
-              <li key={i.key} className="relative flex min-h-[60px] items-center gap-3 border-t border-line px-3.5 py-2.5">
+              <li key={i.key} className="relative flex min-h-14 items-center gap-3 border-t border-line px-3.5 py-2">
                 <button
                   type="button"
                   onClick={() => (done ? uncheck(i) : check(i))}

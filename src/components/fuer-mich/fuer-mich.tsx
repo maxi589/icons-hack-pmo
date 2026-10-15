@@ -96,7 +96,7 @@ export function FuerMich() {
       <div className="flex min-h-0 flex-1">
         <div className="min-w-0 flex-1 md:overflow-y-auto">
           <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-3.5 pt-2 pb-8 md:gap-5 md:px-8 md:pt-8 md:pb-12">
-            <h1 className="pb-1.5 text-[21px] font-semibold tracking-[-0.025em] md:sr-only">{TITLE}</h1>
+            <h1 className="pb-1 text-[20px] font-semibold tracking-[-0.025em] md:sr-only">{TITLE}</h1>
             <div className={cn("grid gap-4 md:gap-5", selected && !isMobile ? "xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]")}>
               <NotesCard
                 title="Notizblock"

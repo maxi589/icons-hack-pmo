@@ -187,8 +187,8 @@ export function MobileWeek({
               </h3>
               <ul className={cn("overflow-hidden rounded-xl bg-card shadow-card", b.days[0] < today && "opacity-75")}>
                 {marksOn(b.days[0]).map((a) => (
-                  <li key={a.key} className="relative flex min-h-11 items-center gap-3 border-t border-line px-3.5 text-[14px] text-fg-2 first:border-t-0">
-                    <span className="flex w-[78px] shrink-0 items-center gap-1.5 font-mono text-[12px] text-fg-3">
+                  <li key={a.key} className="relative flex min-h-11 items-center gap-2 border-t border-line px-3.5 text-[14px] text-fg-2 first:border-t-0">
+                    <span className="flex shrink-0 items-center gap-1.5 font-mono text-[12px] text-fg-3">
                       {a.kind === "milestone" ? diamond : <span className="h-[12px] w-0 border-l-[1.5px] border-dashed border-current" aria-hidden />}
                       {a.tag}
                     </span>

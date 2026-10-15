@@ -34,7 +34,7 @@ export function MeetingRow({
     <MeetingMenu meeting={m} onOpen={onOpen} onDelete={onDelete}>
       <li
         className={cn(
-          "relative flex min-h-14 items-center gap-3 border-t border-line px-3.5 py-2.5 first:border-t-0",
+          "relative flex min-h-[52px] items-center gap-3 border-t border-line px-3.5 py-2 first:border-t-0 md:min-h-14 md:py-2.5",
           selected ? "bg-active" : "hover:bg-hover"
         )}
       >

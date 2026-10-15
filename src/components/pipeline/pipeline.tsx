@@ -16,7 +16,7 @@ import { useToday } from "@/lib/use-today";
 import { useIsMobile } from "@/lib/use-is-mobile";
 import { useOrganizations, type OrgPatch } from "@/lib/data/use-organizations";
 import { logActivity } from "@/lib/data/use-feed";
-import { formatShort } from "@/lib/dates";
+import { formatDayMonth, formatShort } from "@/lib/dates";
 import { FOLLOW_UP_ROUNDS } from "@/lib/phases";
 import { play } from "@/lib/sounds";
 import {
@@ -201,13 +201,14 @@ export function Pipeline() {
       </div>
 
       {/* Ziel und Zähler */}
-      <div className="flex flex-wrap items-center gap-x-[22px] gap-y-2 px-3.5 pb-3 text-[13px] text-fg-2 md:border-b md:border-line md:px-[18px] md:py-3">
-        <span className="flex items-center gap-2.5">
-          {tabDef.goalLabel}
+      {/* Handy (15.10.): eine Zeile, ohne Tab-Namen (steht schon im Umschalter) und mit kurzem „Runde 2.11.“ */}
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-3.5 pb-2.5 text-[13px] text-fg-2 md:gap-x-[22px] md:border-b md:border-line md:px-[18px] md:py-3">
+        <span className="flex items-center gap-2 md:gap-2.5">
+          <span className="max-md:sr-only">{tabDef.goalLabel}</span>
           {tabDef.goal && (
             <span className="flex gap-[3px]" aria-hidden>
               {Array.from({ length: tabDef.goal }, (_, i) => (
-                <span key={i} className={cn("h-[5px] w-[22px] rounded-[3px]", i < won ? "bg-acc-line" : "bg-line-2")} />
+                <span key={i} className={cn("h-[5px] w-3.5 rounded-[3px] md:w-[22px]", i < won ? "bg-acc-line" : "bg-line-2")} />
               ))}
             </span>
           )}
@@ -223,7 +224,12 @@ export function Pipeline() {
             {overdue > 0 && <Chip tone="red">{overdue} überfällig</Chip>}
           </span>
         )}
-        {nextRound && <span className="md:ml-auto">Nächste Runde: {formatShort(nextRound)}</span>}
+        {nextRound && (
+          <span className="md:ml-auto">
+            <span className="md:hidden">Runde {formatDayMonth(nextRound)}</span>
+            <span className="max-md:hidden">Nächste Runde: {formatShort(nextRound)}</span>
+          </span>
+        )}
       </div>
 
       {inThisTab.length === 0 ? (
@@ -327,7 +333,7 @@ export function Pipeline() {
 function OrgList({ orgs, today, selectedId, onOpen }: { orgs: Organization[]; today: string; selectedId: string | null; onOpen: (id: string) => void }) {
   const { personById } = useTeam();
   return (
-    <div className="flex flex-col gap-4 px-3.5 pb-8 md:px-[18px] md:py-4">
+    <div className="flex flex-col gap-3 px-3.5 pb-6 md:gap-4 md:px-[18px] md:py-4">
       {STAGES.map((st) => {
         const items = orgs.filter((o) => o.stage === st.id);
         if (!items.length) return null;
@@ -348,7 +354,7 @@ function OrgList({ orgs, today, selectedId, onOpen }: { orgs: Organization[]; to
                       onClick={() => onOpen(o.id)}
                       aria-current={o.id === selectedId ? "true" : undefined}
                       className={cn(
-                        "flex min-h-14 w-full items-center gap-3 px-3.5 py-2 text-left transition-colors duration-150 hover:bg-hover md:min-h-11",
+                        "flex min-h-[52px] w-full items-center gap-3 px-3.5 py-1.5 text-left transition-colors duration-150 hover:bg-hover md:min-h-11 md:py-2",
                         o.id === selectedId && "bg-active"
                       )}
                     >
@@ -395,9 +401,9 @@ function OrgList({ orgs, today, selectedId, onOpen }: { orgs: Organization[]; to
 
 function EmptyTab({ tabName, onNew }: { tabName: string; onNew: () => void }) {
   return (
-    <div className="m-3.5 flex flex-col items-center gap-2.5 rounded-[14px] bg-card-2 px-4 py-12 text-center max-md:bg-card max-md:shadow-card md:m-5">
+    <div className="m-3.5 flex flex-col items-center gap-2.5 rounded-[14px] bg-card-2 px-4 py-12 text-center max-md:bg-card max-md:py-8 max-md:shadow-card md:m-5">
       <p className="text-sm font-medium">Noch keine Einträge bei {tabName}</p>
-      <button type="button" onClick={onNew} className="mt-1 inline-flex h-8 items-center rounded-[9px] bg-acc px-3 text-[13px] font-medium text-acc-text max-md:h-10">
+      <button type="button" onClick={onNew} className="mt-1 inline-flex h-8 items-center rounded-[9px] bg-acc px-3 text-[13px] font-medium text-acc-text max-md:hidden">
         + Firma
       </button>
     </div>
