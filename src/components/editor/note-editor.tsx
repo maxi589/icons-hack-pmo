@@ -8,12 +8,19 @@ import StarterKit from "@tiptap/starter-kit";
 import { TaskItem, TaskList } from "@tiptap/extension-list";
 import { Placeholder } from "@tiptap/extensions";
 import { Markdown } from "@tiptap/markdown";
-import { Bold, CircleCheck, FileUp, Heading2, Italic, Link2, List, ListChecks } from "lucide-react";
+import { Bold, CircleCheck, FileUp, Heading1, Heading2, Heading3, Italic, Link2, List, ListChecks } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { keepsAllText } from "@/lib/markdown";
+import { createClient } from "@/lib/supabase/client";
+import { useToast } from "@/components/toast";
+import { EditorMenu } from "./editor-menu";
+import { MenuTriggers, TableBlocks, type MenuBridge, type MenuState } from "./suggest";
 
-// Gemeinsamer Editor (Plan Welle 1): Notizblock, Bereichs-Notizen, später Termine und Text-Dokumente.
+// Gemeinsamer Editor (Plan Welle 1): Notizblock, Bereichs-Notizen, Termine und Text-Dokumente.
 // Gespeichert wird Markdown. Kürzel wie in Notion/Linear: „# “, „- “, „[ ] “, „**fett**“, „> “, „---“.
 // Markieren öffnet ein kleines Menü: fett, kursiv, Überschrift, Liste, Checkliste, Link, → Aufgabe.
+// „/“ öffnet das Einfügen-Menü (auch Tabelle), „@“ verknüpft Firmen, Aufgaben, Termine, Dokumente, Meilensteine
+// (gespeichert als normaler Link, im Editor als Chip). Notion light, Stufe A.
 
 type Props = {
   /** Markdown. Fremde Änderungen werden übernommen, solange man selbst nicht im Feld ist. */
@@ -30,13 +37,78 @@ type Props = {
   className?: string;
 };
 
+/** Links auf Einträge im Tool → Tabelle, um vor dem Öffnen zu prüfen, ob es den Eintrag noch gibt. */
+const TARGETS: [RegExp, string][] = [
+  [/^\/pipeline\?firma=([^&]+)/, "organizations"],
+  [/^\/aufgaben\?aufgabe=([^&]+)/, "tasks"],
+  [/^\/termine\?termin=([^&]+)/, "meetings"],
+  [/^\/dokumente\?dok=([^&]+)/, "documents"],
+  [/^\/dokumente\?entscheidung=([^&]+)/, "decisions"],
+  [/^\/roadmap\?m=([^&]+)/, "milestones"],
+];
+
 /** Leere Listen- und Checkbox-Zeilen (Enter am Ende) nicht speichern: Sie kämen sonst als Text „[ ]“ zurück. */
 function tidy(md: string) {
   return md.replace(/^[ \t]*[-*+] (\[[ xX]\])?[ \t]*$\n?/gm, "").replace(/\n{3,}/g, "\n\n");
 }
 
+type DocJson = { type?: string; text?: string; content?: DocJson[] };
+
+/**
+ * Leerzeichen am Anfang eines Absatzes nicht speichern: Markdown kennt sie nicht, und Tiptap 3.31.4 verschluckt nach
+ * einer Checkliste dann das erste Zeichen („ Hallo“ → „allo“, gemessen 15.10.); ab vier Leerzeichen würde Code daraus.
+ */
+function trimBlockStarts(node: DocJson): DocJson {
+  if (!node.content) return node;
+  let content = node.content.map(trimBlockStarts);
+  const first = content[0];
+  if ((node.type === "paragraph" || node.type === "heading") && first?.type === "text" && first.text) {
+    // \s auch für geschützte und schmale Leerzeichen (z. B. aus Google Docs eingefügt), gemessen vom Prüfer 15.10.
+    const text = first.text.replace(/^\s+/, "");
+    content = text ? [{ ...first, text }, ...content.slice(1)] : content.slice(1);
+  }
+  return { ...node, content };
+}
+
+/** Markdown zum Speichern (auch für „Teilen“). */
+function toMarkdown(editor: Editor, json: DocJson = editor.getJSON()) {
+  return tidy(editor.markdown!.serialize(trimBlockStarts(json)));
+}
+
 export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabled, onCreateTask, onShare, className }: Props) {
   const router = useRouter();
+  const toast = useToast();
+  // Verlustbremse: Kann der Editor den gespeicherten Text nicht vollständig darstellen, nur lesen (sonst löscht
+  // das nächste Speichern, was er nicht kennt, z. B. eine Blockart aus einem neueren App-Stand).
+  const [lossy, setLossy] = useState(false);
+  const lossyRef = useRef(false);
+  /** Gespeicherten Text laden. Ergibt er keinen gültigen Inhalt (z. B. eine Bild-Zeile), stand früher die ganze Seite
+   *  (gemessen 15.10.); dann zeigt der Editor den Rohtext nur zum Lesen. */
+  const load = (ed: Editor, saved: string) => {
+    let valid = true;
+    try {
+      const json = ed.markdown!.parse(saved);
+      // Leerer Text ergibt ein leeres Dokument; das ist erlaubt (Tiptap legt selbst einen leeren Absatz an).
+      if (json.content?.length) ed.schema.nodeFromJSON(json).check();
+    } catch {
+      valid = false;
+    }
+    if (valid) ed.commands.setContent(saved, { contentType: "markdown", emitUpdate: false });
+    else {
+      const lines = saved.split("\n").map((line) => (line ? { type: "paragraph", content: [{ type: "text", text: line }] } : { type: "paragraph" }));
+      ed.commands.setContent({ type: "doc", content: lines }, { emitUpdate: false });
+    }
+    lossyRef.current = !valid || !keepsAllText(saved, ed.getMarkdown());
+    setLossy(lossyRef.current);
+  };
+  // „/“- und „@“-Menü: Die Plugins melden über diese Brücke, React zeichnet das Menü.
+  const [menu, setMenu] = useState<MenuState | null>(null);
+  const menuKey = useRef<((e: KeyboardEvent) => boolean) | null>(null);
+  const [triggers] = useState(() => {
+    const bridge: { current: MenuBridge | null } = { current: null };
+    bridge.current = { onChange: setMenu, onKeyDown: (e) => menuKey.current?.(e) ?? false };
+    return MenuTriggers(bridge);
+  });
   // Zuletzt gesehener Stand: eigener Text oder übernommener fremder. Verhindert, dass der eigene Stand nach dem Speichern zurückgesetzt wird.
   const last = useRef(value);
   const onChangeRef = useRef(onChange);
@@ -48,12 +120,13 @@ export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabl
 
   const editor = useEditor({
     immediatelyRender: false,
-    editable: !disabled,
+    // Auch hier die Sperre: @tiptap/react setzt die Optionen nach jedem Neuzeichnen neu (sonst wäre „nur lesen“ wieder offen).
+    editable: !disabled && !lossy,
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
-        code: false,
-        codeBlock: false,
+        code: { HTMLAttributes: { class: "note-code" } },
+        codeBlock: { HTMLAttributes: { class: "note-codeblock" } },
         underline: false,
         link: { openOnClick: false, autolink: true, linkOnPaste: true, defaultProtocol: "https" },
       }),
@@ -62,35 +135,44 @@ export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabl
         nested: true,
         a11y: { checkboxLabel: (node, checked) => `${node.textContent || "Leerer Punkt"}, ${checked ? "erledigt" : "offen"}` },
       }),
+      ...TableBlocks,
+      triggers,
       Placeholder.configure({ placeholder: placeholder ?? "" }),
       Markdown,
     ],
-    content: value,
-    contentType: "markdown",
+    // Inhalt kommt geprüft in onCreate
+    content: "",
     editorProps: {
       attributes: { "aria-label": label, "aria-multiline": "true", role: "textbox", class: "note-editor-content" },
     },
+    onCreate: ({ editor }) => load(editor, last.current),
     onUpdate: ({ editor }) => {
-      const md = tidy(editor.getMarkdown());
+      if (lossyRef.current) return;
+      const md = toMarkdown(editor);
       // Nur echte Änderungen melden (Tiptap meldet z. B. auch beim Freischalten), sonst würde ungewollt gespeichert.
       // Unterschiede nur in Leerzeilen am Ende (z. B. frisch angelegter Text) zählen nicht.
       if (md.trimEnd() === last.current.trimEnd()) return;
       last.current = md;
       onChangeRef.current(md);
     },
-    onBlur: () => onBlurRef.current?.(),
+    onBlur: ({ event }) => {
+      // Wechsel in ein anderes Feld: Menü zu. Ein Tipp ins eigene Menü zählt nicht (falls ein Gerät den Fokus doch abgibt).
+      const to = event.relatedTarget as HTMLElement | null;
+      if (!to?.closest("[data-editor-menu]")) setMenu(null);
+      onBlurRef.current?.();
+    },
   });
 
   // Fremde Änderungen (live) übernehmen, aber nie mitten im eigenen Schreiben.
   useEffect(() => {
     if (!editor || editor.isFocused || value === last.current) return;
     last.current = value;
-    editor.commands.setContent(value, { contentType: "markdown", emitUpdate: false });
+    load(editor, value);
   }, [editor, value]);
 
   useEffect(() => {
-    editor?.setEditable(!disabled, false);
-  }, [editor, disabled]);
+    editor?.setEditable(!disabled && !lossy, false);
+  }, [editor, disabled, lossy]);
 
   /** Links öffnen per Klick: eigene Seiten im Tool, alles andere im neuen Tab. */
   const onClick = (e: React.MouseEvent) => {
@@ -98,13 +180,40 @@ export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabl
     const href = a?.getAttribute("href");
     if (!href) return;
     e.preventDefault();
-    if (href.startsWith("/")) router.push(href);
-    else window.open(href, "_blank", "noopener,noreferrer");
+    if (!href.startsWith("/")) {
+      window.open(href, "_blank", "noopener,noreferrer");
+      return;
+    }
+    const target = TARGETS.map(([re, table]) => [href.match(re)?.[1], table] as const).find(([id]) => id);
+    if (!target) return router.push(href);
+    // Gelöschte Einträge: Hinweis statt einer leeren Seite. Klappt die Abfrage nicht, trotzdem öffnen.
+    const [raw, table] = target;
+    let id = raw!;
+    try {
+      id = decodeURIComponent(id);
+    } catch {
+      // von Hand geschriebener Link mit „%“: so lassen
+    }
+    createClient()
+      .from(table)
+      .select("id")
+      .eq("id", id)
+      .maybeSingle()
+      .then(({ data, error }) => (data || error ? router.push(href) : toast({ text: "Eintrag gibt es nicht mehr." })));
   };
 
   return (
     <div className={cn("note-editor relative", className)} onClick={onClick}>
+      {lossy && (
+        <div role="status" className="mx-3 mt-3 flex items-center gap-3 rounded-[10px] bg-card-2 px-3 py-2 text-[13px] text-fg-2 max-md:text-[14px]">
+          <span className="min-w-0 flex-1">Nicht alles darstellbar, nur lesen.</span>
+          <button type="button" onClick={() => window.location.reload()} className="shrink-0 rounded-sm font-medium text-acc-line max-md:min-h-11">
+            Neu laden
+          </button>
+        </div>
+      )}
       {editor && <SelectionMenu editor={editor} onCreateTask={onCreateTask} onShare={onShare} />}
+      {editor && menu && <EditorMenu editor={editor} state={menu} keyRef={menuKey} />}
       <EditorContent editor={editor} />
     </div>
   );
@@ -125,7 +234,9 @@ function SelectionMenu({ editor, onCreateTask, onShare }: { editor: Editor; onCr
     selector: ({ editor: e }) => ({
       bold: e.isActive("bold"),
       italic: e.isActive("italic"),
+      h1: e.isActive("heading", { level: 1 }),
       heading: e.isActive("heading", { level: 2 }),
+      h3: e.isActive("heading", { level: 3 }),
       bullet: e.isActive("bulletList"),
       task: e.isActive("taskList"),
       link: e.isActive("link"),
@@ -162,7 +273,7 @@ function SelectionMenu({ editor, onCreateTask, onShare }: { editor: Editor; onCr
     const { from, to } = editor.state.selection;
     const slice = editor.state.selection.content().content.toJSON() as object[];
     const plain = editor.state.doc.textBetween(from, to, "\n");
-    const md = tidy(editor.markdown?.serialize({ type: "doc", content: slice }) ?? plain);
+    const md = toMarkdown(editor, { type: "doc", content: slice });
     const first = plain.split("\n").map((l) => l.trim()).find(Boolean) ?? "";
     if (!md.trim()) return;
     setBusy(true);
@@ -210,14 +321,33 @@ function SelectionMenu({ editor, onCreateTask, onShare }: { editor: Editor; onCr
           <button type="button" className={menuBtn} aria-label="Kursiv" aria-pressed={active.italic} onClick={() => run((c) => c.toggleItalic())}>
             <Italic className="size-[15px]" aria-hidden />
           </button>
+          {/* Am Handy nur eine Überschrift (Platz); H1/H3 gibt es dort über „/“. */}
+          <button
+            type="button"
+            className={cn(menuBtn, "max-md:hidden")}
+            aria-label="Überschrift 1"
+            aria-pressed={active.h1}
+            onClick={() => run((c) => c.toggleHeading({ level: 1 }))}
+          >
+            <Heading1 className="size-[15px]" aria-hidden />
+          </button>
           <button
             type="button"
             className={menuBtn}
-            aria-label="Überschrift"
+            aria-label="Überschrift 2"
             aria-pressed={active.heading}
             onClick={() => run((c) => c.toggleHeading({ level: 2 }))}
           >
             <Heading2 className="size-[15px]" aria-hidden />
+          </button>
+          <button
+            type="button"
+            className={cn(menuBtn, "max-md:hidden")}
+            aria-label="Überschrift 3"
+            aria-pressed={active.h3}
+            onClick={() => run((c) => c.toggleHeading({ level: 3 }))}
+          >
+            <Heading3 className="size-[15px]" aria-hidden />
           </button>
           <button type="button" className={menuBtn} aria-label="Liste" aria-pressed={active.bullet} onClick={() => run((c) => c.toggleBulletList())}>
             <List className="size-[15px]" aria-hidden />
@@ -235,10 +365,10 @@ function SelectionMenu({ editor, onCreateTask, onShare }: { editor: Editor; onCr
                 type="button"
                 onClick={toTask}
                 disabled={busy}
-                className="inline-flex h-[30px] items-center gap-1.5 rounded-[7px] px-2 text-[12.5px] font-medium text-fg-2 transition-colors duration-150 hover:bg-hover hover:text-fg disabled:opacity-60 max-md:h-10 max-md:text-[14px]"
+                className="inline-flex h-[30px] items-center gap-1.5 rounded-[7px] px-2 text-[12.5px] font-medium text-fg-2 transition-colors duration-150 hover:bg-hover hover:text-fg disabled:opacity-60 max-md:size-10 max-md:justify-center max-md:px-0"
               >
                 <CircleCheck className="size-[14px]" aria-hidden />
-                Aufgabe
+                <span className="max-md:sr-only">Aufgabe</span>
               </button>
             </>
           )}
@@ -247,10 +377,10 @@ function SelectionMenu({ editor, onCreateTask, onShare }: { editor: Editor; onCr
               type="button"
               onClick={share}
               disabled={busy}
-              className="inline-flex h-[30px] items-center gap-1.5 rounded-[7px] px-2 text-[12.5px] font-medium text-fg-2 transition-colors duration-150 hover:bg-hover hover:text-fg disabled:opacity-60 max-md:h-10 max-md:text-[14px]"
+              className="inline-flex h-[30px] items-center gap-1.5 rounded-[7px] px-2 text-[12.5px] font-medium text-fg-2 transition-colors duration-150 hover:bg-hover hover:text-fg disabled:opacity-60 max-md:size-10 max-md:justify-center max-md:px-0"
             >
               <FileUp className="size-[14px]" aria-hidden />
-              Teilen
+              <span className="max-md:sr-only">Teilen</span>
             </button>
           )}
         </>

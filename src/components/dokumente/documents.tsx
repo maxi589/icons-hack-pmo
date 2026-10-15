@@ -26,13 +26,14 @@ import { logActivity } from "@/lib/data/use-feed";
 import { DECISION_TYPE, docType, formatSize, hostOf, NEW_TITLE, type Doc, type DocType } from "@/lib/documents";
 import { DocDetail } from "./doc-detail";
 import { topicLabel } from "./doc-fields";
+import { firstLine, mdToText } from "@/lib/markdown";
 import { DocText } from "./doc-text";
 import { useDocActions } from "./use-doc-actions";
 import { useTopics } from "./use-topics";
 
 // Dokumente (Plan Welle 1, Schritt 2, ersetzt „Wissen“): Links, Dateien, Texte, Transkripte und Entscheidungen in einer Tabelle.
 // Strg+V eines Links legt sofort ein Dokument an, eine Datei auf die Seite ziehen lädt sie hoch. Kein Pflichtformular.
-// Adresse: ?dok=<id>, ?entscheidung=<id> (teilbar), ?neu=dokument bzw. ?neu=entscheidung (Tasten D und E).
+// Adresse: ?dok=<id>, ?entscheidung=<id> (teilbar), ?neu=dokument bzw. ?neu=entscheidung.
 
 type Filter = "alle" | "texte" | "dateien" | "entscheidungen";
 const FILTERS: { id: Filter; label: string; short?: string }[] = [
@@ -70,7 +71,7 @@ const docRow = (d: Doc): Row => ({
   target_id: d.target_id,
   by: d.updated_by ?? d.created_by,
   when: d.updated_at,
-  search: `${d.title} ${d.url ?? ""} ${d.file_name ?? ""} ${d.content}`.toLowerCase(),
+  search: `${d.title} ${d.url ?? ""} ${d.file_name ?? ""} ${mdToText(d.content ?? "")}`.toLowerCase(),
   filter: d.kind === "text" || d.kind === "transcript" ? "texte" : "dateien",
 });
 
@@ -205,7 +206,7 @@ export function Documents() {
         onUpdate={(p) => docsApi.update(doc.id, p, me?.id ?? null)}
         onSaveContent={(content) => {
           // Solange kein Titel vergeben ist, gilt die erste Zeile als Titel (wie in Apple Notes).
-          const first = content.split("\n").map((l) => l.replace(/^[#>\-*+\s]+|\[[ xX]\]\s*|[*_`]/g, "").trim()).find(Boolean);
+          const first = firstLine(content);
           const title = doc.title === NEW_TITLE && first ? first.slice(0, 80) : undefined;
           return docsApi.update(doc.id, title ? { content, title } : { content }, me?.id ?? null);
         }}

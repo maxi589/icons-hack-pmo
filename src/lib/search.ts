@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { formatDayMonth, formatShort } from "@/lib/dates";
 import { docType, type DocumentKind } from "@/lib/documents";
 import { targetHref } from "@/lib/links";
+import { mdToText } from "@/lib/markdown";
 import { viennaParts } from "@/lib/meetings";
 import { stageName, type Stage } from "@/lib/pipeline";
 
@@ -51,6 +52,9 @@ type Source = {
   /** die ersten `titleFields` Felder (Standard 1) zählen als Titel, der Rest als Text */
   fields: string[];
   titleFields?: number;
+  /** Felder aus dem Editor (Markdown): zählen nur mit ihrem Text, nicht mit Link-Adressen („pipeline“, IDs) oder
+   *  Tabellen-Strichen. Nur echte Markdown-Felder, Klartext (Firmen-Notizen, Aufgaben …) bleibt unverändert. */
+  md?: string[];
   order: { column: string; ascending: boolean };
   limit: number;
   toHit: (r: Row) => Pick<Hit, "id" | "title" | "href" | "meta"> & Partial<Pick<Hit, "doc" | "done">>;
@@ -88,6 +92,7 @@ const SOURCES: Source[] = [
     table: "meetings",
     select: "id, title, starts_at, location, agenda, notes",
     fields: ["title", "location", "agenda", "notes"],
+    md: ["agenda", "notes"],
     order: { column: "starts_at", ascending: false },
     limit: 12,
     toHit: (r) => {
@@ -101,6 +106,7 @@ const SOURCES: Source[] = [
     table: "documents",
     select: "id, kind, title, url, file_name, mime, content",
     fields: ["title", "file_name", "url", "content"],
+    md: ["content"],
     order: { column: "updated_at", ascending: false },
     limit: 8,
     toHit: (r) => {
@@ -132,26 +138,16 @@ const SOURCES: Source[] = [
     table: "areas",
     select: "id, name, notes",
     fields: ["name", "notes"],
+    md: ["notes"],
     order: { column: "sort", ascending: true },
     limit: 6,
     toHit: (r) => ({ id: str(r.id), title: str(r.name), href: `/bereiche/${str(r.id)}`, meta: "Notizen" }),
   },
 ];
 
-/** Markdown grob zu Fließtext (für die Textstelle unter dem Titel). */
-function plain(md: string) {
-  return md
-    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
-    .replace(/^\s*(#{1,6}|[-*+]|\d+\.|>)\s+/gm, "")
-    .replace(/\[[ xX]\]\s*/g, "")
-    .replace(/[*_`~]+/g, "")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-/** Ausschnitt von ca. 90 Zeichen rund um das erste gefundene Wort. */
+/** Ausschnitt von ca. 90 Zeichen rund um das erste gefundene Wort (Markdown ist schon Klartext, siehe `md`). */
 function snippetOf(text: string, words: string[]) {
-  const t = plain(text);
+  const t = text.replace(/\s+/g, " ").trim();
   const lower = t.toLowerCase();
   const at = Math.min(...words.map((w) => lower.indexOf(w)).filter((i) => i >= 0));
   if (!Number.isFinite(at)) return null;
@@ -162,7 +158,8 @@ function snippetOf(text: string, words: string[]) {
 }
 
 function rank(source: Source, r: Row, words: string[]): Hit | null {
-  const values = source.fields.map((f) => str(r[f]));
+  // Die Datenbank sucht im Rohtext; hier fallen Treffer weg, die nur in einer Link-Adresse stehen.
+  const values = source.fields.map((f) => (source.md?.includes(f) ? mdToText(str(r[f])) : str(r[f])));
   const hay = values.join("\n").toLowerCase();
   if (!matchesAll(hay, words)) return null;
   const n = source.titleFields ?? 1;
@@ -193,7 +190,8 @@ export async function searchAll(db: SupabaseClient, q: string, perType = 5): Pro
       let query = db.from(s.table).select(s.select);
       // Jedes Wort muss in irgendeinem Feld stehen (UND über die Wörter, ODER über die Felder).
       for (const w of words) query = query.or(s.fields.map((f) => `${f}.ilike."*${w}*"`).join(","));
-      const { data, error } = await query.order(s.order.column, { ascending: s.order.ascending }).limit(s.limit);
+      // Die Datenbank sucht im Rohtext. Bei Markdown mehr Zeilen holen, weil reine Adress-Treffer erst danach wegfallen.
+      const { data, error } = await query.order(s.order.column, { ascending: s.order.ascending }).limit(s.md ? s.limit * 3 : s.limit);
       if (error || !data) return [];
       return (data as unknown as Row[])
         .map((r) => rank(s, r, words))

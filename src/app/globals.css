@@ -507,7 +507,7 @@
    Gemeinsamer Editor (Notizblock, Bereichs-Notizen; Tiptap, Markdown)
    Desktop 14px, Handy 16px (sonst zoomt das iPhone). Farben nur über Tokens.
    --------------------------------------------------------------- */
-.note-editor > div {
+.note-editor > div:has(> .ProseMirror) {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -643,3 +643,115 @@
 .note-editor .ProseMirror strong {
   font-weight: 600;
 }
+
+/* Code (vorher stillschweigend gelöscht, gemessen 15.10.): `Code` im Text und Code-Blöcke aus ``` */
+.note-editor .ProseMirror code {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 0.88em;
+  border-radius: 4px;
+  background: var(--card2);
+  box-shadow: 0 0 0 1px var(--line);
+  padding: 1px 4px;
+}
+.note-editor .ProseMirror pre {
+  overflow-x: auto;
+  border-radius: 8px;
+  background: var(--card2);
+  box-shadow: 0 0 0 1px var(--line);
+  padding: 10px 12px;
+  white-space: pre;
+}
+.note-editor .ProseMirror pre code {
+  background: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+/* Tabelle (Notion light): nur Text in Zellen, am Handy scrollt sie in sich */
+.note-editor .ProseMirror .tableWrapper {
+  overflow-x: auto;
+  margin: 0.9em 0;
+}
+.note-editor .ProseMirror table {
+  border-collapse: collapse;
+}
+/* Spalten richten sich nach dem Inhalt (lange Wörter nicht abschneiden), die Hülle scrollt */
+.note-editor .ProseMirror th,
+.note-editor .ProseMirror td {
+  min-width: 96px;
+  overflow-wrap: normal;
+  border: 1px solid var(--line2);
+  padding: 5px 9px;
+  vertical-align: top;
+  text-align: left;
+}
+.note-editor .ProseMirror th {
+  background: var(--card2);
+  font-weight: 600;
+}
+.note-editor .ProseMirror th > p,
+.note-editor .ProseMirror td > p {
+  margin: 0;
+}
+.note-editor .ProseMirror .selectedCell {
+  background: color-mix(in srgb, var(--accLine) 12%, transparent);
+}
+
+/* „/“ bzw. „@“ beim Tippen leicht hinterlegt, solange das Menü offen ist */
+.note-editor .ProseMirror .suggestion {
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--accLine) 10%, transparent);
+}
+
+/* Verknüpfung mit einem Eintrag im Tool = Chip mit Symbol (gespeichert als normaler Link).
+   Text --accLine auf 10 % --accLine: hell ≥ 5,4:1, dunkel ≥ 6,5:1, beim Drüberfahren ≥ 4,7:1 (nachgerechnet 15.10.). */
+.note-editor .ProseMirror
+  a:is(
+    [href^="/pipeline?firma="],
+    [href^="/aufgaben?aufgabe="],
+    [href^="/termine?termin="],
+    [href^="/dokumente?dok="],
+    [href^="/dokumente?entscheidung="],
+    [href^="/roadmap?m="]
+  ) {
+  padding: 1px 6px 1px 5px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--accLine) 10%, transparent);
+  font-weight: 500;
+  text-decoration: none;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background 150ms ease-out;
+}
+.note-editor .ProseMirror a:is([href^="/pipeline?firma="], [href^="/aufgaben?aufgabe="], [href^="/termine?termin="], [href^="/dokumente?dok="], [href^="/dokumente?entscheidung="], [href^="/roadmap?m="]):hover {
+  background: color-mix(in srgb, var(--accLine) 18%, transparent);
+}
+.note-editor .ProseMirror a:is([href^="/pipeline?firma="], [href^="/aufgaben?aufgabe="], [href^="/termine?termin="], [href^="/dokumente?dok="], [href^="/dokumente?entscheidung="], [href^="/roadmap?m="])::before {
+  content: "";
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  margin-right: 0.3em;
+  vertical-align: -0.1em;
+  background-color: currentColor;
+  mask: var(--chip-icon) center / contain no-repeat;
+}
+.note-editor .ProseMirror a[href^="/pipeline?firma="] {
+  --chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 12h4'/%3E%3Cpath d='M10 8h4'/%3E%3Cpath d='M14 21v-3a2 2 0 0 0-4 0v3'/%3E%3Cpath d='M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2'/%3E%3Cpath d='M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16'/%3E%3C/svg%3E");
+}
+.note-editor .ProseMirror a[href^="/aufgaben?aufgabe="] {
+  --chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m16 9-5.5 5.5L8 12'/%3E%3C/svg%3E");
+}
+.note-editor .ProseMirror a[href^="/termine?termin="] {
+  --chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 2v3'/%3E%3Cpath d='M16 2v3'/%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3Cpath d='M3 9h18'/%3E%3Cpath d='M8 13h.01'/%3E%3Cpath d='M12 13h.01'/%3E%3Cpath d='M16 13h.01'/%3E%3Cpath d='M8 17h.01'/%3E%3Cpath d='M12 17h.01'/%3E%3Cpath d='M16 17h.01'/%3E%3C/svg%3E");
+}
+.note-editor .ProseMirror a[href^="/dokumente?dok="] {
+  --chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z'/%3E%3Cpath d='M14 2v5a1 1 0 0 0 1 1h5'/%3E%3Cpath d='M10 9H8'/%3E%3Cpath d='M16 13H8'/%3E%3Cpath d='M16 17H8'/%3E%3C/svg%3E");
+}
+.note-editor .ProseMirror a[href^="/dokumente?entscheidung="] {
+  --chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m14 13-8.381 8.38a1 1 0 0 1-3.001-3l8.384-8.381'/%3E%3Cpath d='m16 16 6-6'/%3E%3Cpath d='m21.5 10.5-8-8'/%3E%3Cpath d='m8 8 6-6'/%3E%3Cpath d='m8.5 7.5 8 8'/%3E%3C/svg%3E");
+}
+.note-editor .ProseMirror a[href^="/roadmap?m="] {
+  --chip-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528'/%3E%3C/svg%3E");
+}
+
