@@ -80,7 +80,7 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
    - „Heute nachfassen“ mit Leerzustand: „Noch nichts nachzufassen. Welle 1 startet am Mo, 19.10. …“, darunter die Nachfass-Runden 2.11., 16.11. und 30.11.
    - Bereiche-Raster mit „Verantwortlich offen“ und dem Knopf „Zuständigkeiten verteilen“.
    - „Als Nächstes“ zeigt die Unterpunkte des nächsten Meilensteins nicht noch einmal (stehen in dessen Karte).
-   - **Handy (15.10.):** Label-Zeile mit Datum („Do, 15. Oktober · noch 3 Tage Vorbereitung“). Countdown in einer Zeile (Tage 42px, Uhr 20px), „bis Sa 27.2., 09:00“ rechts neben dem Label. Zielzahlen als eine Karte „Ziele“ mit vier Zeilen (Name, Frist, Balken, Wert), Bereiche als Liste (Zeichen, Name, x/n · nächste Frist, Verantwortliche/r).
+   - **Handy (15.10.):** Label-Zeile mit Datum („Do, 15. Oktober · noch 3 Tage Vorbereitung“). Countdown nur die Uhr in einer Zeile (Tage 42px, Uhr 20px), ohne Label, Zieldatum und Phasen-Balken (Maxi: „unnötigen Fülltext weg“). „Nächster Meilenstein“ mit eingeklappten Unterpunkten (Zeile „0 von 4“ klappt auf). „Heute nachfassen“ nur am Desktop (eigene Fälle stehen in „Heute für dich“). Karten am Handy Radius 12, Abstände 12px. Zielzahlen als eine Karte „Ziele“ mit vier Zeilen (Name, Frist, Balken, Wert), Bereiche als Liste (Zeichen, Name, x/n · nächste Frist, Verantwortliche/r).
 2. **Roadmap** (`Graphit-Roadmap.dc.html`)
    - Zeilen je Bereich plus Vorbereitung. Zeitachse 1.10.2026–28.2.2027 (151 Tage, Monate proportional).
    - Rauten für Meilensteine, Balken für Zeiträume: M3 vom 19.10. bis 18.12., M2 vom 19.10. bis 30.11., Sponsoren vom 16.11. bis 18.12., Bewerbung vom 30.11. bis 22.1. (Zeile Marketing & Teilnehmer)
