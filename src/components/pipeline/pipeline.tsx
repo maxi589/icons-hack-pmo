@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { Chip } from "@/components/chip";
@@ -38,9 +38,14 @@ import { OrgTable } from "./org-table";
 
 // Pipeline (Board „Graphit-Pipeline“), das Kernstück: Tabs je Typ, Zielbalken, Board mit Ziehen &
 // Ablegen (nur Desktop) oder Liste, Detail rechts bzw. als Bottom Sheet. Zustand in der Adresse:
-// ?tab=venues&firma=<id> (teilbar), ?neu=1 öffnet „+ Firma“.
+// ?tab=venues&firma=<id> (teilbar), ?neu=1 öffnet „+ Firma“, ?nachfassen=heute|ueberfaellig filtert.
 
 type View = "board" | "list";
+
+const DUE_FILTERS = [
+  { param: "heute", tone: "today", label: "heute" },
+  { param: "ueberfaellig", tone: "red", label: "überfällig" },
+] as const;
 
 const PRIO_ORDER = { A: 0, B: 1, C: 2 } as const;
 
@@ -70,6 +75,8 @@ export function Pipeline() {
 
   const tab = (TABS.find((t) => t.id === params.get("tab"))?.id ?? "partner") as TabId;
   const selectedId = params.get("firma");
+  // Filter „heute“/„überfällig“ (Maxi, 15.10.): Antippen des Chips zeigt nur diese Firmen, bleibt beim Tab-Wechsel
+  const due = DUE_FILTERS.find((f) => f.param === params.get("nachfassen")) ?? null;
   const newOpen = params.get("neu") === "1";
 
   const setParams = (patch: Record<string, string | null>) => {
@@ -99,6 +106,7 @@ export function Pipeline() {
   const q = query.trim().toLowerCase();
   const visible = inThisTab
     .filter((o) => !onlyMine || o.owner_id === me?.id)
+    .filter((o) => !due || followState(o, today ?? "")?.tone === due.tone)
     .filter((o) => !q || [o.name, o.warm_via, o.contact_person, o.notes, o.location].some((v) => v?.toLowerCase().includes(q)))
     .sort(sortOrgs);
 
@@ -218,10 +226,30 @@ export function Pipeline() {
           </b>
           {tabDef.goal ? (tab === "venues" ? "plus Backup" : "zugesagt") : "zugesagt · Ziel offen"}
         </span>
-        {(dueToday > 0 || overdue > 0) && (
+        {(dueToday > 0 || overdue > 0 || due) && (
           <span className="flex gap-1.5">
-            {dueToday > 0 && <Chip tone="today">{dueToday} heute</Chip>}
-            {overdue > 0 && <Chip tone="red">{overdue} überfällig</Chip>}
+            {DUE_FILTERS.map((f) => {
+              const count = f.tone === "today" ? dueToday : overdue;
+              const active = due?.param === f.param;
+              // Aktiver Filter bleibt sichtbar, auch bei 0 (sonst kommt man nicht mehr heraus)
+              if (!count && !active) return null;
+              return (
+                <button
+                  key={f.param}
+                  type="button"
+                  aria-pressed={active}
+                  onClick={() => setParams({ nachfassen: active ? null : f.param, firma: null })}
+                  // Handy: Tippfläche 44px hoch über ein unsichtbares Feld, der Chip selbst bleibt 22px
+                  className="relative rounded-full focus-visible:outline-solid max-md:after:absolute max-md:after:-inset-x-0.5 max-md:after:-inset-y-[11px]"
+                >
+                  <Chip tone={f.tone} still={active} className={cn("cursor-pointer gap-1", active && "shadow-[inset_0_0_0_1.5px_currentColor]")}>
+                    {count} {f.label}
+                    {active && <X className="-mr-1 size-3" aria-hidden />}
+                  </Chip>
+                  {active && <span className="sr-only">, Filter aufheben</span>}
+                </button>
+              );
+            })}
           </span>
         )}
         {nextRound && (
