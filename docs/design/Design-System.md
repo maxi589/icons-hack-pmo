@@ -102,6 +102,7 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
 4. **Befehlsleiste** (Strg+K, im Übersicht-Board klickbar)
    - Gruppen: Zuletzt · Aktionen (Neue Aufgabe C, Firma F, Entscheidung E) · Gehe zu (G R …).
    - Tastenkürzel stehen rechts in Kästchen.
+   - **Suche über alles** (Welle 1, 15.10.; Platzhalter „Suchen oder Befehl …“): ab 2 Zeichen auch Firmen, Aufgaben, Termine, Dokumente (inkl. Text und Transkripte), Entscheidungen, Meilensteine (auch per Nummer „M1.2“) und Bereichs-Notizen. Wortteile genügen („Erst“ findet „Erste Bank“), mehrere Wörter müssen alle vorkommen. Reihenfolge: passende Seiten und Bereiche oben, dann Inhalts-Gruppen nach bestem Treffer (Titel vor Text), dann Darstellung, Sonstiges, Aktionen. Je Art höchstens 5 Treffer. Zeile: Symbol · Titel · rechts Stufe/Datum/Art/Nummer; steht das Wort nur im Text, darunter eine Textstelle (12,5px `--text3`, Suchwort `--text2`). Enter öffnet das Detail. Während des Ladens „Suche …“.
 5. **Bereichs-Seite** (Maxi, 14.10.)
    - Oben eine Kopf-Leiste wie die Eigenschaften eines Projekts in Linear: Verantwortlich (Auswahl direkt im Feld) · Pipeline-Ziel (falls vorhanden, mit Stufen und heute/überfällig) · Meilensteine x/n · Aufgaben x/n.
    - Darunter links **Notizen** im gemeinsamen Editor (siehe 6.7; speichert von selbst nach 0,8 s bzw. beim Verlassen, zeigt „wer · wann“), rechts Meilensteine und Aufgaben. Am Handy Notizen unten.
