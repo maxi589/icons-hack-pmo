@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronRight, House, Inbox, Kanban, List, LogOut, Plus, Search } from "lucide-react";
+import { ChevronRight, House, Inbox, Kanban, List, LogOut, MessageSquare, Plus, Search } from "lucide-react";
+import { openFeedback } from "@/components/feedback/feedback-panel";
 import { cn } from "@/lib/utils";
 import { isActive, NAV_HACKATHON, NAV_MAIN, NEW_ACTIONS } from "@/lib/nav";
 import { useInbox } from "./inbox-provider";
@@ -105,6 +106,18 @@ function MenuSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (o: bo
           <div className="label-mono px-3.5">Darstellung</div>
           <ThemeToggle size="lg" className="flex w-full" />
         </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            close();
+            openFeedback(350);
+          }}
+          className={sheetRow}
+        >
+          <MessageSquare className="size-5 text-fg-2" strokeWidth={1.8} aria-hidden />
+          Feedback geben
+        </button>
 
         <button type="button" onClick={signOut} className={cn(sheetRow, "text-fg-2")}>
           <LogOut className="size-5" strokeWidth={1.8} aria-hidden />

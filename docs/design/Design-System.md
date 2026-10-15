@@ -132,7 +132,13 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
    - Zeit: Beginn als echter Zeitpunkt (`timestamptz`), Anzeige immer Wien; 10:00 bleibt über die Zeitumstellung 10:00.
    - Auch sichtbar: am Handy oben in „Heute für dich“ die eigenen Termine von heute (Uhrzeit, „Beitreten“), Übersicht „Als Nächstes“ (kommende Termine mit Uhrzeit), Block „Termine“ auf der Bereichs-Seite und im Firmen-Detail (mit „+ Termin“), Verlauf der Firma („hat den Termin … eingetragen“), Inbox („hat dich eingetragen“). Dokumente und Entscheidungen können zu einem Termin gehören.
    - Teamregeln: „Jedes Meeting hat eine Seite im Tool.“ „Google erinnert, das Tool hält Agenda, Notizen und Ergebnisse fest.“
-10. **Handy** (`Graphit-Handy.dc.html`)
+10. **Feedback** (Welle 1, 15.10.; Strg+K „Feedback geben“, Handy-Menü „Feedback geben“)
+   - Einstieg: Sprechblase unten in der Sidebar neben Hell/Dunkel (auch eingeklappt), kein schwebender Knopf. Die drei Symbole stehen eng (2px), damit der Name daneben nicht abgeschnitten wird.
+   - Desktop: Popover rechts am Symbol (340px): Textfeld „Was fällt dir auf?“, Chips Fehler · Idee · Sonstiges (freiwillig), Bildschirmfoto mit Vorschau (per X weg, „Bildschirm mitschicken“ holt es zurück), **Stelle zeigen** (Fadenkreuz, Element anklicken, Esc bricht ab; im Foto eingerahmt in `--accLine`), Senden (Strg+Enter). Handy: Bottom Sheet, ohne „Stelle zeigen“. Danach Hinweis „Danke, ist bei Maxi.“ Der Entwurf bleibt beim Schließen erhalten, jedes Öffnen macht ein neues Foto.
+   - Automatisch dabei: Seite (Adresse inkl. offenem Detail), Gerät, Browser, Fenstergröße, hell/dunkel, Version (Commit), Person, Zeit, letzte 10 Fehlermeldungen der Seite.
+   - Bei Maxi S: Inbox „hat Feedback gegeben“ mit Status-Chip (offen amber, umgesetzt grün, verworfen grau). Detail rechts 460px (Handy Sheet): Text, Foto (Klick = volle Größe), Seite, Stelle, Gerät, Darstellung, Version, Fehler; Knöpfe **Umgesetzt** · **Verworfen**, danach „Wieder öffnen“. Bei „Umgesetzt“ bekommt die absendende Person nach Ablauf des Rückgängig-Hinweises (5 s) „hat dein Feedback umgesetzt“.
+   - Effekte wie rollende Countdown-Ziffern können im Foto fehlen.
+11. **Handy** (`Graphit-Handy.dc.html`)
    - „Heute für dich“ zum Abhaken, mit +2 T.
    - Status-Sheet: Stufen als 48px-Zeilen, Nachfass-Chips, Knopf „Speichern“.
    - Firmen-Detail mit Kommentaren, @-Vorschlagsliste und unten fixiertem Eingabefeld.

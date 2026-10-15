@@ -2,7 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, LogOut, Monitor, Moon, PanelLeft, Plus, Sun, UserRound } from "lucide-react";
+import { Check, LogOut, MessageSquare, Monitor, Moon, PanelLeft, Plus, Sun, UserRound } from "lucide-react";
+import { openFeedback } from "@/components/feedback/feedback-panel";
 import { openProfile } from "./profile-dialog";
 import {
   Command,
@@ -175,6 +176,10 @@ function Palette({ mode, close }: { mode: Mode; close: () => void }) {
               <CommandItem value="Profil Passwort ändern Team einladen" onSelect={run(openProfile)}>
                 <UserRound aria-hidden />
                 <span className="flex-1">Profil &amp; Team</span>
+              </CommandItem>
+              <CommandItem value="Feedback geben Fehler Idee melden" onSelect={run(() => openFeedback(250))}>
+                <MessageSquare aria-hidden />
+                <span className="flex-1">Feedback geben</span>
               </CommandItem>
               <CommandItem value="Abmelden" onSelect={run(signOut)}>
                 <LogOut aria-hidden />

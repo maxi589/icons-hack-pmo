@@ -8,6 +8,7 @@ import { ProfileDialog } from "./profile-dialog";
 import { Sidebar } from "./sidebar";
 import { SoundProvider } from "./sound-provider";
 import { TeamProvider } from "./team-provider";
+import { FeedbackPanel } from "@/components/feedback/feedback-panel";
 
 // App-Rahmen (Design-System, Abschnitt 5).
 // Desktop: Sidebar links, Hauptpanel eingerückt (8px), Radius 14, Ring; nur das Panel scrollt.
@@ -32,6 +33,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <MobileTabBar />
               <MilestoneCelebration />
               <ProfileDialog />
+              <FeedbackPanel />
             </ToastProvider>
           </CommandProvider>
         </InboxProvider>

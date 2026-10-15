@@ -16,6 +16,7 @@ import { AreaGlyph } from "@/components/area-glyph";
 import { useMilestones } from "@/lib/data/use-milestones";
 import { EVENT_NAME } from "@/lib/brand";
 import { useTeam } from "./team-provider";
+import { FeedbackTrigger } from "@/components/feedback/feedback-panel";
 
 // Desktop-Sidebar (ab 768px). Ausgeklappt 220px, eingeklappt 60px-Icon-Band.
 // Der Knopf zum Ein-/Ausklappen sitzt in beiden Zuständen an exakt derselben Stelle oben links (Mitte 30px/32px).
@@ -180,12 +181,16 @@ export function Sidebar() {
             <Avatar person={me} />
             <span className="flex-1 truncate text-[13px]">{me?.name}</span>
           </button>
-          <button type="button" onClick={toggleDark} className={iconBtn} aria-label="Hell oder dunkel umschalten" title="Hell/Dunkel">
-            <ThemeIcon />
-          </button>
-          <button type="button" onClick={signOut} className={iconBtn} aria-label="Abmelden" title="Abmelden">
-            <LogOut className="size-4" strokeWidth={1.8} aria-hidden />
-          </button>
+          {/* Symbole eng beieinander, damit der Name nicht abgeschnitten wird */}
+          <div className="flex shrink-0 items-center gap-0.5">
+            <FeedbackTrigger className={iconBtn} />
+            <button type="button" onClick={toggleDark} className={iconBtn} aria-label="Hell oder dunkel umschalten" title="Hell/Dunkel">
+              <ThemeIcon />
+            </button>
+            <button type="button" onClick={signOut} className={iconBtn} aria-label="Abmelden" title="Abmelden">
+              <LogOut className="size-4" strokeWidth={1.8} aria-hidden />
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -221,6 +226,7 @@ export function Sidebar() {
           );
         })}
         <div className="mt-auto flex flex-col items-center gap-1.5 border-t border-line pt-2">
+          <FeedbackTrigger rail className={iconBtn} />
           <button type="button" onClick={toggleDark} className={iconBtn} aria-label="Hell oder dunkel umschalten" title="Hell/Dunkel">
             <ThemeIcon />
           </button>

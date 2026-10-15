@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   cacheComponents: true,
   partialPrefetching: true,
+  // App-Version fürs Feedback (Commit auf Vercel, lokal „lokal“).
+  env: { NEXT_PUBLIC_APP_VERSION: (process.env.VERCEL_GIT_COMMIT_SHA ?? "").slice(0, 7) || "lokal" },
   // „Meine Aufgaben“ heißt seit Welle 1 „Für mich“ (alte Links und Lesezeichen funktionieren weiter).
   async redirects() {
     return [

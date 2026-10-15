@@ -5,13 +5,13 @@ import { createClient } from "@/lib/supabase/client";
 import { targetHref, type TargetType } from "@/lib/links";
 import { useTeam } from "./team-provider";
 
-// Inbox der angemeldeten Person: Erwähnungen und Zuweisungen (Tabelle notifications, RLS = nur die eigenen).
+// Inbox der angemeldeten Person: Erwähnungen, Zuweisungen und Feedback (Tabelle notifications, RLS = nur die eigenen).
 // Einmal im App-Rahmen geladen und live gehalten, damit Zähler in Sidebar und Tab-Leiste, die Inbox-Seite
 // und „Heute für dich“ dieselben Daten nutzen. Keine Mails (Entscheidung Chat 2).
 
 export type InboxItem = {
   id: string;
-  kind: "mention" | "assignment";
+  kind: "mention" | "assignment" | "feedback" | "feedback_done";
   target_type: TargetType;
   target_id: string;
   actor_id: string | null;
@@ -21,6 +21,8 @@ export type InboxItem = {
   body: string | null;
   /** Name des Eintrags; null = inzwischen gelöscht */
   targetName: string | null;
+  /** Status bei Feedback (offen, umgesetzt, verworfen) */
+  targetStatus: string | null;
   href: string;
 };
 
@@ -28,9 +30,11 @@ type Inbox = {
   items: InboxItem[] | null;
   unread: number;
   setRead: (ids: string[], read: boolean) => Promise<void>;
+  /** Neu laden, z. B. nachdem ein Feedback-Status geändert wurde. */
+  reload: () => Promise<void>;
 };
 
-const InboxContext = createContext<Inbox>({ items: null, unread: 0, setRead: async () => {} });
+const InboxContext = createContext<Inbox>({ items: null, unread: 0, setRead: async () => {}, reload: async () => {} });
 
 type Row = {
   id: string;
@@ -43,16 +47,21 @@ type Row = {
   comment: { body: string } | null;
 };
 
-/** Namen der verlinkten Einträge nachladen (Firma, Aufgabe, Meilenstein, Entscheidung). */
+/** Namen der verlinkten Einträge nachladen (Firma, Aufgabe, Meilenstein, Entscheidung, …), bei Feedback auch den Status. */
 async function targetNames(rows: Row[]) {
   const supabase = createClient();
   const ids = (t: TargetType) => [...new Set(rows.filter((r) => r.target_type === t).map((r) => r.target_id))];
   const names = new Map<string, string>();
+  const statuses = new Map<string, string>();
   const load = async (t: TargetType, table: string, field: string) => {
     const list = ids(t);
     if (!list.length) return;
-    const { data } = await supabase.from(table).select(`id, ${field}`).in("id", list);
-    for (const d of (data ?? []) as unknown as Record<string, string>[]) names.set(`${t}:${d.id}`, d[field]);
+    const extra = t === "feedback" ? ", status" : "";
+    const { data } = await supabase.from(table).select(`id, ${field}${extra}`).in("id", list);
+    for (const d of (data ?? []) as unknown as Record<string, string>[]) {
+      names.set(`${t}:${d.id}`, d[field]);
+      if (d.status) statuses.set(`${t}:${d.id}`, d.status);
+    }
   };
   await Promise.all([
     load("organization", "organizations", "name"),
@@ -61,8 +70,9 @@ async function targetNames(rows: Row[]) {
     load("decision", "decisions", "title"),
     load("document", "documents", "title"),
     load("meeting", "meetings", "title"),
+    load("feedback", "feedback", "body"),
   ]);
-  return names;
+  return { names, statuses };
 }
 
 export function InboxProvider({ children }: { children: React.ReactNode }) {
@@ -80,13 +90,14 @@ export function InboxProvider({ children }: { children: React.ReactNode }) {
       .limit(200);
     if (!data) return;
     const rows = data as unknown as Row[];
-    const names = await targetNames(rows);
+    const { names, statuses } = await targetNames(rows);
     if (v !== version.current) return;
     setItems(
       rows.map(({ comment, ...r }) => ({
         ...r,
         body: comment?.body ?? null,
         targetName: names.get(`${r.target_type}:${r.target_id}`) ?? null,
+        targetStatus: statuses.get(`${r.target_type}:${r.target_id}`) ?? null,
         href: targetHref(r.target_type, r.target_id),
       }))
     );
@@ -116,7 +127,7 @@ export function InboxProvider({ children }: { children: React.ReactNode }) {
 
   const unread = useMemo(() => items?.filter((n) => !n.read_at).length ?? 0, [items]);
 
-  return <InboxContext value={{ items, unread, setRead }}>{children}</InboxContext>;
+  return <InboxContext value={{ items, unread, setRead, reload: load }}>{children}</InboxContext>;
 }
 
 export function useInbox() {

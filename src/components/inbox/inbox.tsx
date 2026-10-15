@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { format, isToday, isYesterday, parseISO } from "date-fns";
 import { de } from "date-fns/locale";
 import { Check, CheckCheck, Link2, Mail } from "lucide-react";
@@ -11,8 +12,12 @@ import { PageHeader } from "@/components/app-shell/page-header";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { useInbox, type InboxItem } from "@/components/app-shell/inbox-provider";
 import { TARGET_NAMES } from "@/lib/links";
+import { Chip } from "@/components/chip";
+import { FeedbackDetail, STATUS_TONE } from "@/components/feedback/feedback-detail";
+import { STATUS_LABEL, type FeedbackStatus } from "@/lib/feedback";
 
-// Inbox (Umfang v1, ohne Mails): Erwähnungen und Zuweisungen der angemeldeten Person.
+// Inbox (Umfang v1, ohne Mails): Erwähnungen, Zuweisungen und Feedback der angemeldeten Person.
+// Feedback öffnet rechts im Detail (?feedback=<id>), alles andere führt zum Eintrag.
 // Klick öffnet den Eintrag und markiert ihn als gelesen. „Link“ kopiert den Direktlink für WhatsApp.
 
 function dayLabel(iso: string) {
@@ -27,12 +32,16 @@ const iconBtn =
 
 export function Inbox() {
   const { items, unread, setRead } = useInbox();
+  const router = useRouter();
+  const feedbackId = useSearchParams().get("feedback");
+  const detail = <FeedbackDetail id={feedbackId} onClose={() => router.replace("/inbox", { scroll: false })} />;
 
   if (!items) {
     return (
       <>
         <PageHeader title="Inbox" />
         <div className="m-3.5 h-[320px] rounded-xl bg-card-2 md:m-5" aria-busy="true" aria-label="Inbox lädt" />
+        {detail}
       </>
     );
   }
@@ -81,6 +90,7 @@ export function Inbox() {
           ))
         )}
       </div>
+      {detail}
     </div>
   );
 }
@@ -91,7 +101,17 @@ function InboxRow({ item: n, onRead }: { item: InboxItem; onRead: (read: boolean
   const actor = personById(n.actor_id);
   const unread = !n.read_at;
   const gone = n.targetName === null;
-  const what = n.kind === "mention" ? "hat dich erwähnt" : n.target_type === "meeting" ? "hat dich eingetragen" : "hat dich zugewiesen";
+  const what =
+    n.kind === "mention"
+      ? "hat dich erwähnt"
+      : n.kind === "feedback"
+        ? "hat Feedback gegeben"
+        : n.kind === "feedback_done"
+          ? "hat dein Feedback umgesetzt"
+          : n.target_type === "meeting"
+            ? "hat dich eingetragen"
+            : "hat dich zugewiesen";
+  const status = n.target_type === "feedback" ? (n.targetStatus as FeedbackStatus | null) : null;
 
   const copy = async () => {
     await navigator.clipboard.writeText(window.location.origin + n.href);
@@ -114,12 +134,18 @@ function InboxRow({ item: n, onRead }: { item: InboxItem; onRead: (read: boolean
         ) : (
           <Link
             href={n.href}
+            scroll={false}
             onClick={() => unread && onRead(true)}
             className="min-w-0 truncate rounded-sm text-[14px] font-medium after:absolute after:inset-0 md:text-[13.5px]"
           >
             <span className="font-normal text-fg-3">{TARGET_NAMES[n.target_type]} · </span>
             {n.targetName}
           </Link>
+        )}
+        {status && n.kind === "feedback" && (
+          <Chip tone={STATUS_TONE[status]} still className="self-start">
+            {STATUS_LABEL[status]}
+          </Chip>
         )}
         {n.body && <p className="line-clamp-2 text-[13px] leading-normal text-fg-2">„{n.body}“</p>}
       </div>
