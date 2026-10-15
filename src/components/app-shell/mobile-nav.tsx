@@ -3,7 +3,23 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronRight, House, Inbox, Kanban, List, LogOut, MessageSquare, Plus, Search } from "lucide-react";
+import {
+  Bell,
+  Building2,
+  CalendarDays,
+  ChevronRight,
+  CircleCheck,
+  FileText,
+  Gavel,
+  House,
+  Kanban,
+  List,
+  LogOut,
+  MessageSquare,
+  Plus,
+  Search,
+  type LucideIcon,
+} from "lucide-react";
 import { openFeedback } from "@/components/feedback/feedback-panel";
 import { cn } from "@/lib/utils";
 import { isActive, NAV_HACKATHON, NAV_MAIN, NEW_ACTIONS } from "@/lib/nav";
@@ -14,35 +30,53 @@ import { Avatar } from "@/components/avatar";
 import { signOut, usePalette } from "./command-palette";
 import { useTeam } from "./team-provider";
 import { openProfile } from "./profile-dialog";
-import { useToday } from "@/lib/use-today";
-import { formatHeaderDate } from "@/lib/dates";
 import { EVENT_NAME } from "@/lib/brand";
 
-// Handy (unter 768px): Kopfzeile mit Logo, Datum und Avatar (öffnet das Menü),
-// unten die Tab-Leiste Heute · Pipeline · + · Aufgaben · Inbox. Tippflächen mind. 44px.
+// Handy (unter 768px): Kopfzeile mit Logo, Suche, Inbox (Glocke mit Zähler) und Avatar (öffnet das Menü),
+// unten die Tab-Leiste Heute · Pipeline · + · Termine · Aufgaben (15.10.: Kalender sichtbar, Inbox als Glocke oben).
+// Tippflächen mind. 44px.
 
 const sheetRow =
   "flex min-h-12 w-full items-center gap-3 rounded-xl px-3.5 text-left text-[15px] text-fg transition-colors duration-150 active:bg-active";
+
+/** Ungelesen-Zähler auf einem Symbol (Glocke oben, früher Inbox-Tab) */
+function UnreadBadge({ n }: { n: number }) {
+  if (n <= 0) return null;
+  return (
+    <span className="absolute -top-1.5 -right-2.5 min-w-4 rounded-full bg-acc px-1 text-center text-[10px] leading-4 font-semibold text-acc-text tabular shadow-[0_0_0_2px_var(--bg)]">
+      {n > 99 ? "99+" : n}
+    </span>
+  );
+}
 
 export function MobileHeader() {
   const { me } = useTeam();
   const [menu, setMenu] = useState(false);
   const { open } = usePalette();
-  const today = useToday();
-  const todayLabel = today ? formatHeaderDate(today) : "";
+  const { unread } = useInbox();
+  const pathname = usePathname();
+  const inInbox = isActive(pathname, "/inbox");
 
   return (
     <header className="flex items-center justify-between px-[18px] pt-[max(12px,env(safe-area-inset-top))] pb-2 md:hidden">
       <Link href="/" className="flex min-h-11 items-center font-display text-[14px] tracking-[0.02em]">
         {EVENT_NAME}
       </Link>
-      <div className="flex items-center gap-1">
-        <span className="text-[13px] text-fg-2">
-          {todayLabel}
-        </span>
+      <div className="flex items-center">
         <button type="button" onClick={() => open()} className="grid size-11 place-items-center text-fg-2" aria-label="Suchen">
-          <Search className="size-[18px]" strokeWidth={1.8} aria-hidden />
+          <Search className="size-[19px]" strokeWidth={1.8} aria-hidden />
         </button>
+        <Link
+          href="/inbox"
+          aria-current={inInbox ? "page" : undefined}
+          aria-label={unread > 0 ? `Inbox, ${unread} ungelesen` : "Inbox"}
+          className={cn("grid size-11 place-items-center", inInbox ? "text-fg" : "text-fg-2")}
+        >
+          <span className="relative">
+            <Bell className="size-[19px]" strokeWidth={inInbox ? 2.2 : 1.8} aria-hidden />
+            <UnreadBadge n={unread} />
+          </span>
+        </Link>
         <button type="button" onClick={() => setMenu(true)} className="-mr-2 grid size-11 place-items-center" aria-label="Menü öffnen">
           <Avatar person={me} />
         </button>
@@ -56,8 +90,8 @@ function MenuSheet({ open, onOpenChange }: { open: boolean; onOpenChange: (o: bo
   const { me, areas } = useTeam();
   const pathname = usePathname();
   const close = () => onOpenChange(false);
-  // Was nicht in der Tab-Leiste steht, ist hier erreichbar.
-  const links = [...NAV_MAIN, ...NAV_HACKATHON].filter((n) => !["/", "/inbox", "/pipeline", "/aufgaben"].includes(n.href));
+  // Was nicht in der Tab-Leiste oder oben (Inbox) steht, ist hier erreichbar.
+  const links = [...NAV_MAIN, ...NAV_HACKATHON].filter((n) => n.href !== "/inbox" && !TABS.some((t) => t?.href === n.href));
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -132,13 +166,21 @@ const TABS = [
   { href: "/", label: "Heute", Icon: House },
   { href: "/pipeline", label: "Pipeline", Icon: Kanban },
   null, // Platz für „+“
+  { href: "/termine", label: "Termine", Icon: CalendarDays },
   { href: "/aufgaben", label: "Aufgaben", Icon: List },
-  { href: "/inbox", label: "Inbox", Icon: Inbox },
 ];
+
+/** Symbole im „Neu anlegen“-Sheet, damit man die Zeilen ohne Lesen unterscheidet */
+const NEW_ICONS: Record<string, LucideIcon> = {
+  "/aufgaben?neu=1": CircleCheck,
+  "/termine?neu=1": CalendarDays,
+  "/pipeline?neu=1": Building2,
+  "/dokumente?neu=dokument": FileText,
+  "/dokumente?neu=entscheidung": Gavel,
+};
 
 export function MobileTabBar() {
   const pathname = usePathname();
-  const { unread } = useInbox();
   const [newOpen, setNewOpen] = useState(false);
 
   return (
@@ -158,16 +200,8 @@ export function MobileTabBar() {
                 isActive(pathname, tab.href) && "text-fg"
               )}
             >
-              <span className="relative">
-                <tab.Icon className="size-5" strokeWidth={1.8} aria-hidden />
-                {tab.href === "/inbox" && unread > 0 && (
-                  <span className="absolute -top-1.5 -right-2.5 min-w-4 rounded-full bg-acc px-1 text-center text-[10px] leading-4 font-semibold text-acc-text tabular shadow-[0_0_0_2px_var(--panel)]">
-                    {unread}
-                  </span>
-                )}
-              </span>
+              <tab.Icon className="size-5" strokeWidth={isActive(pathname, tab.href) ? 2.2 : 1.8} aria-hidden />
               {tab.label}
-              {tab.href === "/inbox" && unread > 0 && <span className="sr-only">, {unread} ungelesen</span>}
             </Link>
           ) : (
             <button
@@ -188,12 +222,15 @@ export function MobileTabBar() {
           <div className="mx-auto h-1 w-9 rounded-full bg-line-2" aria-hidden />
           <SheetTitle className="px-1 pt-1 text-[17px] font-semibold">Neu anlegen</SheetTitle>
           <div className="flex flex-col">
-            {NEW_ACTIONS.map((a) => (
-              <Link key={a.href} href={a.href} onClick={() => setNewOpen(false)} className={sheetRow}>
-                <Plus className="size-5 text-fg-2" strokeWidth={2} aria-hidden />
-                {a.label}
-              </Link>
-            ))}
+            {NEW_ACTIONS.map((a) => {
+              const Icon = NEW_ICONS[a.href] ?? Plus;
+              return (
+                <Link key={a.href} href={a.href} onClick={() => setNewOpen(false)} className={sheetRow}>
+                  <Icon className="size-5 text-fg-2" strokeWidth={1.8} aria-hidden />
+                  {a.label}
+                </Link>
+              );
+            })}
           </div>
         </SheetContent>
       </Sheet>

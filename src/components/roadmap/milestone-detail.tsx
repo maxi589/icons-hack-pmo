@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Check, ChevronDown, ListTodo, MessageSquare, RotateCcw } from "lucide-react";
+import { Check, ChevronDown, ListTodo, MessageSquare, RotateCcw, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { Chip, DueChip } from "@/components/chip";
@@ -30,6 +30,7 @@ export function MilestoneDetail({
   highlighted = false,
   as: Tag = "section",
   feed = "toggle",
+  onClose,
 }: {
   milestone: Milestone;
   subs: Milestone[];
@@ -40,6 +41,8 @@ export function MilestoneDetail({
   highlighted?: boolean;
   as?: "section" | "article";
   feed?: "open" | "toggle";
+  /** Im Handy-Sheet: ohne Kartenrahmen, mit „Detail schließen“ in der Kopfzeile */
+  onClose?: () => void;
 }) {
   const { areaById, personById } = useTeam();
   const area = areaById(m.area_id);
@@ -52,8 +55,9 @@ export function MilestoneDetail({
     <Tag
       id={`ms-${m.id}`}
       className={cn(
-        "flex scroll-mt-4 flex-wrap items-start gap-x-6 gap-y-4 rounded-[14px] bg-card p-4 md:px-[22px] md:py-[18px]",
-        highlighted ? "shadow-[0_0_0_1.5px_var(--accLine)]" : "shadow-card"
+        "flex scroll-mt-4 flex-wrap items-start gap-x-6 gap-y-4",
+        onClose ? "px-4 pt-2 pb-6" : "rounded-[14px] bg-card p-4 md:px-[22px] md:py-[18px]",
+        !onClose && (highlighted ? "shadow-[0_0_0_1.5px_var(--accLine)]" : "shadow-card")
       )}
     >
       <div className="flex min-w-0 flex-[1.4_1_420px] flex-col gap-2">
@@ -73,6 +77,16 @@ export function MilestoneDetail({
             <DueChip due={m.due_date} today={today} />
           )}
           <CopyLinkButton path={`/roadmap?m=${m.id}`} label={`Link zu ${m.id} kopieren`} className="-my-1 ml-auto" />
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="-my-1.5 -mr-2 grid size-11 place-items-center rounded-lg text-fg-3 hover:bg-hover hover:text-fg"
+              aria-label="Detail schließen"
+            >
+              <X className="size-[18px]" aria-hidden />
+            </button>
+          )}
         </div>
         <h2 className={cn("text-[17px] leading-[1.3] font-semibold tracking-[-0.015em] md:text-[19px]", done && "text-fg-2")}>{m.title}</h2>
         {m.description && <p className="text-[14px] leading-[1.55] text-fg-2">{m.description}</p>}

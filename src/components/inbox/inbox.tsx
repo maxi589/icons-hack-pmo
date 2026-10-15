@@ -72,7 +72,7 @@ export function Inbox() {
         </div>
 
         {items.length === 0 ? (
-          <div className="flex flex-col items-center gap-2.5 rounded-[14px] bg-card-2 px-4 py-12 text-center">
+          <div className="flex flex-col items-center gap-2.5 rounded-[14px] bg-card-2 px-4 py-12 text-center max-md:bg-card max-md:shadow-card">
             <p className="text-sm font-medium">Noch nichts in deiner Inbox</p>
           </div>
         ) : (

@@ -15,7 +15,7 @@ import { useTeam } from "@/components/app-shell/team-provider";
 import { useNow, useToday } from "@/lib/use-today";
 import { useMeetings } from "@/lib/data/use-meetings";
 import { endOf, meetingHref, viennaParts, type Meeting } from "@/lib/meetings";
-import { daysBetween, EVENT_START, EVENT_START_UTC, formatDayMonth, formatLong, formatShort, relativeDays, TIME_ZONE } from "@/lib/dates";
+import { daysBetween, EVENT_START, EVENT_START_UTC, formatDayMonth, formatHeaderDate, formatLong, formatShort, relativeDays, TIME_ZONE } from "@/lib/dates";
 import { currentPhase, phaseFill, PHASES, WAVE_1 } from "@/lib/phases";
 import { MilestoneChecklist } from "@/components/milestone-checklist";
 import { OwnersDialog } from "./owners-dialog";
@@ -51,6 +51,7 @@ export function Overview() {
       <h1 className="sr-only">Übersicht</h1>
       <p className="label-mono -mb-1 pt-1 md:pt-0">
         <span className="max-md:hidden">{formatLong(today)} · </span>
+        <span className="md:hidden">{formatHeaderDate(today)} · </span>
         {phaseLeft(today, phase)}
       </p>
 
@@ -67,7 +68,7 @@ export function Overview() {
         <FollowUpCard orgs={data.orgs} today={today} />
       </div>
 
-      <AreasSection milestones={data.milestones} today={today} />
+      <AreasSection milestones={data.milestones} />
     </div>
   );
 }
@@ -77,11 +78,14 @@ export function Overview() {
 // ---------------------------------------------------------------
 function CountdownCard({ today, phase }: { today: string; phase: number }) {
   return (
-    <section className={cn(card, "relative isolate flex min-w-0 flex-[1.45_1_440px] flex-col justify-between gap-[22px] overflow-hidden px-5 py-[18px] md:px-6 md:py-[22px]")}>
+    <section className={cn(card, "relative isolate flex min-w-0 flex-[1.45_1_440px] flex-col justify-between gap-[18px] overflow-hidden px-5 py-4 md:gap-[22px] md:px-6 md:py-[22px]")}>
       <RasterField />
-      <h2 className="label-mono">Countdown</h2>
+      <div className="flex items-baseline justify-between gap-2">
+        <h2 className="label-mono">Countdown</h2>
+        <span className="text-[12.5px] text-fg-2 md:hidden">{EVENT_UNTIL}</span>
+      </div>
       <Countdown />
-      <p className="-mt-2 text-[13px] text-fg-2">{EVENT_UNTIL}</p>
+      <p className="-mt-2 text-[13px] text-fg-2 max-md:hidden">{EVENT_UNTIL}</p>
       <ol className="grid grid-cols-5 gap-1.5" aria-label="Phasen">
         {PHASES.map((p, i) => (
           <li key={p.name} className="flex flex-col gap-2" aria-current={i === phase ? "step" : undefined}>
@@ -179,14 +183,38 @@ function GoalTiles({ orgs, milestones }: { orgs: Org[]; milestones: Milestone[] 
   };
 
   const goals = [
-    { label: "Track-Partner zugesagt", value: won("challenge"), target: 4, note: `bis ${due("M3")}` },
-    { label: "Jury zugesagt", value: won("jury"), target: 4, note: `bis ${due("M4")}` },
-    { label: "Venue fixiert", value: won("venue", ["fix"]), target: 1, note: `plus Backup · bis ${due("M2")}` },
-    { label: "Sponsoren zugesagt", value: won("sponsor") + won("tokens"), target: null, note: "" },
+    { label: "Track-Partner zugesagt", short: "Track-Partner", value: won("challenge"), target: 4, note: `bis ${due("M3")}` },
+    { label: "Jury zugesagt", short: "Jury", value: won("jury"), target: 4, note: `bis ${due("M4")}` },
+    { label: "Venue fixiert", short: "Venue", value: won("venue", ["fix"]), target: 1, note: `plus Backup · bis ${due("M2")}` },
+    { label: "Sponsoren zugesagt", short: "Sponsoren", value: won("sponsor") + won("tokens"), target: null, note: "Ziel offen" },
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] md:gap-4">
+    <>
+      {/* Handy (15.10.): eine Karte mit vier Zeilen statt vier Kacheln */}
+      <Link href="/pipeline" className={cn(card, "flex flex-col md:hidden")}>
+        <span className="label-mono px-4 pt-3.5 pb-1">Ziele</span>
+        {goals.map((g) => (
+          <span key={g.label} className="flex min-h-[52px] items-center gap-3 border-t border-line px-4 py-2 nth-[2]:border-t-0">
+            <span className="flex min-w-0 flex-1 flex-col">
+              <span className="truncate text-[15px] font-medium">{g.short}</span>
+              {g.note && <span className="truncate text-[12.5px] text-fg-3">{g.note}</span>}
+            </span>
+            {g.target && (
+              <span className="flex w-[84px] gap-1" aria-hidden>
+                {Array.from({ length: g.target }, (_, i) => (
+                  <span key={i} className={cn("h-1 flex-1 rounded-sm", i < g.value ? "bg-acc-line" : "bg-line-2")} />
+                ))}
+              </span>
+            )}
+            <span className="w-12 text-right tabular">
+              <span className="text-[20px] leading-none font-medium tracking-[-0.03em]">{g.value}</span>
+              {g.target && <span className="text-[13px] text-fg-3"> / {g.target}</span>}
+            </span>
+          </span>
+        ))}
+      </Link>
+    <div className="hidden gap-3 md:grid md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] md:gap-4">
       {goals.map((g) => (
         <Link
           key={g.label}
@@ -205,10 +233,11 @@ function GoalTiles({ orgs, milestones }: { orgs: Org[]; milestones: Milestone[] 
               ))}
             </span>
           )}
-          {g.note && <span className="text-[12px] text-fg-3">{g.note}</span>}
+          {g.note && g.target && <span className="text-[12px] text-fg-3">{g.note}</span>}
         </Link>
       ))}
     </div>
+    </>
   );
 }
 
@@ -222,10 +251,14 @@ function DueCard({ milestones, tasks, meetings, today }: { milestones: Milestone
   const now = useNow();
   const parentsWithChildren = new Set(milestones.map((m) => m.parent_id).filter(Boolean));
   const areaOwner = (id: string | null) => areaById(id)?.owner_id ?? null;
+  // Unterpunkte des nächsten Meilensteins stehen schon in der Karte „Nächster Meilenstein“ (15.10.: nicht doppelt zeigen).
+  // Überfällige bleiben drin, nur hier sind sie rot markiert.
+  const nextTop = milestones.find((m) => !m.parent_id && m.status !== "erledigt");
+  const shownAbove = (m: Milestone) => !!nextTop && m.parent_id === nextTop.id && m.due_date >= today;
 
   const items: DueItem[] = [
     ...milestones
-      .filter((m) => m.status !== "erledigt" && !parentsWithChildren.has(m.id))
+      .filter((m) => m.status !== "erledigt" && !parentsWithChildren.has(m.id) && !shownAbove(m))
       .map((m) => ({ key: m.id, kind: "milestone" as const, id: m.id, title: m.title, due: m.due_date, areaId: m.area_id, ownerId: areaOwner(m.area_id) })),
     ...tasks.map((t) => ({ key: t.id, kind: "task" as const, title: t.title, due: t.due_date!, areaId: t.area_id, ownerId: t.assignee_id })),
     // Termine: nur kommende bzw. laufende, mit Uhrzeit vor Meilensteinen und Aufgaben des Tages
@@ -354,7 +387,7 @@ function FollowUpCard({ orgs, today }: { orgs: Org[]; today: string }) {
 // ---------------------------------------------------------------
 // Bereiche mit Verantwortlichen
 // ---------------------------------------------------------------
-function AreasSection({ milestones, today }: { milestones: Milestone[]; today: string }) {
+function AreasSection({ milestones }: { milestones: Milestone[] }) {
   const { areas, personById } = useTeam();
   const [dialog, setDialog] = useState(false);
   const open = areas.filter((a) => !a.owner_id).length;
@@ -374,13 +407,45 @@ function AreasSection({ milestones, today }: { milestones: Milestone[]; today: s
         )}
       </div>
 
+      {/* Handy (15.10.): Liste statt Kacheln, damit lange Namen nicht abgeschnitten werden */}
+      <ul className={cn(card, "overflow-hidden md:hidden")}>
+        {areas.map((a) => {
+          const own = milestones.filter((m) => m.area_id === a.id);
+          const done = own.filter((m) => m.status === "erledigt").length;
+          const next = own.find((m) => m.status !== "erledigt");
+          const owner = personById(a.owner_id);
+          return (
+            <li key={a.id} className="relative flex min-h-[52px] items-center gap-3 border-t border-line px-4 first:border-t-0">
+              <AreaGlyph color={a.color} progress={own.length ? done / own.length : 0} size={14} />
+              <span className="flex min-w-0 flex-1 flex-col">
+                <Link href={`/bereiche/${a.id}`} className="truncate rounded-sm text-[15px] font-medium after:absolute after:inset-0">
+                  {a.name}
+                </Link>
+                <span className="truncate font-mono text-[11.5px] text-fg-3 tabular">
+                  {done}/{own.length}
+                  {next ? ` · ${formatDayMonth(next.due_date)}` : own.length ? " · fertig" : ""}
+                </span>
+              </span>
+              {owner ? (
+                <span className="flex shrink-0 items-center gap-1.5 text-[13px] text-fg-2">
+                  <Avatar person={owner} size={22} />
+                  {owner.name}
+                </span>
+              ) : (
+                <span className="shrink-0 text-[13px] text-st-amber">Verantwortlich offen</span>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+
       {/* Breit genug: alle Bereiche in einer Zeile (Spaltenzahl folgt der Zahl der Bereiche), sonst 2–4 Spalten */}
-      <div className="@container">
+      <div className="@container max-md:hidden">
         <div className="grid grid-cols-2 gap-2 @lg:grid-cols-3 @2xl:grid-cols-4 @4xl:grid-flow-col @4xl:grid-cols-none @4xl:auto-cols-fr">
           {areas.map((a) => {
             const own = milestones.filter((m) => m.area_id === a.id);
             const done = own.filter((m) => m.status === "erledigt").length;
-            const next = own.find((m) => m.status !== "erledigt" && m.due_date >= today);
+            const next = own.find((m) => m.status !== "erledigt");
             const owner = personById(a.owner_id);
             return (
               <Link

@@ -176,7 +176,8 @@ export function OrgDetail({
               onChange={(e) => onUpdate({ next_follow_up: e.target.value || null })}
               aria-describedby={follow && follow.tone !== "gray" ? f("follow-state") : undefined}
               className={cn(
-                "h-8 rounded-lg bg-transparent px-2 text-[13px] tabular hover:bg-hover",
+                // min-w-0 + flex-1: Datum gibt nach, damit „+1 W“ auch auf 375px-Handys sichtbar bleibt
+                "h-8 min-w-0 flex-1 rounded-lg bg-transparent px-2 text-[13px] tabular hover:bg-hover max-md:[&::-webkit-calendar-picker-indicator]:hidden md:flex-none",
                 follow?.tone === "red" ? "font-medium text-st-red" : follow?.tone === "today" ? "font-medium text-acc-line" : "text-fg"
               )}
             />

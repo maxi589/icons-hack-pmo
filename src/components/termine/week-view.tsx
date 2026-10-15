@@ -18,7 +18,7 @@ import { MeetingMenu } from "./meeting-menu";
 const HOUR = 48; // px je Stunde
 const SNAP = 15; // min
 
-export type AllDay = { key: string; date: string; label: string; href: string; kind: "milestone" | "round" };
+export type AllDay = { key: string; date: string; label: string; tag?: string; title?: string; href: string; kind: "milestone" | "round" };
 
 type Placed = { m: Meeting; top: number; height: number; col: number; cols: number };
 

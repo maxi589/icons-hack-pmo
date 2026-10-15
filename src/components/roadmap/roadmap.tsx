@@ -1,13 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
-import { PageHeader } from "@/components/app-shell/page-header";
+import { DueChip } from "@/components/chip";
+import { MobileSheet } from "@/components/mobile-sheet";
+import { useIsMobile } from "@/lib/use-is-mobile";
+import { MobileTitle, PageHeader } from "@/components/app-shell/page-header";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { useToday } from "@/lib/use-today";
 import { useMilestones, type Milestone } from "@/lib/data/use-milestones";
-import { daysBetween, formatDayMonth } from "@/lib/dates";
+import { daysBetween, formatDayMonth, formatShort, relativeDays } from "@/lib/dates";
 import { FOLLOW_UP_ROUNDS } from "@/lib/phases";
 import { AXIS_DAYS, axisEdge, axisPos, MONTHS, PLAN_BARS } from "@/lib/roadmap";
 import { Segmented } from "@/components/segmented";
@@ -36,7 +40,13 @@ export function Roadmap() {
     window.history.replaceState(null, "", `?m=${id}`);
   };
 
+  const isMobile = useIsMobile();
   const byId = (id: string | null) => milestones?.find((m) => m.id === id) ?? null;
+  const sheetItem = byId(picked);
+  const closeSheet = () => {
+    setPicked(null);
+    window.history.replaceState(null, "", "/roadmap");
+  };
   const childrenOf = (id: string) => (milestones ?? []).filter((m) => m.parent_id === id).sort((a, b) => a.sort - b.sort);
   const tops = (milestones ?? []).filter((m) => !m.parent_id);
   const selected = byId(picked) ?? tops.find((m) => m.status !== "erledigt") ?? tops[0] ?? null;
@@ -66,13 +76,15 @@ export function Roadmap() {
           ]}
         />
       </PageHeader>
-      <h1 className="px-3.5 pt-2 pb-3 text-[21px] font-semibold tracking-[-0.025em] md:sr-only">Roadmap</h1>
+      <MobileTitle title="Roadmap" />
+      <h1 className="sr-only max-md:hidden">Roadmap</h1>
 
       {!milestones || !today ? (
         <div className="mx-3.5 h-[420px] rounded-xl bg-card-2 md:mx-5 md:mt-5" aria-busy="true" aria-label="Roadmap lädt" />
       ) : (
         <>
-          {view === "timeline" && (
+          {/* Nicht am Handy rendern: sonst gäbe es das Detail (mit id="ms-…") doppelt neben dem Sheet */}
+          {view === "timeline" && !isMobile && (
             <div className="hidden pt-1.5 pb-6 md:block">
               <Timeline milestones={milestones} today={today} selectedId={selected?.id ?? null} onSelect={select} />
               {selected && (
@@ -90,17 +102,122 @@ export function Roadmap() {
               )}
             </div>
           )}
-          <div className={cn("flex flex-col gap-3 px-3.5 pb-8 md:gap-4 md:px-5 md:pt-5", view === "timeline" && "md:hidden")}>
-            <MilestoneList
-              tops={tops}
-              childrenOf={childrenOf}
-              today={today}
-              onToggle={setMilestoneDone}
-              highlightId={picked ? listTarget : null}
-            />
+          {view === "list" && (
+            <div className="hidden flex-col gap-4 px-5 pt-5 pb-8 md:flex">
+              <MilestoneList
+                tops={tops}
+                childrenOf={childrenOf}
+                today={today}
+                onToggle={setMilestoneDone}
+                highlightId={picked ? listTarget : null}
+              />
+            </div>
+          )}
+          {/* Handy: kompakte Liste, Antippen öffnet das Detail als Sheet (15.10., vorher lange Karten) */}
+          <div className="flex flex-col gap-3 px-3.5 pb-8 md:hidden">
+            <CompactList tops={tops} childrenOf={childrenOf} today={today} onOpen={select} />
           </div>
         </>
       )}
+
+      {isMobile && sheetItem && today && (
+        <MobileSheet open onClose={closeSheet} title={`${sheetItem.id} ${sheetItem.title}`}>
+          <MilestoneDetail
+            key={sheetItem.id}
+            milestone={sheetItem}
+            subs={childrenOf(sheetItem.id)}
+            parent={byId(sheetItem.parent_id)}
+            today={today}
+            onToggle={setMilestoneDone}
+            onSelect={select}
+            onClose={closeSheet}
+          />
+        </MobileSheet>
+      )}
+    </>
+  );
+}
+
+// ---------------------------------------------------------------
+// Handy: Meilensteine als Zeilen nach Monat. Unterpunkte stecken im Detail; steht einer früher an als sein
+// Meilenstein, zeigt die Zeile ihn darunter („als Nächstes M2.1 · Mo, 19.10.“), damit nichts übersehen wird.
+// ---------------------------------------------------------------
+function CompactList({
+  tops,
+  childrenOf,
+  today,
+  onOpen,
+}: {
+  tops: Milestone[];
+  childrenOf: (id: string) => Milestone[];
+  today: string;
+  onOpen: (id: string) => void;
+}) {
+  const { areaById } = useTeam();
+  const monthOf = (d: string) => MONTHS.find((mo) => d.slice(0, 7) === mo.start.slice(0, 7))?.name ?? d.slice(0, 7);
+  const groups = [...new Set(tops.map((m) => monthOf(m.due_date)))];
+
+  return (
+    <>
+      {groups.map((g) => (
+        <section key={g} className="flex flex-col gap-1.5">
+          <h2 className="label-mono px-1 pt-1">{g}</h2>
+          <ul className="overflow-hidden rounded-xl bg-card shadow-card">
+            {tops
+              .filter((m) => monthOf(m.due_date) === g)
+              .map((m) => {
+                const area = areaById(m.area_id);
+                const subs = childrenOf(m.id);
+                const subsDone = subs.filter((s) => s.status === "erledigt").length;
+                const done = m.status === "erledigt";
+                const next = done ? undefined : subs.find((s) => s.status !== "erledigt" && s.due_date < m.due_date);
+                const urgent = !done && daysBetween(today, m.due_date) <= 7;
+                return (
+                  <li key={m.id} className={cn("relative flex items-start gap-3 border-t border-line px-3.5 py-3 first:border-t-0", done && "opacity-60")}>
+                    <span
+                      className={cn("mt-[6px] size-[11px] shrink-0 rotate-45 rounded-[2px]", done ? "" : "border-[1.5px]")}
+                      style={done ? { background: area?.color } : { borderColor: area?.color }}
+                      aria-hidden
+                    />
+                    <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+                      <button
+                        type="button"
+                        onClick={() => onOpen(m.id)}
+                        className="min-w-0 truncate rounded-sm text-left text-[15px] font-medium after:absolute after:inset-0"
+                      >
+                        <span className="font-mono text-[12.5px] font-normal text-fg-3">{m.id} </span>
+                        {m.title}
+                        {done && <span className="sr-only">, erledigt</span>}
+                      </button>
+                      <span className="truncate text-[12.5px] text-fg-3 tabular">
+                        {formatShort(m.due_date)} · {area?.name}
+                        {subs.length > 0 && ` · ${subsDone}/${subs.length}`}
+                      </span>
+                      {next && (
+                        <span className="truncate text-[12.5px] text-fg-2 tabular">
+                          {/* Nah oder überfällig: Wort statt nur Farbe („in 4 Tagen“, „überfällig“) */}
+                          {daysBetween(today, next.due_date) < 0 ? (
+                            <span className="text-st-red">überfällig</span>
+                          ) : daysBetween(today, next.due_date) <= 7 ? (
+                            <span className="text-st-amber">{relativeDays(next.due_date, today)}</span>
+                          ) : (
+                            formatShort(next.due_date)
+                          )}{" "}
+                          · {next.id} {next.title}
+                        </span>
+                      )}
+                    </span>
+                    {done ? (
+                      <Check className="mt-0.5 size-4 shrink-0 text-acc-line" strokeWidth={2.4} aria-hidden />
+                    ) : (
+                      urgent && <DueChip due={m.due_date} today={today} />
+                    )}
+                  </li>
+                );
+              })}
+          </ul>
+        </section>
+      ))}
     </>
   );
 }

@@ -126,7 +126,7 @@ export function FuerMich() {
                   </button>
                 </div>
                 {openCount === 0 && (
-                  <p className="rounded-[14px] bg-card-2 px-4 py-6 text-[13.5px] text-fg-2">Dir ist gerade nichts zugewiesen.</p>
+                  <p className="rounded-[14px] bg-card-2 px-4 py-6 text-[13.5px] text-fg-2 max-md:bg-card max-md:shadow-card">Dir ist gerade nichts zugewiesen.</p>
                 )}
                 <TaskList
                   className=""

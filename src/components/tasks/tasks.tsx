@@ -9,7 +9,7 @@ import { DueChip } from "@/components/chip";
 import { Segmented } from "@/components/segmented";
 import { useToast } from "@/components/toast";
 import { MobileSheet } from "@/components/mobile-sheet";
-import { PageHeader } from "@/components/app-shell/page-header";
+import { MobileTitle, PageHeader } from "@/components/app-shell/page-header";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { KanbanBoard, KanbanCard, KanbanCards, KanbanHeader, KanbanProvider } from "@/components/ui/kanban";
 import { play } from "@/lib/sounds";
@@ -30,7 +30,7 @@ import { TaskDetail } from "./task-detail";
 type View = "board" | "list";
 
 const filterCls =
-  "h-8 cursor-pointer appearance-none rounded-[9px] border border-field bg-card pr-7 pl-2.5 text-[13px] text-fg focus-visible:outline-solid max-md:h-10 max-md:text-base";
+  "h-8 cursor-pointer appearance-none truncate rounded-[9px] border border-field bg-card pr-7 pl-2.5 text-[13px] text-fg focus-visible:outline-solid max-md:h-10 max-md:pr-6 max-md:text-base";
 
 function FilterSelect({
   label,
@@ -46,12 +46,12 @@ function FilterSelect({
   children: React.ReactNode;
 }) {
   return (
-    <label className={cn("relative inline-flex min-w-0 items-center max-md:flex-1", wide ? "md:w-[240px] max-md:basis-full" : "md:w-[160px]")}>
+    <label className={cn("relative inline-flex min-w-0 items-center max-md:basis-0", wide ? "max-md:flex-[1.3] md:w-[240px]" : "max-md:flex-1 md:w-[160px]")}>
       <span className="sr-only">{label}</span>
       <select value={value} onChange={(e) => onChange(e.target.value)} className={cn(filterCls, "w-full", value && "bg-active")}>
         {children}
       </select>
-      <ChevronDown className="pointer-events-none absolute right-2 size-3.5 text-fg-3" aria-hidden />
+      <ChevronDown className="pointer-events-none absolute right-2 size-3.5 text-fg-3 max-md:right-1.5" aria-hidden />
     </label>
   );
 }
@@ -162,12 +162,13 @@ export function Tasks() {
       {/* Links Filter und Inhalt; rechts das Detail über die volle Höhe unter der Kopfzeile */}
       <div className="flex min-h-0 flex-1">
         <div className="flex min-w-0 flex-1 flex-col">
-      <h1 className="px-3.5 pt-2 pb-2 text-[21px] font-semibold tracking-[-0.025em] md:sr-only">{title}</h1>
+      <MobileTitle title={title} action={{ label: "Aufgabe", onClick: () => setParams({ neu: "1" }) }} />
+      <h1 className="sr-only max-md:hidden">{title}</h1>
 
-      {/* Filter */}
+      {/* Filter (Handy: drei gleich breite Auswahlen in einer Zeile, kurze Namen) */}
       <div className="flex flex-wrap items-center gap-2 px-3.5 pb-3 md:border-b md:border-line md:px-[18px] md:py-3">
         <FilterSelect label="Bereich" value={fArea} onChange={(v) => setParams({ bereich: v })}>
-          <option value="">Alle Bereiche</option>
+          <option value="">{isMobile ? "Bereich" : "Alle Bereiche"}</option>
           {allAreas.map((a) => (
             <option key={a.id} value={a.id}>
               {a.name}
@@ -175,7 +176,7 @@ export function Tasks() {
           ))}
         </FilterSelect>
         <FilterSelect label="Person" value={fPerson} onChange={(v) => setParams({ person: v })}>
-            <option value="">Alle Personen</option>
+            <option value="">{isMobile ? "Person" : "Alle Personen"}</option>
             {people.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name}
@@ -184,7 +185,7 @@ export function Tasks() {
             <option value="offen">Noch niemand</option>
           </FilterSelect>
         <FilterSelect wide label="Meilenstein" value={fMs} onChange={(v) => setParams({ meilenstein: v })}>
-          <option value="">Alle Meilensteine</option>
+          <option value="">{isMobile ? "Meilenstein" : "Alle Meilensteine"}</option>
           {milestoneOptions(msList).map((m) => (
             <option key={m.id} value={m.id}>
               {`${m.parent_id ? "   " : ""}${m.id} · ${m.title}`}
@@ -195,18 +196,11 @@ export function Tasks() {
           <button
             type="button"
             onClick={() => setParams({ bereich: null, person: null, meilenstein: null })}
-            className="h-8 rounded-[9px] px-2.5 text-[13px] text-fg-2 hover:bg-hover hover:text-fg max-md:h-10"
+            className="h-8 rounded-[9px] px-2.5 text-[13px] text-fg-2 hover:bg-hover hover:text-fg max-md:-ml-1 max-md:h-10 max-md:basis-full max-md:text-left"
           >
             Filter zurücksetzen
           </button>
         )}
-        <button
-          type="button"
-          onClick={() => setParams({ neu: "1" })}
-          className="inline-flex h-10 items-center rounded-[9px] bg-acc px-3.5 text-[14px] font-medium text-acc-text md:hidden"
-        >
-          + Aufgabe
-        </button>
       </div>
 
       {all.length === 0 ? (
@@ -495,7 +489,7 @@ function TaskRow({
 
 function EmptyState({ onNew }: { onNew: () => void }) {
   return (
-    <div className="m-3.5 flex flex-col items-center gap-2.5 rounded-[14px] bg-card-2 px-4 py-12 text-center md:m-5">
+    <div className="m-3.5 flex flex-col items-center gap-2.5 rounded-[14px] bg-card-2 px-4 py-12 text-center max-md:bg-card max-md:shadow-card md:m-5">
       <p className="text-sm font-medium">Noch keine Aufgaben</p>
       <button type="button" onClick={onNew} className="mt-1 inline-flex h-8 items-center rounded-[9px] bg-acc px-3 text-[13px] font-medium text-acc-text max-md:h-10">
         + Aufgabe

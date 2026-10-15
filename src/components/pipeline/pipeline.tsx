@@ -8,7 +8,7 @@ import { Avatar } from "@/components/avatar";
 import { Chip } from "@/components/chip";
 import { Segmented } from "@/components/segmented";
 import { useToast } from "@/components/toast";
-import { PageHeader } from "@/components/app-shell/page-header";
+import { MobileTitle, PageHeader } from "@/components/app-shell/page-header";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { MobileSheet } from "@/components/mobile-sheet";
 import { KanbanBoard, KanbanCard, KanbanCards, KanbanHeader, KanbanProvider } from "@/components/ui/kanban";
@@ -156,7 +156,8 @@ export function Pipeline() {
       {/* Links Tabs, Filter und Inhalt; rechts das Detail über die volle Höhe unter der Kopfzeile (wie Linear/Attio) */}
       <div className="flex min-h-0 flex-1">
         <div className="flex min-w-0 flex-1 flex-col">
-      <h1 className="px-3.5 pt-2 pb-2 text-[21px] font-semibold tracking-[-0.025em] md:sr-only">Pipeline</h1>
+      <MobileTitle title="Pipeline" action={{ label: "Firma", onClick: () => setParams({ neu: "1" }) }} />
+      <h1 className="sr-only max-md:hidden">Pipeline</h1>
 
       {/* Tabs, Suche, Filter */}
       <div className="flex flex-wrap items-center gap-2.5 px-3.5 pb-2.5 md:border-b md:border-line md:px-[18px] md:py-3">
@@ -183,7 +184,7 @@ export function Pipeline() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Suchen …"
-            className="h-8 w-full rounded-[9px] border border-field bg-card pr-2.5 pl-8 text-[13px] text-fg placeholder:text-fg-3 focus-visible:outline-solid"
+            className="h-8 w-full rounded-[9px] border border-field bg-card pr-2.5 pl-8 text-[13px] text-fg placeholder:text-fg-3 focus-visible:outline-solid max-md:h-10 max-md:text-base"
           />
         </label>
         <button
@@ -191,18 +192,11 @@ export function Pipeline() {
           aria-pressed={onlyMine}
           onClick={() => setOnlyMine((v) => !v)}
           className={cn(
-            "inline-flex h-8 items-center gap-1.5 rounded-[9px] px-3 text-[13px] font-medium shadow-[inset_0_0_0_1px_var(--line2)] transition-colors duration-150",
+            "inline-flex h-8 items-center gap-1.5 rounded-[9px] px-3 text-[13px] font-medium shadow-[inset_0_0_0_1px_var(--line2)] transition-colors duration-150 max-md:h-10",
             onlyMine ? "bg-active text-fg" : "text-fg-2 hover:bg-hover hover:text-fg"
           )}
         >
           Nur meine
-        </button>
-        <button
-          type="button"
-          onClick={() => setParams({ neu: "1" })}
-          className="inline-flex h-8 items-center rounded-[9px] bg-acc px-3 text-[13px] font-medium text-acc-text md:hidden"
-        >
-          + Firma
         </button>
       </div>
 
@@ -236,7 +230,8 @@ export function Pipeline() {
         <EmptyTab tabName={tabDef.name} onNew={() => setParams({ neu: "1" })} />
       ) : (
           <div className="min-h-0 min-w-0 flex-1 md:overflow-auto">
-            {view === "board" && (
+            {/* Ohne Treffer kein leeres Board: sonst stünde „Keine Treffer.“ unter dem bildschirmhohen Board */}
+            {view === "board" && visible.length > 0 && (
               <div className="hidden p-3.5 pb-5 md:block">
                 <KanbanProvider
                   columns={STAGES.map((s) => ({ id: s.id, name: s.name }))}
@@ -362,7 +357,17 @@ function OrgList({ orgs, today, selectedId, onOpen }: { orgs: Organization[]; to
                       </span>
                       <span className="flex min-w-0 flex-1 flex-col gap-0.5 md:flex-row md:items-center md:gap-3">
                         <span className="truncate text-[14px] font-medium md:w-[240px] md:shrink-0 md:text-[13.5px]">{o.name}</span>
-                        {warmLine(o) && <span className="truncate text-[12.5px] text-fg-2">{warmLine(o)}</span>}
+                        {/* Handy: Nachfass-Chip in der zweiten Zeile (Wort statt nur Farbpunkt), daneben „warm über …“ */}
+                        {(warmLine(o) || follow) && (
+                          <span className="flex min-w-0 items-center gap-1.5">
+                            {follow && (
+                              <Chip tone={follow.tone} className="sm:hidden">
+                                {follow.label}
+                              </Chip>
+                            )}
+                            {warmLine(o) && <span className="truncate text-[12.5px] text-fg-2">{warmLine(o)}</span>}
+                          </span>
+                        )}
                       </span>
                       {o.prio && (
                         <span className="rounded-[5px] px-[5px] py-px font-mono text-[10.5px] font-medium text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)]">
@@ -375,8 +380,6 @@ function OrgList({ orgs, today, selectedId, onOpen }: { orgs: Organization[]; to
                           {follow.label}
                         </Chip>
                       )}
-                      {follow?.tone === "today" && <span className="size-2 rounded-full bg-acc sm:hidden" aria-label="heute nachfassen" />}
-                      {follow?.tone === "red" && <span className="size-2 rounded-full bg-st-red sm:hidden" aria-label="überfällig" />}
                       <Avatar person={personById(o.owner_id)} size={22} />
                     </button>
                   </li>
@@ -392,9 +395,9 @@ function OrgList({ orgs, today, selectedId, onOpen }: { orgs: Organization[]; to
 
 function EmptyTab({ tabName, onNew }: { tabName: string; onNew: () => void }) {
   return (
-    <div className="m-3.5 flex flex-col items-center gap-2.5 rounded-[14px] bg-card-2 px-4 py-12 text-center md:m-5">
+    <div className="m-3.5 flex flex-col items-center gap-2.5 rounded-[14px] bg-card-2 px-4 py-12 text-center max-md:bg-card max-md:shadow-card md:m-5">
       <p className="text-sm font-medium">Noch keine Einträge bei {tabName}</p>
-      <button type="button" onClick={onNew} className="mt-1 inline-flex h-8 items-center rounded-[9px] bg-acc px-3 text-[13px] font-medium text-acc-text">
+      <button type="button" onClick={onNew} className="mt-1 inline-flex h-8 items-center rounded-[9px] bg-acc px-3 text-[13px] font-medium text-acc-text max-md:h-10">
         + Firma
       </button>
     </div>

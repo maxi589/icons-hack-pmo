@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChevronDown, ChevronLeft, ChevronRight, Plus, Video } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Avatar } from "@/components/avatar";
 import { useToast } from "@/components/toast";
 import { MobileSheet } from "@/components/mobile-sheet";
 import { Segmented } from "@/components/segmented";
-import { PageHeader } from "@/components/app-shell/page-header";
+import { MobileTitle, PageHeader } from "@/components/app-shell/page-header";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { NewTaskDialog } from "@/components/tasks/new-task-dialog";
 import { useTaskActions } from "@/components/tasks/use-task-actions";
@@ -24,12 +23,13 @@ import { useOrganizations } from "@/lib/data/use-organizations";
 import { useTasks } from "@/lib/data/use-tasks";
 import { useKnowledge } from "@/lib/data/use-knowledge";
 import { logActivity } from "@/lib/data/use-feed";
-import { plusDays, timeRange, viennaParts, weekLabel, weekStart, type Meeting, joinUrl, fromVienna } from "@/lib/meetings";
+import { plusDays, viennaParts, weekLabel, weekStart, type Meeting, fromVienna } from "@/lib/meetings";
 import { MeetingDetail } from "./meeting-detail";
 import { NewMeetingDialog, type MeetingDefaults } from "./new-meeting-dialog";
 import { useMeetingActions } from "./use-meeting-actions";
 import { WeekView, type AllDay } from "./week-view";
-import { MeetingMenu } from "./meeting-menu";
+import { MeetingRow } from "./meeting-row";
+import { MobileWeek } from "./mobile-week";
 
 // Termine (Plan Welle 1, Schritt 3): Team-Meetings und Partner-Calls an einem Ort, mit Agenda, Notizen, Unterlagen
 // und Ergebnissen. Desktop: Woche (Standard) oder Liste; Handy: Liste. Detail rechts, zweiter Klick schließt.
@@ -93,10 +93,15 @@ export function Termine() {
   const monday = params.get("woche") ?? weekStart(meeting ? viennaParts(meeting.starts_at).date : today);
   const shown = mine && me ? all.filter((m) => m.attendees.includes(me.id) || m.created_by === me.id) : all;
 
+  // Unterpunkte, die am selben Tag wie ihr offener Meilenstein fällig sind (M1.1–M1.4 am 18.10.), stecken schon in ihm.
+  const inParent = (m: (typeof milestones)[number]) => {
+    const p = milestones.find((x) => x.id === m.parent_id);
+    return !!p && p.status !== "erledigt" && p.due_date === m.due_date;
+  };
   const allDay: AllDay[] = [
     ...milestones
-      .filter((m) => m.status !== "erledigt")
-      .map((m) => ({ key: `m-${m.id}`, date: m.due_date, label: `${m.id} ${m.title}`, href: `/roadmap?m=${m.id}`, kind: "milestone" as const })),
+      .filter((m) => m.status !== "erledigt" && !inParent(m))
+      .map((m) => ({ key: `m-${m.id}`, date: m.due_date, label: `${m.id} ${m.title}`, tag: m.id, title: m.title, href: `/roadmap?m=${m.id}`, kind: "milestone" as const })),
     ...FOLLOW_UP_ROUNDS.map((d) => ({ key: `r-${d}`, date: d, label: "Nachfass-Runde", href: "/pipeline", kind: "round" as const })),
   ];
 
@@ -140,10 +145,11 @@ export function Termine() {
       <PageHeader title="Termine" action={{ label: "Termin", onClick: () => startDraft() }} />
       <div className="relative flex min-h-0 flex-1">
         <div className="flex min-w-0 flex-1 flex-col md:overflow-hidden">
-          <h1 className="px-3.5 pt-2 pb-2 text-[21px] font-semibold tracking-[-0.025em] md:sr-only">Termine</h1>
+          <MobileTitle title="Termine" action={{ label: "Termin", onClick: () => startDraft() }} />
+          <h1 className="sr-only max-md:hidden">Termine</h1>
 
-          {/* Werkzeugleiste */}
-          <div className="flex flex-wrap items-center gap-2 px-3.5 pb-3 md:border-b md:border-line md:px-[18px] md:py-3">
+          {/* Werkzeugleiste (Desktop; am Handy steht „Nur meine“ in der Wochenleiste) */}
+          <div className="hidden flex-wrap items-center gap-2 border-b border-line px-[18px] py-3 md:flex">
             {!list && (
               <div className="flex items-center gap-1.5">
                 <button
@@ -174,41 +180,46 @@ export function Termine() {
                 </h2>
               </div>
             )}
-            <div className="flex items-center gap-2 max-md:w-full md:ml-auto">
+            <div className="ml-auto flex items-center gap-2">
               <button
                 type="button"
                 aria-pressed={mine}
                 onClick={() => setMine((v) => !v)}
                 className={cn(
-                  "inline-flex h-8 items-center rounded-full px-3 text-[13px] transition-colors duration-150 max-md:h-10",
+                  "inline-flex h-8 items-center rounded-full px-3 text-[13px] transition-colors duration-150",
                   mine ? "bg-active font-medium text-fg shadow-[inset_0_0_0_1px_var(--line2)]" : "text-fg-2 hover:bg-hover hover:text-fg"
                 )}
               >
                 Nur meine
               </button>
-              {!isMobile && (
-                <Segmented
-                  label="Ansicht"
-                  value={list ? "liste" : "woche"}
-                  options={[
-                    { value: "woche", label: "Woche" },
-                    { value: "liste", label: "Liste" },
-                  ]}
-                  onChange={(v) => setParams({ ansicht: v === "liste" ? "liste" : null })}
-                />
-              )}
-              <button
-                type="button"
-                onClick={() => startDraft()}
-                className="ml-auto inline-flex h-10 items-center rounded-[9px] bg-acc px-3.5 text-[14px] font-medium text-acc-text md:hidden"
-              >
-                + Termin
-              </button>
+              <Segmented
+                label="Ansicht"
+                value={list ? "liste" : "woche"}
+                options={[
+                  { value: "woche", label: "Woche" },
+                  { value: "liste", label: "Liste" },
+                ]}
+                onChange={(v) => setParams({ ansicht: v === "liste" ? "liste" : null })}
+              />
             </div>
           </div>
 
           {api.meetings === false && <p className="px-5 py-8 text-center text-[13.5px] text-st-red">Termine konnten nicht geladen werden.</p>}
-          {list ? (
+          {isMobile ? (
+            <MobileWeek
+              monday={monday}
+              today={today}
+              meetings={shown}
+              allDay={allDay}
+              selected={selId}
+              mine={mine}
+              onMine={() => setMine((v) => !v)}
+              onWeek={(w) => setParams({ woche: w, termin: null })}
+              // Woche festhalten, sonst springt sie beim Öffnen eines Termins aus „Danach“ hinter dem Sheet um
+              onOpen={(m) => setParams({ termin: m.id === selId ? null : m.id, woche: monday })}
+              onDelete={remove}
+            />
+          ) : list ? (
             <div className="min-h-0 flex-1 md:overflow-y-auto">
               <MeetingList meetings={shown} today={today} selected={selId} onOpen={open} onDelete={remove} onNew={() => startDraft()} />
             </div>
@@ -354,8 +365,6 @@ function DayGroups({
   onOpen: (m: Meeting) => void;
   onDelete: (m: Meeting) => void;
 }) {
-  const { areaById, personById, me } = useTeam();
-  const { orgs } = useOrganizations();
   const days = [...new Set(meetings.map((m) => viennaParts(m.starts_at).date))];
   return (
     <>
@@ -367,65 +376,9 @@ function DayGroups({
           <ul className="overflow-hidden rounded-xl bg-card shadow-card">
             {meetings
               .filter((m) => viennaParts(m.starts_at).date === d)
-              .map((m) => {
-                const area = areaById(m.area_id);
-                const org = orgs?.find((o) => o.id === m.organization_id);
-                const sub = [m.location, org?.name].filter(Boolean).join(" · ");
-                const others = m.attendees.map((id) => personById(id)).filter((p) => !!p);
-                return (
-                  <MeetingMenu key={m.id} meeting={m} onOpen={() => onOpen(m)} onDelete={() => onDelete(m)}>
-                    <li
-                      className={cn(
-                        "relative flex min-h-14 items-center gap-3 border-t border-line px-3.5 py-2.5 first:border-t-0",
-                        m.id === selected ? "bg-active" : "hover:bg-hover"
-                      )}
-                    >
-                      <span className="w-[86px] shrink-0 text-[12.5px] text-fg-2 tabular max-md:w-[78px]">{timeRange(m)}</span>
-                      <span
-                        className="h-8 w-[3px] shrink-0 rounded-full bg-line-2"
-                        style={area ? { background: area.color } : undefined}
-                        aria-hidden
-                      />
-                      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                        <button
-                          type="button"
-                          onClick={() => onOpen(m)}
-                          aria-current={m.id === selected ? "true" : undefined}
-                          className="flex min-w-0 items-center gap-1.5 rounded-sm text-left text-[14px] font-medium after:absolute after:inset-0 max-md:text-[15px]"
-                        >
-                          <span className="truncate">{m.title}</span>
-                          {me && m.attendees.includes(me.id) && <span className="sr-only">, du bist dabei</span>}
-                        </button>
-                        {(sub || area) && <span className="truncate text-[12.5px] text-fg-3">{[area?.name, sub].filter(Boolean).join(" · ")}</span>}
-                      </span>
-                      {joinUrl(m) && (
-                        <a
-                          href={joinUrl(m)!}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="relative z-[1] grid size-8 shrink-0 place-items-center rounded-lg text-fg-3 hover:bg-active hover:text-fg max-md:size-10"
-                          aria-label={`„${m.title}“ beitreten`}
-                          title="Beitreten"
-                        >
-                          <Video className="size-4" aria-hidden />
-                        </a>
-                      )}
-                      <span className="flex shrink-0 -space-x-1.5 max-sm:hidden">
-                        {others.slice(0, 4).map((p) => (
-                          <span key={p.id} className="rounded-full shadow-[0_0_0_2px_var(--card)]">
-                            <Avatar person={p} size={22} />
-                          </span>
-                        ))}
-                        {others.length > 4 && (
-                          <span className="grid size-[22px] place-items-center rounded-full bg-active text-[10px] text-fg-2">
-                            +{others.length - 4}
-                          </span>
-                        )}
-                      </span>
-                    </li>
-                  </MeetingMenu>
-                );
-              })}
+              .map((m) => (
+                <MeetingRow key={m.id} meeting={m} selected={m.id === selected} onOpen={() => onOpen(m)} onDelete={() => onDelete(m)} />
+              ))}
           </ul>
         </section>
       ))}

@@ -94,8 +94,9 @@ export function NewMeetingDialog({
             <span className={label}>Titel</span>
             <input autoFocus required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="z. B. Jour fixe" className={field} />
           </label>
-          <div className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)] gap-2.5">
-            <label className="flex flex-col gap-1.5">
+          {/* Handy: Datum über die ganze Breite, Beginn + Dauer darunter (sonst wird die Uhrzeit abgeschnitten) */}
+          <div className="grid grid-cols-2 gap-2.5 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)]">
+            <label className="flex flex-col gap-1.5 max-md:col-span-2">
               <span className={label}>Datum</span>
               <input type="date" required value={date ?? defaults.date} onChange={(e) => setDate(e.target.value)} className={field} />
             </label>

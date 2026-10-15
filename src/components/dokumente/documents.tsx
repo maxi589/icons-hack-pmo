@@ -8,7 +8,7 @@ import { Avatar } from "@/components/avatar";
 import { useToast } from "@/components/toast";
 import { MobileSheet } from "@/components/mobile-sheet";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { PageHeader } from "@/components/app-shell/page-header";
+import { MobileTitle, PageHeader } from "@/components/app-shell/page-header";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { useTaskActions } from "@/components/tasks/use-task-actions";
 import { DecisionDetail } from "@/components/wissen/decision-detail";
@@ -35,10 +35,10 @@ import { useTopics } from "./use-topics";
 // Adresse: ?dok=<id>, ?entscheidung=<id> (teilbar), ?neu=dokument bzw. ?neu=entscheidung (Tasten D und E).
 
 type Filter = "alle" | "texte" | "dateien" | "entscheidungen";
-const FILTERS: { id: Filter; label: string }[] = [
+const FILTERS: { id: Filter; label: string; short?: string }[] = [
   { id: "alle", label: "Alle" },
   { id: "texte", label: "Texte" },
-  { id: "dateien", label: "Dateien & Links" },
+  { id: "dateien", label: "Dateien & Links", short: "Dateien" },
   { id: "entscheidungen", label: "Entscheidungen" },
 ];
 
@@ -266,11 +266,16 @@ export function Documents() {
       <PageHeader title="Dokumente" action={{ label: "Dokument", onClick: newDoc }} />
       <div className="relative flex min-h-0 flex-1">
         <div className="flex min-w-0 flex-1 flex-col md:overflow-auto">
-          <h1 className="px-3.5 pt-2 pb-2 text-[21px] font-semibold tracking-[-0.025em] md:sr-only">Dokumente</h1>
+          <MobileTitle title="Dokumente" action={{ label: "Dokument", onClick: newDoc }} />
+          <h1 className="sr-only max-md:hidden">Dokumente</h1>
 
-          {/* Filter: Art als Chips, Bereich, Suche */}
+          {/* Filter: Art als Chips, Bereich, Suche (Handy: Chips in einer Zeile, darunter Suche + Bereich) */}
           <div className="flex flex-wrap items-center gap-2 px-3.5 pb-3 md:border-b md:border-line md:px-[18px] md:py-3">
-            <div className="flex flex-wrap gap-1" role="group" aria-label="Art">
+            <div
+              className="flex gap-1 max-md:-mx-3.5 max-md:w-[calc(100%+28px)] max-md:overflow-x-auto max-md:px-3.5 max-md:[scrollbar-width:none] md:flex-wrap"
+              role="group"
+              aria-label="Art"
+            >
               {FILTERS.map((f) => (
                 <button
                   key={f.id}
@@ -278,16 +283,23 @@ export function Documents() {
                   aria-pressed={filter === f.id}
                   onClick={() => setFilter(f.id)}
                   className={cn(
-                    "inline-flex h-8 items-center gap-1.5 rounded-full px-3 text-[13px] transition-colors duration-150 max-md:h-10",
+                    "inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full px-3 text-[13px] whitespace-nowrap transition-colors duration-150 max-md:h-10",
                     filter === f.id ? "bg-active font-medium text-fg shadow-[inset_0_0_0_1px_var(--line2)]" : "text-fg-2 hover:bg-hover hover:text-fg"
                   )}
                 >
-                  {f.label}
+                  {f.short ? (
+                    <>
+                      <span className="md:hidden">{f.short}</span>
+                      <span className="max-md:hidden">{f.label}</span>
+                    </>
+                  ) : (
+                    f.label
+                  )}
                   <span className="text-[12px] text-fg-3 tabular">{count(f.id)}</span>
                 </button>
               ))}
             </div>
-            <label className="relative inline-flex items-center max-md:flex-1">
+            <label className="relative inline-flex items-center max-md:order-last max-md:w-[132px]">
               <span className="sr-only">Bereich</span>
               <select
                 value={area}
@@ -297,7 +309,7 @@ export function Documents() {
                   area && "bg-active"
                 )}
               >
-                <option value="">Alle Bereiche</option>
+                <option value="">{isMobile ? "Bereich" : "Alle Bereiche"}</option>
                 {allAreas.map((a) => (
                   <option key={a.id} value={a.id}>
                     {a.name}
@@ -306,7 +318,7 @@ export function Documents() {
               </select>
               <ChevronDown className="pointer-events-none absolute right-2 size-3.5 text-fg-3" aria-hidden />
             </label>
-            <label className="relative flex min-w-0 items-center max-md:basis-full md:ml-auto md:w-[240px]">
+            <label className="relative flex min-w-0 items-center max-md:flex-1 md:ml-auto md:w-[240px]">
               <Search className="pointer-events-none absolute left-2.5 size-3.5 text-fg-3" aria-hidden />
               <span className="sr-only">Dokumente durchsuchen</span>
               <input
@@ -316,13 +328,6 @@ export function Documents() {
                 className="h-8 w-full rounded-[9px] border border-field bg-card pr-2.5 pl-8 text-[13px] text-fg placeholder:text-fg-3 focus-visible:outline-solid max-md:h-10 max-md:text-base"
               />
             </label>
-            <button
-              type="button"
-              onClick={newDoc}
-              className="inline-flex h-10 items-center rounded-[9px] bg-acc px-3.5 text-[14px] font-medium text-acc-text md:hidden"
-            >
-              + Dokument
-            </button>
           </div>
 
           {docsApi.docs === false && <p className="px-5 py-8 text-center text-[13.5px] text-st-red">Dokumente konnten nicht geladen werden.</p>}
