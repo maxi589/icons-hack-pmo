@@ -24,18 +24,22 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
 |---|---|---|---|
 | `--bg` | #080809 | #f5f5f6 | App-Hintergrund, Sidebar |
 | `--panel` | #0d0d0f | #ffffff | Hauptfläche |
-| `--card` | #121214 | #ffffff | Karten |
-| `--card2` | #18181a | #f7f7f8 | Gruppenköpfe, Leerzustände |
+| `--card` | #151517 | #ffffff | Karten |
+| `--card2` | #1b1b1d | #f7f7f8 | Gruppenköpfe, Leerzustände |
 | `--col` | #09090a | #f4f4f5 | Kanban-Spalte (Mulde) |
-
-**Flächen neu (Maxi, 14.10.: „weißer bzw. schwärzer, Boxen nicht so fremd“):** hell ist die Hauptfläche reinweiß und Karten heben sich nur über den feinen Ring ab (wie Vercel/Linear), dunkel fast schwarz mit Karten knapp darüber (Kontrast Karte/Fläche 1,04:1). **Dunkel nachjustiert (Maxi, 14.10. abends: „minimal weniger schwarz“):** alle Flächen ein Drittel des Wegs zurück zur alten Graphit-Stufe (Panel L\* 2,8 → 3,7, ein Wahrnehmungsschritt), Abstufung gleich; geprüft von einem Design-Agenten, nachgerechnet: schwächste Werte auf `--card2` `--text3` 6,92:1, `--field` 3,35:1, Bereichsfarben ≥ 4,47:1. Alle Text-, Status-, Bereichs- und Feldfarben auf allen Flächen nachgerechnet: 160 Prüfungen, 0 Fehler (WCAG; schwächste Werte: hell `--text3` 5,84:1, Bereichsfarben ≥ 3,65:1).
-| `--field` | #6b6b72 | #7c7c85 | Ränder von Eingabefeldern (≥ 3:1) |
+| `--line` | rgba(255,255,255,.12) | rgba(0,0,0,.09) | Karten-Ring, Trennlinien (nur Dekoration) |
+| `--line2` | rgba(255,255,255,.16) | rgba(0,0,0,.13) | Hover-Ring, Prio-Kästchen |
+| `--field` | #707077 | #7c7c85 | Ränder von Eingabefeldern (≥ 3:1) |
 | `--text` | #e4e4e8 | #18181b | Haupttext (dunkel bewusst nicht reinweiß: 14,3:1) |
 | `--text2` | #bbbbc2 | #52525b | Nebentext |
 | `--text3` | #a1a1aa | #5e5e66 | Labels, Meta (hellste erlaubte Textfarbe, ≥ 4,6:1) |
 | `--acc` | #0f5ba5 | #0f5ba5 | Fläche: Primärknopf, „+“, Chip „heute“ (Kobalt der Website) |
 | `--accText` | #ffffff | #ffffff | Text auf Akzentfläche (6,86:1) |
 | `--accLine` | #7fb2ee | #0f5ba5 | Linien, Icons, Fokus, Heute-Linie, aktive Navigation, Fortschritt |
+
+**Flächen neu (Maxi, 14.10.: „weißer bzw. schwärzer, Boxen nicht so fremd“):** hell ist die Hauptfläche reinweiß und Karten heben sich nur über den feinen Ring ab (wie Vercel/Linear), dunkel fast schwarz mit Karten knapp darüber (Kontrast Karte/Fläche 1,04:1). **Dunkel nachjustiert (Maxi, 14.10. abends: „minimal weniger schwarz“):** alle Flächen ein Drittel des Wegs zurück zur alten Graphit-Stufe (Panel L\* 2,8 → 3,7, ein Wahrnehmungsschritt), Abstufung gleich; geprüft von einem Design-Agenten, nachgerechnet: schwächste Werte auf `--card2` `--text3` 6,92:1, `--field` 3,35:1, Bereichsfarben ≥ 4,47:1. Alle Text-, Status-, Bereichs- und Feldfarben auf allen Flächen nachgerechnet: 160 Prüfungen, 0 Fehler (WCAG; schwächste Werte: hell `--text3` 5,84:1, Bereichsfarben ≥ 3,65:1).
+
+**Dunkel: Karten besser abgesetzt (Maxi, 15.10.: „bei Pipeline bissi zu dunkel, man erkennt die Boxen nicht mehr so ganz, minimal heller“):** Prinzip wie Linear/Vercel/Height: die Fläche bleibt fast schwarz, Karten sitzen eine kleine Stufe höher und der feine helle Rand trägt die Kante. Karte #121214 → #151517 (L\* 5,5 → 6,8), `--card2` #18181a → #1b1b1d (Abstand zur Karte gleich), `--line` Weiß 9 % → 12 % (Ring auf der Mulde L\* 11,8 → 15,6), `--line2` 13 % → 16 %, `--field` #6b6b72 → #707077 (damit Feldränder auch auf Hover-Flächen ≥ 3:1 bleiben). Hintergrund, Panel und Mulde unverändert, Hellmodus unverändert. Nachgerechnet (WCAG): 80 Prüfungen auf den fünf Flächen, 0 Fehler; schwächste Werte auf `--card2`: `--text3` 6,71:1, `--field` 3,50:1, Bereichsfarben ≥ 4,33:1; Status-Chips mit Tönung ≥ 6,12:1 (Kontaktiert auf `--card2`), Chip „heute“ 6,27:1. Zusätzlich auf Hover-/Aktiv-Flächen: Text ≥ 5,44:1, Bereichsfarben ≥ 3,51:1; einziger Wert unter 3:1 bleibt `--field` auf `--card2` + Aktiv (2,84:1, vorher 2,75:1; betrifft nur ein Feld auf einem aktiv markierten Gruppenkopf).
 
 **Status-Farben** (dunkel / hell): grau #adb1b8 / #474a52 · Kontaktiert (violett) #c79be4 / #643b9b · amber #f4b067 / #7e4801 · grün #7dbf87 / #206734 · rot #fc9382 / #a32730. „Kontaktiert“ ist violett, damit es nicht mit dem Kobalt-Akzent verwechselt wird (Token heißt weiter `--st-blue`).
 

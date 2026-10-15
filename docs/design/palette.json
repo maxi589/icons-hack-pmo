@@ -32,14 +32,14 @@
   "shadow-cmdk": "0 24px 64px rgba(0, 0, 0, 0.45)"
  },
  "dark": {
-  "bg": "#050506",
-  "panel": "#0a0a0b",
-  "card": "#0f0f11",
-  "card2": "#161618",
-  "col": "#060607",
-  "line": "rgba(255, 255, 255, 0.09)",
-  "line2": "rgba(255, 255, 255, 0.13)",
-  "field": "#6b6b72",
+  "bg": "#080809",
+  "panel": "#0d0d0f",
+  "card": "#151517",
+  "card2": "#1b1b1d",
+  "col": "#09090a",
+  "line": "rgba(255, 255, 255, 0.12)",
+  "line2": "rgba(255, 255, 255, 0.16)",
+  "field": "#707077",
   "text": "#e4e4e8",
   "text2": "#bbbbc2",
   "text3": "#a1a1aa",
@@ -9261,5 +9261,6 @@
   "total": 1005,
   "fails": 0
  },
- "flaechen_15_10": "Flächen heller/dunkler (Maxi, 14.10.). Nachgerechnet: 160 WCAG-Prüfungen (Text, Status, Akzentlinie, Feldrand, Bereichsfarben auf bg/panel/card/card2/col, hell und dunkel), 0 Fehler. Die älteren APCA/ΔE-Prüfungen unten beziehen sich auf die Flächen vom 14.10."
+ "flaechen_15_10": "Flächen heller/dunkler (Maxi, 14.10.). Nachgerechnet: 160 WCAG-Prüfungen (Text, Status, Akzentlinie, Feldrand, Bereichsfarben auf bg/panel/card/card2/col, hell und dunkel), 0 Fehler. Die älteren APCA/ΔE-Prüfungen unten beziehen sich auf die Flächen vom 14.10.",
+ "dunkel_karten_15_10": "Dunkel: Karten besser abgesetzt (Maxi, 15.10.: „minimal heller“). Werte oben = Stand globals.css. Geändert: card #121214 -> #151517, card2 #18181a -> #1b1b1d, line Weiss 9 % -> 12 %, line2 13 % -> 16 %, field #6b6b72 -> #707077. bg/panel/col standen hier noch auf dem Stand vor dem 14.10. abends (#050506/#0a0a0b/#060607) und sind jetzt auf globals.css nachgezogen (#080809/#0d0d0f/#09090a). Nachgerechnet (WCAG): 80 Pruefungen auf bg/panel/card/card2/col, 0 Fehler; schwaechste Werte auf card2: text3 6,71:1, field 3,50:1, Bereichsfarben >= 4,33:1, Status >= 7,56:1, Chips mit Toenung >= 6,12:1 (Kontaktiert auf card2), Chip heute 6,27:1. Kartenkante: Ring auf der Mulde L* 11,8 -> 15,6 (Kontrast 1,21 -> 1,33), Karte/Mulde 1,064 -> 1,091."
 }
