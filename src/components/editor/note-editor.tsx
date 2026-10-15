@@ -15,6 +15,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/toast";
 import { EditorMenu } from "./editor-menu";
 import { MenuTriggers, TableBlocks, type MenuBridge, type MenuState } from "./suggest";
+import { TableControls } from "./table-controls";
 
 // Gemeinsamer Editor (Plan Welle 1): Notizblock, Bereichs-Notizen, Termine und Text-Dokumente.
 // Gespeichert wird Markdown. Kürzel wie in Notion/Linear: „# “, „- “, „[ ] “, „**fett**“, „> “, „---“.
@@ -111,6 +112,7 @@ export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabl
   });
   // Zuletzt gesehener Stand: eigener Text oder übernommener fremder. Verhindert, dass der eigene Stand nach dem Speichern zurückgesetzt wird.
   const last = useRef(value);
+  const root = useRef<HTMLDivElement>(null);
   const onChangeRef = useRef(onChange);
   const onBlurRef = useRef(onBlur);
   useEffect(() => {
@@ -137,7 +139,14 @@ export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabl
       }),
       ...TableBlocks,
       triggers,
-      Placeholder.configure({ placeholder: placeholder ?? "" }),
+      // Leerer Text: der Platzhalter der Stelle (fest ab dem Anlegen). Sonst in der leeren Zeile mit dem Cursor ein
+      // Hinweis auf „/“ bzw. die Überschrift (nur mit Fokus, globals.css).
+      Placeholder.configure({
+        placeholder: ({ editor: e, node }) => {
+          if (node.type.name === "heading") return `Überschrift ${node.attrs.level}`;
+          return e.isEmpty ? (placeholder ?? "") : "„/“ für Befehle";
+        },
+      }),
       Markdown,
     ],
     // Inhalt kommt geprüft in onCreate
@@ -203,7 +212,7 @@ export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabl
   };
 
   return (
-    <div className={cn("note-editor relative", className)} onClick={onClick}>
+    <div ref={root} className={cn("note-editor relative", className)} onClick={onClick}>
       {lossy && (
         <div role="status" className="mx-3 mt-3 flex items-center gap-3 rounded-[10px] bg-card-2 px-3 py-2 text-[13px] text-fg-2 max-md:text-[14px]">
           <span className="min-w-0 flex-1">Nicht alles darstellbar, nur lesen.</span>
@@ -213,6 +222,7 @@ export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabl
         </div>
       )}
       {editor && <SelectionMenu editor={editor} onCreateTask={onCreateTask} onShare={onShare} />}
+      {editor && !disabled && !lossy && <TableControls editor={editor} root={root} />}
       {editor && menu && <EditorMenu editor={editor} state={menu} keyRef={menuKey} />}
       <EditorContent editor={editor} />
     </div>

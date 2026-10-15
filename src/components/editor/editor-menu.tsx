@@ -5,13 +5,10 @@ import type { ChainedCommands, Editor } from "@tiptap/core";
 import { autoUpdate, computePosition, flip, offset, shift, size } from "@floating-ui/dom";
 import {
   AtSign,
-  BetweenHorizontalEnd,
-  BetweenVerticalEnd,
   Building2,
   CalendarDays,
   Circle,
   CircleCheck,
-  Columns3,
   Flag,
   Heading1,
   Heading2,
@@ -21,10 +18,8 @@ import {
   ListOrdered,
   Minus,
   Pilcrow,
-  Rows3,
   Table,
   TextQuote,
-  Trash2,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -33,7 +28,9 @@ import { createClient } from "@/lib/supabase/client";
 import { DECISION_TYPE, docType } from "@/lib/documents";
 import { TARGET_NAMES } from "@/lib/links";
 import { matchesAll, searchAll, searchWords, type Hit } from "@/lib/search";
-import { inTable, type MenuState } from "./suggest";
+import { type MenuState } from "./suggest";
+import { useToast } from "@/components/toast";
+import { TABLE_OPS, cellInfo, offerUndo } from "./table-controls";
 
 // Kleines Menü am Cursor: „/“ = Blockarten (in Tabellen: Zeilen/Spalten), „@“ = Verknüpfen mit Firma, Aufgabe,
 // Termin, Dokument, Entscheidung oder Meilenstein. Weitertippen filtert, Pfeile + Enter wählen, Esc schließt.
@@ -50,6 +47,8 @@ type SlashItem = {
   run: (c: ChainedCommands) => ChainedCommands;
   /** nur zeigen, wenn passend */
   when?: (e: Editor) => boolean;
+  /** nach dem Ausführen (Löschen: Hinweis mit Rückgängig) */
+  done?: () => void;
 };
 
 /** Tabellen nur auf oberster Ebene (nicht in Listen oder Zitaten), sonst kann Markdown sie nicht speichern. */
@@ -66,16 +65,6 @@ const BLOCKS: SlashItem[] = [
   { id: "quote", label: "Zitat", Icon: TextQuote, keys: "quote", run: (c) => c.toggleBlockquote() },
   { id: "hr", label: "Trennlinie", Icon: Minus, keys: "linie divider hr strich", run: (c) => c.setHorizontalRule() },
   { id: "table", label: "Tabelle", Icon: Table, keys: "table raster", run: (c) => c.insertTable({ rows: 3, cols: 3, withHeaderRow: true }), when: topLevel },
-];
-
-/** In einer Tabelle: Zeilen und Spalten statt Blockarten (Zellen können nur Text). */
-const TABLE_OPS: SlashItem[] = [
-  { id: "row", label: "Zeile darunter", Icon: BetweenHorizontalEnd, keys: "zeile einfügen row", run: (c) => c.addRowAfter() },
-  { id: "col", label: "Spalte rechts", Icon: BetweenVerticalEnd, keys: "spalte einfügen column", run: (c) => c.addColumnAfter() },
-  // Die Kopfzeile bleibt: Markdown-Tabellen haben immer eine.
-  { id: "delrow", label: "Zeile löschen", Icon: Rows3, keys: "zeile entfernen row", run: (c) => c.deleteRow(), when: (e) => !e.isActive("tableHeader") },
-  { id: "delcol", label: "Spalte löschen", Icon: Columns3, keys: "spalte entfernen column", run: (c) => c.deleteColumn() },
-  { id: "deltable", label: "Tabelle löschen", Icon: Trash2, keys: "tabelle entfernen table", run: (c) => c.deleteTable() },
 ];
 
 const LINK: SlashItem = { id: "link", label: "Verknüpfen …", Icon: AtSign, keys: "link firma aufgabe termin dokument meilenstein entscheidung @", run: (c) => c.insertContent("@") };
@@ -121,6 +110,7 @@ function useLinkHits(query: string | null) {
 
 export function EditorMenu({ editor, state, keyRef }: { editor: Editor; state: MenuState; keyRef: { current: ((e: KeyboardEvent) => boolean) | null } }) {
   const mobile = useIsMobile();
+  const toast = useToast();
   const box = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
   const link = useLinkHits(state.kind === "link" ? state.query : null);
@@ -129,10 +119,13 @@ export function EditorMenu({ editor, state, keyRef }: { editor: Editor; state: M
 
   let rows: Row[];
   if (state.kind === "slash") {
-    const list = inTable(editor) ? [...TABLE_OPS, LINK] : [...BLOCKS, LINK];
+    // In einer Tabelle: Zeilen und Spalten statt Blockarten (Zellen können nur Text), wie im Menü am Zellen-Griff.
+    const cell = cellInfo(editor.state);
+    const ops = TABLE_OPS.map((op): SlashItem => ({ ...op, when: op.when && (() => op.when!(cell!)), done: () => offerUndo(editor, op, toast) }));
+    const list = cell ? [...ops, LINK] : [...BLOCKS, LINK];
     rows = list
       .filter((it) => (!it.when || it.when(editor)) && matches(it, state.query))
-      .map((it) => ({ id: it.id, label: it.label, Icon: it.Icon, pick: () => it.run(chain()).run() }));
+      .map((it) => ({ id: it.id, label: it.label, Icon: it.Icon, pick: () => it.run(chain()).run() && it.done?.() }));
   } else {
     rows = link.hits.map((h) => ({
       id: `${h.type}-${h.id}`,

@@ -1,5 +1,6 @@
 import { Extension, type Editor, type Range } from "@tiptap/core";
-import { PluginKey } from "@tiptap/pm/state";
+import { PluginKey, TextSelection } from "@tiptap/pm/state";
+import { isInTable, selectedRect } from "@tiptap/pm/tables";
 import Suggestion from "@tiptap/suggestion";
 import { Table, TableCell, TableHeader, TableRow } from "@tiptap/extension-table";
 
@@ -83,6 +84,57 @@ export function MenuTriggers(bridge: { current: MenuBridge | null }) {
 }
 
 /**
+ * Enter in einer Zelle springt in die Zelle darunter (wie in einer Tabellenkalkulation), in der letzten Zeile mit
+ * neuer Zeile. Vorher passierte nichts, weil eine Zelle nur einen Absatz hat. Niedrige Priorität: Ein offenes
+ * „/“-Menü bekommt Enter zuerst. Tab/Shift+Tab (nächste/vorige Zelle, in der letzten Zelle neue Zeile) kann Tiptap selbst.
+ */
+function cellBelow(e: Editor) {
+  if (!e.state.selection.empty || !isInTable(e.state)) return false;
+  const r = selectedRect(e.state);
+  const chain = e.chain();
+  if (r.bottom >= r.map.height) chain.addRowAfter();
+  return chain
+    .command(({ tr, state }) => {
+      const s = selectedRect(state);
+      const pos = s.tableStart + s.map.map[s.bottom * s.map.width + s.left];
+      const cell = state.doc.nodeAt(pos);
+      if (!cell) return false;
+      tr.setSelection(TextSelection.near(tr.doc.resolve(pos + cell.nodeSize - 1), -1));
+      return true;
+    })
+    .scrollIntoView()
+    .run();
+}
+
+const TableEnter = Extension.create({
+  name: "tableEnter",
+  priority: 50,
+  addKeyboardShortcuts() {
+    return { Enter: () => cellBelow(this.editor) };
+  },
+});
+
+/**
+ * Shift+Enter in einer Zelle wie Enter: Ein Zeilenumbruch in der Zelle käme als wörtliches „<br>“ zurück (gemessen
+ * vom Prüfer 15.10.). Muss vor dem Zeilenumbruch von Tiptap (Priorität 100) dran sein, darf aber ein offenes Menü nicht stören.
+ */
+const TableShiftEnter = Extension.create({
+  name: "tableShiftEnter",
+  priority: 110,
+  addKeyboardShortcuts() {
+    return {
+      "Shift-Enter": () => {
+        const e = this.editor;
+        if (!isInTable(e.state)) return false;
+        if ([SLASH_KEY, LINK_KEY].some((k) => k.getState(e.state)?.active)) return false;
+        // Auch bei markiertem Text nie einen Umbruch einfügen
+        return cellBelow(e) || true;
+      },
+    };
+  },
+});
+
+/**
  * Tabelle: in Zellen nur Text (eine Zeile), weil Markdown-Tabellen keine Listen oder Absätze speichern können.
  * Am Handy scrollt die Tabelle in sich (Hülle `tableWrapper`).
  */
@@ -91,6 +143,6 @@ export const TableBlocks = [
   TableRow,
   TableHeader.extend({ content: "paragraph" }),
   TableCell.extend({ content: "paragraph" }),
+  TableEnter,
+  TableShiftEnter,
 ];
-
-export const inTable = (editor: Editor) => editor.isActive("table");

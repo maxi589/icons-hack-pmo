@@ -2,7 +2,6 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
 import { MobileSheet } from "@/components/mobile-sheet";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { useTeam } from "@/components/app-shell/team-provider";
@@ -21,7 +20,8 @@ import { docHref } from "@/lib/documents";
 import { useTasks, type TaskPatch } from "@/lib/data/use-tasks";
 
 // „Für mich“ (Plan Welle 1, ersetzt „Meine Aufgaben“): Aufbau wie die Bereichs-Seite.
-// Links der private Notizblock, rechts die eigenen Aufgaben nach Fälligkeit. Am Handy Aufgaben zuerst.
+// Oben die eigenen Aufgaben nach Fälligkeit, darunter der private Notizblock über die ganze Breite (Maxi, 15.10.:
+// „wie Notion, über die ganze Breite, Aufgaben darüber“).
 // Detail rechts über die volle Höhe (wie auf der Aufgaben-Seite). Adresse: ?aufgabe=<id>, ?neu=1.
 
 const TITLE = "Für mich";
@@ -61,8 +61,8 @@ export function FuerMich() {
     return (
       <>
         <PageHeader title={TITLE} />
-        <div className="mx-auto grid w-full max-w-[1440px] gap-4 px-3.5 pt-2 md:gap-5 md:px-8 md:pt-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]" aria-busy="true" aria-label={`${TITLE} lädt`}>
-          <div className="h-[460px] rounded-[14px] bg-card-2" />
+        <div className="mx-auto grid w-full max-w-[1440px] gap-4 px-3.5 pt-2 md:gap-5 md:px-8 md:pt-8" aria-busy="true" aria-label={`${TITLE} lädt`}>
+          <div className="h-[120px] rounded-[14px] bg-card-2" />
           <div className="h-[460px] rounded-[14px] bg-card-2" />
         </div>
       </>
@@ -97,21 +97,8 @@ export function FuerMich() {
         <div className="min-w-0 flex-1 md:overflow-y-auto">
           <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-4 px-3.5 pt-2 pb-8 md:gap-5 md:px-8 md:pt-8 md:pb-12">
             <h1 className="pb-1 text-[20px] font-semibold tracking-[-0.025em] md:sr-only">{TITLE}</h1>
-            <div className={cn("grid gap-4 md:gap-5", selected && !isMobile ? "xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]" : "lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]")}>
-              <NotesCard
-                title="Notizblock"
-                label="Notizblock, nur für dich"
-                private
-                data={notepad.data}
-                save={notepad.save}
-                placeholder="Gedanken, Ideen, To-dos …"
-                onCreateTask={(title) => createTask({ title }, here)}
-                onShare={async (markdown, title) => {
-                  const d = await docActions.addText({}, title || "Aus dem Notizblock", markdown);
-                  return d ? docHref(d.id) : null;
-                }}
-              />
-              <section aria-labelledby="mine-title" className="flex min-w-0 flex-col gap-3 self-start max-lg:order-first">
+            <div className="flex flex-col gap-4 md:gap-6">
+              <section aria-labelledby="mine-title" className="flex min-w-0 flex-col gap-3">
                 <div className="flex min-h-8 items-center justify-between gap-2 px-1">
                   <h2 id="mine-title" className="flex items-center gap-2 text-[14px] font-semibold">
                     Meine Aufgaben
@@ -141,6 +128,19 @@ export function FuerMich() {
                   onToggle={toggleDone}
                 />
               </section>
+              <NotesCard
+                title="Notizblock"
+                label="Notizblock, nur für dich"
+                private
+                data={notepad.data}
+                save={notepad.save}
+                placeholder="Gedanken, Ideen, To-dos …"
+                onCreateTask={(title) => createTask({ title }, here)}
+                onShare={async (markdown, title) => {
+                  const d = await docActions.addText({}, title || "Aus dem Notizblock", markdown);
+                  return d ? docHref(d.id) : null;
+                }}
+              />
             </div>
           </div>
         </div>
