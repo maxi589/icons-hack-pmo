@@ -391,6 +391,21 @@ if (fs.existsSync(ADJUST_FILE)) {
     n++;
   }
   hints.push(`Anpassungen aus ${path.basename(ADJUST_FILE)}: ${n} Venues (Prio, Zuständig)`);
+  // Gleiche Firma als Partner und Venue: eine Ansprechperson pro Firma. Nur Hinweis, Partner-Zuständige setzt das Team.
+  for (const [partnerName, venueName] of adj.gleiche_firma ?? []) {
+    const partner = partners.rows.find((x) => norm(x.name) === norm(partnerName));
+    const venue = venues.rows.find((x) => norm(x.name) === norm(venueName));
+    if (!partner || !venue) {
+      problems.push(`Anpassungen „gleiche_firma“: ${partner ? `Venue „${venueName}“` : `Partner „${partnerName}“`} nicht gefunden`);
+      continue;
+    }
+    const who = people.find((pp) => pp.id === venue.owner_id)?.name ?? "offen";
+    const partnerWho = people.find((pp) => pp.id === partner.owner_id)?.name;
+    hints.push(
+      `Gleiche Firma: Partner „${partner.name}“ ${partnerWho ? `(zuständig ${partnerWho})` : "(noch ohne Zuständige)"} und Venue „${venue.name}“ (zuständig ${who})` +
+        (partnerWho && partnerWho !== who ? " → zwei verschiedene Personen, angleichen" : "")
+    );
+  }
 }
 
 // Doppelte Namen innerhalb der Partner-Liste und gegenüber bestehenden Einträgen (ohne frühere Importe)
