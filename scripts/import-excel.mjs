@@ -7,7 +7,7 @@
 //   node --env-file=.env.local scripts/import-excel.mjs --write    schreiben und danach mit der Datenbank abgleichen
 //   node --env-file=.env.local scripts/import-excel.mjs --remove   alle importierten Zeilen samt Verlauf wieder entfernen
 //
-// Optional: --dir <Ordner> (Standard: OneDrive-Projektordner), --partner <datei>, --venues <datei>.
+// Optional: --dir <Ordner> (Standard: OneDrive-Projektordner), --partner <datei>, --venues <datei>, --json <datei> (nur Trockenlauf).
 // --write bricht ab, wenn schon importierte Zeilen in der Datenbank stehen oder die Excel Fehler hat.
 
 import fs from "node:fs";
@@ -129,6 +129,11 @@ const PARTNER_STAGE = {
   fix: "fix",
   abgesagt: "abgesagt",
 };
+// Nachfassen für Partner (Maxi, 15.10.): Partner.xlsx hat keine Datumsspalte. Wer schon kontaktiert ist (Kontaktiert,
+// Im Gespräch, Zugesagt), bekommt die erste Nachfass-Runde 2.11. als Datum. Fix und Abgesagt brauchen keins.
+// Steht in der Excel doch ein Datum (Spalte „Nachfassen“), gilt das.
+const FIRST_ROUND = "2026-11-02";
+const FOLLOW_UP_STAGES = ["kontaktiert", "im_gespraech", "zugesagt"];
 const ROLE = { challenge: "challenge", sponsor: "sponsor", jury: "jury", tokens: "tokens", credits: "tokens" };
 const CONTACT = { te: "Talent Elevator", coop: "Coop", "te & coop": "Talent Elevator + Coop" };
 
@@ -153,6 +158,7 @@ function readPartners(owner) {
       prio: ["prio", "priorität"],
       wave: ["welle"],
       warm_via: ["warm über", "warmer kontakt", "kontakt über"],
+      follow_up: ["nachfassen", "nächstes nachfassen", "follow-up", "follow up"],
     },
     []
   );
@@ -166,7 +172,7 @@ function readPartners(owner) {
       hints.push(`${where}: kein Firmenname, übersprungen`);
       continue;
     }
-    raw.push({ r, type: c("type"), status: c("status"), contact: c("contact"), owner: c("owner"), prio: c("prio") });
+    raw.push({ r, type: c("type"), status: c("status"), contact: c("contact"), owner: c("owner"), prio: c("prio"), follow_up: c("follow_up") });
 
     const roles = [
       ...new Set(
@@ -186,6 +192,7 @@ function readPartners(owner) {
     const contactRaw = text(c("contact"));
     const existing = contactRaw ? CONTACT[norm(contactRaw)] ?? contactRaw : null;
     if (contactRaw && !CONTACT[norm(contactRaw)]) hints.push(`${where}: Bestehender Kontakt „${contactRaw}“ unverändert übernommen`);
+    const followUp = dateOf(c("follow_up"), where) ?? (FOLLOW_UP_STAGES.includes(stage) ? FIRST_ROUND : null);
 
     out.push({
       name,
@@ -195,6 +202,7 @@ function readPartners(owner) {
       prio: prioOf(c("prio"), where),
       wave: waveOf(c("wave"), where),
       stage: stage ?? "recherche",
+      next_follow_up: followUp,
       existing_contact: existing,
       warm_via: text(c("warm_via")),
       contact_person: text(c("contact_person")),
@@ -381,6 +389,7 @@ for (const o of all) {
 const STAGE_NAME = { recherche: "Recherche", kontaktiert: "Kontaktiert", im_gespraech: "Im Gespräch", zugesagt: "Zugesagt", fix: "Fix", abgesagt: "Abgesagt" };
 const p = partners.rows;
 const v = venues.rows;
+const col = (f, raw) => (raw.some((x) => x[f] != null && x[f] !== "") ? tally(raw.map((x) => x[f])) : "keine Spalte bzw. leer");
 const line = (label, src, tool) => console.log(`  ${label.padEnd(18)} Excel: ${src}\n  ${"".padEnd(18)} Tool:  ${tool}`);
 
 console.log(`\nPartner.xlsx: ${partners.raw.length} Firmen gelesen (Z. ${partners.headerRow + 1}–${Math.max(...partners.raw.map((x) => x.r))}), ${p.length} zum Import`);
@@ -389,6 +398,8 @@ line("Status → Stufe", tally(partners.raw.map((x) => x.status)), tally(p.map((
 line("Kontakt", tally(partners.raw.map((x) => x.contact)), tally(p.map((o) => o.existing_contact)));
 line("Owner → zuständig", tally(partners.raw.map((x) => x.owner)), tally(p.map((o) => personName[o.owner_id])));
 line("Prio", tally(partners.raw.map((x) => x.prio)), tally(p.map((o) => o.prio)));
+line("Nachfassen", col("follow_up", partners.raw), tally(p.map((o) => o.next_follow_up)));
+console.log(`    Stufe → Nachfassen: ${tally(p.map((o) => `${STAGE_NAME[o.stage]} ${o.next_follow_up ? "→ " + o.next_follow_up : "→ leer"}`))}`);
 console.log(`  Kategorie: ${tally(p.map((o) => o.category))}`);
 console.log(`  Standort:  ${tally(p.map((o) => o.location))}`);
 console.log(`  Notizen:   ${p.filter((o) => o.notes).length} befüllt`);
