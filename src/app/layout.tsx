@@ -40,6 +40,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: `${THEME_SCRIPT};${SIDEBAR_SCRIPT}` }} />
+        {/* Verbindung zur Datenbank schon aufbauen, während die App startet (erste Abfragen beim Öffnen schneller) */}
+        <link rel="preconnect" href={process.env.NEXT_PUBLIC_SUPABASE_URL} crossOrigin="anonymous" />
       </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
