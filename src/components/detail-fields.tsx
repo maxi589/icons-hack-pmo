@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { Select, type SelectOption } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
 // Bausteine für Detail-Panels (Firma, Aufgabe): Eigenschafts-Zeile, Auswahl, Textfeld, das wie Text
 // aussieht und beim Verlassen speichert, kleiner Knopf (z. B. „+2 Tage“).
 
-const selectCls =
-  "h-8 w-full cursor-pointer appearance-none rounded-lg bg-transparent pr-7 pl-2 text-[13px] text-fg transition-colors max-md:text-base duration-150 hover:bg-hover focus-visible:bg-hover";
+const selectCls = "h-8 w-full rounded-lg px-2 text-[13px] text-fg hover:bg-hover focus-visible:bg-hover max-md:text-base";
 
 export const miniButton =
   "inline-flex h-[26px] items-center rounded-[7px] px-2.5 text-[12px] text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)] transition-colors duration-150 hover:bg-hover hover:text-fg";
@@ -29,15 +28,8 @@ export function PropRow({ label, htmlFor, children }: { label: string; htmlFor?:
   );
 }
 
-export function SelectBox({ id, value, onChange, children }: { id: string; value: string; onChange: (v: string) => void; children: React.ReactNode }) {
-  return (
-    <span className="relative block">
-      <select id={id} value={value} onChange={(e) => onChange(e.target.value)} className={selectCls}>
-        {children}
-      </select>
-      <ChevronDown className="pointer-events-none absolute top-1/2 right-2 size-3.5 -translate-y-1/2 text-fg-3" aria-hidden />
-    </span>
-  );
+export function SelectBox({ id, value, onChange, options }: { id: string; value: string; onChange: (v: string) => void; options: SelectOption[] }) {
+  return <Select id={id} value={value} onChange={onChange} options={options} className={selectCls} />;
 }
 
 /** Textfeld, das wie Text aussieht und beim Verlassen speichert. */

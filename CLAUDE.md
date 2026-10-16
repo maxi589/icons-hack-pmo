@@ -38,6 +38,7 @@ Auftraggeber ist Maxi S (kein Entwickler): Deutsch, Ergebnis zuerst, einfache Sp
   - icons-Farben (Logo = einfarbiger Schriftzug „hack-vienna“ in Michroma, „by icons“ klein)
   - Glas-Effekte, Glow, animierte Sidebar, Kipp- und Magnet-Effekte, eigener Mauszeiger, WebGL
   - Werte oder Code von uimaxx.ing und aicss.dev (beide untersagen KI-Nutzung, nicht abrufen)
+- **Auswahlfelder** nur mit `Select` aus `src/components/ui/select.tsx` (Listen aus `src/lib/options.ts`), nie natives `<select>` (Windows-Liste sieht anders aus und blitzt weiß auf).
 - Bewegung: 150 / 200 / 300 ms, `ease-out`, `prefers-reduced-motion` immer respektieren. Fokus: 2px `--accLine` mit 2px Abstand.
 - Barrierefreiheit: echte `<button>`/`<a>`/`<label>`, Icon-Knöpfe mit `aria-label`, Status nie nur über Farbe (Stufen: Punkt plus Wort; Chips: Wort im Chip mit Farbverlauf, ohne Punkt).
 

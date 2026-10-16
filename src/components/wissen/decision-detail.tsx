@@ -8,7 +8,8 @@ import { EditText, PropRow, SelectBox } from "@/components/detail-fields";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { targetHref } from "@/lib/links";
 import type { Decision, DecisionPatch } from "@/lib/data/use-knowledge";
-import { parseTopic, PeoplePicker, TopicOptions, topicValue, type Topic } from "./pickers";
+import { nameOptions } from "@/lib/options";
+import { parseTopic, PeoplePicker, topicOptions, topicValue, type Topic } from "./pickers";
 
 // Entscheidung im Detail (rechts 400px; am Handy als Bottom Sheet). Alle Felder speichern sofort bzw. beim Verlassen.
 
@@ -79,23 +80,14 @@ export function DecisionDetail({
           <span className="flex items-center gap-1">
             <span className="ml-1.5 size-[7px] shrink-0 rounded-full bg-line-2" style={area ? { background: area.color } : undefined} aria-hidden />
             <span className="flex-1">
-              <SelectBox id={f("area")} value={d.area_id ?? ""} onChange={(v) => onUpdate({ area_id: v || null })}>
-                <option value="">Kein Bereich</option>
-                {allAreas.map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.name}
-                  </option>
-                ))}
-              </SelectBox>
+              <SelectBox id={f("area")} value={d.area_id ?? ""} onChange={(v) => onUpdate({ area_id: v || null })} options={nameOptions(allAreas, "Kein Bereich")} />
             </span>
           </span>
         </PropRow>
         <PropRow label="Thema" htmlFor={f("topic")}>
           <span className="flex items-center gap-1">
             <span className="min-w-0 flex-1">
-              <SelectBox id={f("topic")} value={topicValue(d.target_type, d.target_id)} onChange={(v) => onUpdate(parseTopic(v))}>
-                <TopicOptions topics={topics} />
-              </SelectBox>
+              <SelectBox id={f("topic")} value={topicValue(d.target_type, d.target_id)} onChange={(v) => onUpdate(parseTopic(v))} options={topicOptions(topics)} />
             </span>
             {d.target_type && d.target_id && (
               <Link

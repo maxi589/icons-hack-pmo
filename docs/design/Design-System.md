@@ -68,6 +68,7 @@ Graphit-Flächen wie bisher (dunkel bleibt schwarz), Akzent ist das Kobalt der E
 - **Schatten:** Karten-Ring `0 0 0 1px var(--line)` plus `0 1px 2px` (dunkel .35, hell .05). Befehlsleiste `0 24px 64px rgba(0,0,0,.45)`.
 - **Bewegung:** Tailwind-Standard, 150ms für Hover/Farbe, 200ms für Zustandswechsel, 300ms für Öffnen/Schließen, `ease-out`. Klick-Feedback `scale(.97)`. `prefers-reduced-motion` immer respektieren.
 - **Fokus:** `:focus-visible` mit 2px `--accLine` und 2px Abstand.
+- **Auswahlfelder** (16.10.): nie `<select>`, immer `Select` aus `src/components/ui/select.tsx` (Base UI, Liste unter dem Feld, Haken am gewählten Eintrag, Gruppen und eingerückte Unterpunkte, lange Namen auf 2 Zeilen, Handy-Zeilen 44px). Listen über `src/lib/options.ts` (`nameOptions`, `msSelectOptions`, `durationOptions`, `PRIO_OPTIONS`). Klick neben die offene Liste schließt nur die Liste, nicht Dialog/Sheet (`selectWasOpen`). Scrollleisten überall dünn (`scrollbar-width: thin`).
 
 ## 5. Layout
 - **Desktop:** Sidebar 220px (Maxi, 14.10.: enger), auf ein 60px-Icon-Band einklappbar. Der Knopf zum Ein-/Ausklappen sitzt in beiden Zuständen an exakt derselben Stelle oben links. Hauptpanel eingerückt (8px), Radius 14, Ring. Inhalt von Übersicht, Bereichen und „Für mich“ max. 1440px breit, mittig (Maxi, 14.10.: Breite besser nutzen; vorher 1080px). Pipeline über die volle Breite, rechts Detail-Sheet mit 400px.

@@ -1,9 +1,11 @@
 "use client";
 
-import { Check, ChevronDown, ExternalLink, X } from "lucide-react";
+import { Check, ExternalLink, X } from "lucide-react";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { EditText, miniButton as mini, PropRow, SelectBox } from "@/components/detail-fields";
 import { cn } from "@/lib/utils";
+import { Select } from "@/components/ui/select";
+import { nameOptions, PRIO_OPTIONS } from "@/lib/options";
 import { Avatar } from "@/components/avatar";
 import { Feed } from "@/components/feed";
 import { useTeam } from "@/components/app-shell/team-provider";
@@ -102,22 +104,14 @@ export function OrgDetail({
 
         {/* Stufe: am Handy als 48px-Zeilen zum Antippen, am Desktop als Auswahl plus „Weiter zu …“ */}
         <div className="hidden flex-wrap items-center gap-1.5 md:flex">
-          <span className="relative inline-flex h-7 items-center rounded-lg shadow-[inset_0_0_0_1px_var(--line2)]">
-            <span className={cn("pointer-events-none absolute left-2.5 size-[7px] rounded-full", stage.dot)} aria-hidden />
-            <select
-              aria-label="Stufe"
-              value={org.stage}
-              onChange={(e) => onStage(e.target.value as Stage)}
-              className="h-7 cursor-pointer appearance-none rounded-lg bg-transparent pr-7 pl-6 text-[12.5px] text-fg"
-            >
-              {STAGES.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="pointer-events-none absolute right-2 size-3.5 text-fg-3" aria-hidden />
-          </span>
+          <Select
+            aria-label="Stufe"
+            value={org.stage}
+            onChange={(v) => onStage(v as Stage)}
+            options={STAGES.map((s) => ({ value: s.id, label: s.name }))}
+            leading={<span className={cn("size-[7px] shrink-0 rounded-full", stage.dot)} aria-hidden />}
+            className="h-7 rounded-lg pr-2 pl-2.5 text-[12.5px] text-fg shadow-[inset_0_0_0_1px_var(--line2)] hover:bg-hover"
+          />
           {next && (
             <button
               type="button"
@@ -159,14 +153,8 @@ export function OrgDetail({
                   onUpdate({ owner_id: v || null });
                   notifyAssignment("organization", org.id, me?.id ?? null, v || null);
                 }}
-              >
-                <option value="">Noch offen</option>
-                {people.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </SelectBox>
+                options={nameOptions(people, "Noch offen")}
+              />
             </span>
           </span>
         </PropRow>
@@ -213,12 +201,7 @@ export function OrgDetail({
           </span>
         </PropRow>
         <PropRow label="Prio" htmlFor={f("prio")}>
-          <SelectBox id={f("prio")} value={org.prio ?? ""} onChange={(v) => onUpdate({ prio: (v || null) as Organization["prio"] })}>
-            <option value="">Keine</option>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-          </SelectBox>
+          <SelectBox id={f("prio")} value={org.prio ?? ""} onChange={(v) => onUpdate({ prio: (v || null) as Organization["prio"] })} options={PRIO_OPTIONS} />
         </PropRow>
         {!isVenue && warmRow}
         <PropRow label="Ansprechperson" htmlFor={f("contact")}>

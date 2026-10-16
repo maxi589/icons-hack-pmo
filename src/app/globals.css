@@ -224,6 +224,9 @@
 @layer base {
   * {
     @apply border-border;
+    /* Dünne, ruhige Scrollleisten statt der Windows-Leiste mit Pfeilen */
+    scrollbar-width: thin;
+    scrollbar-color: var(--line2) transparent;
   }
   html {
     @apply font-sans;

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useTeam } from "@/components/app-shell/team-provider";
+import { Select } from "@/components/ui/select";
+import { nameOptions, PRIO_OPTIONS } from "@/lib/options";
 import { ROLE_NAMES, type Organization, type Role } from "@/lib/pipeline";
 
 // „+ Firma“: Name, Rollen, Prio, Zuständig. Warnt bei gleichem Namen (Doppelte vermeiden).
@@ -115,26 +117,14 @@ export function NewOrgDialog({
             </div>
           </fieldset>
           <div className="grid grid-cols-[1fr_2fr] gap-2.5">
-            <label className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5">
               <span className="text-[13px] text-fg-2">Prio</span>
-              <select value={prio} onChange={(e) => setPrio(e.target.value)} className={field}>
-                <option value="">–</option>
-                <option>A</option>
-                <option>B</option>
-                <option>C</option>
-              </select>
-            </label>
-            <label className="flex flex-col gap-1.5">
+              <Select aria-label="Prio" value={prio} onChange={setPrio} options={PRIO_OPTIONS} className={field} />
+            </div>
+            <div className="flex flex-col gap-1.5">
               <span className="text-[13px] text-fg-2">Zuständig</span>
-              <select value={ownerValue} onChange={(e) => setOwner(e.target.value)} className={field}>
-                <option value="">Offen</option>
-                {people.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+              <Select aria-label="Zuständig" value={ownerValue} onChange={setOwner} options={nameOptions(people, "Offen")} className={field} />
+            </div>
           </div>
           {error && (
             <p role="alert" className="text-[13px] text-st-red">

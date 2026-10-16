@@ -3,8 +3,10 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useTeam } from "@/components/app-shell/team-provider";
+import { Select } from "@/components/ui/select";
 import type { DecisionPatch } from "@/lib/data/use-knowledge";
-import { parseTopic, PeoplePicker, TopicOptions, type Topic } from "./pickers";
+import { nameOptions } from "@/lib/options";
+import { parseTopic, PeoplePicker, topicOptions, type Topic } from "./pickers";
 
 const field =
   "h-10 w-full rounded-[9px] border border-field bg-card px-3 text-[14px] text-fg placeholder:text-fg-3 focus-visible:outline-solid max-md:text-base";
@@ -110,24 +112,15 @@ export function NewDecisionDialog({
               <span className={label}>Wann</span>
               <input type="date" required value={date ?? today} onChange={(e) => setDate(e.target.value)} className={field} />
             </label>
-            <label className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5">
               <span className={label}>Bereich</span>
-              <select value={area} onChange={(e) => setArea(e.target.value)} className={field}>
-                <option value="">Keiner</option>
-                {allAreas.map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+              <Select aria-label="Bereich" value={area} onChange={setArea} options={nameOptions(allAreas, "Keiner")} className={field} />
+            </div>
           </div>
-          <label className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5">
             <span className={label}>Gehört zu</span>
-            <select value={topic} onChange={(e) => setTopic(e.target.value)} className={field}>
-              <TopicOptions topics={topics} />
-            </select>
-          </label>
+            <Select aria-label="Gehört zu" value={topic} onChange={setTopic} options={topicOptions(topics)} className={field} />
+          </div>
           {error && (
             <p role="alert" className="text-[13px] text-st-red">
               {error}

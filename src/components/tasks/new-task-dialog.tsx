@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useTeam } from "@/components/app-shell/team-provider";
+import { Select } from "@/components/ui/select";
 import type { Milestone } from "@/lib/data/use-milestones";
-import { milestoneOptions } from "@/lib/tasks";
+import { msSelectOptions, nameOptions } from "@/lib/options";
 
 // „+ Aufgabe“: Titel, Zuständig (vorbelegt mit dir), Fällig, Bereich, Meilenstein.
 // Vorbelegung aus den aktiven Filtern der Seite, damit die neue Aufgabe gleich sichtbar bleibt.
@@ -94,44 +95,23 @@ export function NewTaskDialog({
             <input autoFocus required value={title} onChange={(e) => setTitle(e.target.value)} placeholder="z. B. Pitch Deck an Jury-Liste anpassen" className={field} />
           </label>
           <div className="grid grid-cols-2 gap-2.5">
-            <label className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5">
               <span className="text-[13px] text-fg-2">Zuständig</span>
-              <select value={assigneeValue} onChange={(e) => setAssignee(e.target.value)} className={field}>
-                <option value="">Offen</option>
-                {people.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            </label>
+              <Select aria-label="Zuständig" value={assigneeValue} onChange={setAssignee} options={nameOptions(people, "Offen")} className={field} />
+            </div>
             <label className="flex flex-col gap-1.5">
               <span className="text-[13px] text-fg-2">Fällig</span>
               <input type="date" value={due} onChange={(e) => setDue(e.target.value)} className={field} />
             </label>
           </div>
-          <label className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5">
             <span className="text-[13px] text-fg-2">Meilenstein</span>
-            <select value={msValue} onChange={(e) => setMilestone(e.target.value)} className={field}>
-              <option value="">Keiner</option>
-              {milestoneOptions(milestones).map((m) => (
-                <option key={m.id} value={m.id}>
-                  {`${m.parent_id ? "   " : ""}${m.id} · ${m.title}`}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="flex flex-col gap-1.5">
+            <Select aria-label="Meilenstein" value={msValue} onChange={setMilestone} options={msSelectOptions(milestones, "Keiner")} className={field} />
+          </div>
+          <div className="flex flex-col gap-1.5">
             <span className="text-[13px] text-fg-2">Bereich</span>
-            <select value={areaValue} onChange={(e) => setArea(e.target.value)} className={field}>
-              <option value="">Keiner</option>
-              {allAreas.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.name}
-                </option>
-              ))}
-            </select>
-          </label>
+            <Select aria-label="Bereich" value={areaValue} onChange={setArea} options={nameOptions(allAreas, "Keiner")} className={field} />
+          </div>
           {error && (
             <p role="alert" className="text-[13px] text-st-red">
               {error}

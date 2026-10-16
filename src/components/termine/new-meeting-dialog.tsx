@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useTeam } from "@/components/app-shell/team-provider";
+import { Select } from "@/components/ui/select";
 import { PeoplePicker } from "@/components/wissen/pickers";
-import { DURATIONS, durationLabel } from "@/lib/meetings";
+import { durationOptions, nameOptions } from "@/lib/options";
 
 // „+ Termin“: nötig sind nur Titel und Zeit, der Rest ist freiwillig und lässt sich im Detail ergänzen.
 // Kein Meet-Link hier: Er kommt aus Google, nachdem man den Termin dort eingetragen hat.
@@ -104,18 +105,10 @@ export function NewMeetingDialog({
               <span className={label}>Beginn</span>
               <input type="time" step={300} required value={time ?? defaults.time} onChange={(e) => setTime(e.target.value)} className={field} />
             </label>
-            <label className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-1.5">
               <span className={label}>Dauer</span>
-              <select value={durValue} onChange={(e) => setDuration(Number(e.target.value))} className={field}>
-                {[...new Set([...DURATIONS, durValue])]
-                  .sort((a, b) => a - b)
-                  .map((d) => (
-                    <option key={d} value={d}>
-                      {durationLabel(d)}
-                    </option>
-                  ))}
-              </select>
-            </label>
+              <Select aria-label="Dauer" value={String(durValue)} onChange={(v) => setDuration(Number(v))} options={durationOptions(durValue)} className={field} />
+            </div>
           </div>
           <div className="flex flex-col gap-1.5">
             <span className="flex items-center justify-between">
@@ -130,17 +123,10 @@ export function NewMeetingDialog({
             </span>
             <PeoplePicker label="Wer ist dabei" value={whoValue} onChange={setWho} />
           </div>
-          <label className="flex flex-col gap-1.5">
+          <div className="flex flex-col gap-1.5">
             <span className={label}>Bereich</span>
-            <select value={area ?? defaults.area_id ?? ""} onChange={(e) => setArea(e.target.value)} className={field}>
-              <option value="">Keiner</option>
-              {allAreas.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.name}
-                </option>
-              ))}
-            </select>
-          </label>
+            <Select aria-label="Bereich" value={area ?? defaults.area_id ?? ""} onChange={setArea} options={nameOptions(allAreas, "Keiner")} className={field} />
+          </div>
           {error && (
             <p role="alert" className="text-[13px] text-st-red">
               {error}

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useTeam } from "@/components/app-shell/team-provider";
+import { Select } from "@/components/ui/select";
+import { nameOptions } from "@/lib/options";
 
 // „Zuständigkeiten verteilen“: je Bereich eine verantwortliche Person. Speichert sofort, gilt live für alle.
 export function OwnersDialog({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
@@ -25,25 +26,17 @@ export function OwnersDialog({ open, onOpenChange }: { open: boolean; onOpenChan
 
         <div className="flex flex-col">
           {areas.map((a) => (
-            <label key={a.id} className="flex min-h-12 items-center gap-3 border-t border-line first:border-t-0">
+            <div key={a.id} className="flex min-h-12 items-center gap-3 border-t border-line first:border-t-0">
               <span className="size-2 shrink-0 rounded-full" style={{ background: a.color }} aria-hidden />
               <span className="flex-1 text-[14px]">{a.name}</span>
-              <span className="relative">
-                <select
-                  value={a.owner_id ?? ""}
-                  onChange={(e) => change(a.id, e.target.value)}
-                  className="h-9 w-[150px] cursor-pointer appearance-none rounded-[9px] border border-field bg-card pr-8 pl-3 text-[13.5px] text-fg transition-colors duration-150 hover:bg-hover"
-                >
-                  <option value="">Noch offen</option>
-                  {people.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-fg-3" aria-hidden />
-              </span>
-            </label>
+              <Select
+                aria-label={`Zuständig für ${a.name}`}
+                value={a.owner_id ?? ""}
+                onChange={(v) => change(a.id, v)}
+                options={nameOptions(people, "Noch offen")}
+                className="h-9 w-[150px] rounded-[9px] border border-field bg-card pr-2.5 pl-3 text-[13.5px] text-fg hover:bg-hover max-md:h-11"
+              />
+            </div>
           ))}
         </div>
 

@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, ChevronDown } from "lucide-react";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Select } from "@/components/ui/select";
+import { nameOptions } from "@/lib/options";
 import { Avatar } from "@/components/avatar";
 import { AreaGlyph } from "@/components/area-glyph";
 import { Chip, DueChip } from "@/components/chip";
@@ -173,26 +175,17 @@ function OwnerField({ areaId }: { areaId: string }) {
   return (
     <div className={cn(field, "max-md:col-span-2")}>
       <h2 className="label-mono">Verantwortlich</h2>
-      <label className="relative -mx-2 flex min-w-0 items-center gap-2.5 rounded-[9px] px-2 transition-colors duration-150 hover:bg-hover">
-        <Avatar person={owner} size={24} />
-        <span className="sr-only">Verantwortliche Person für {area.name}</span>
-        <select
-          value={area.owner_id ?? ""}
-          onChange={(e) => change(e.target.value)}
-          className={cn(
-            "h-9 min-w-0 flex-1 cursor-pointer appearance-none truncate bg-transparent pr-6 text-[15px] font-semibold tracking-[-0.01em] focus-visible:outline-solid max-md:h-11 max-md:text-base",
-            !owner && "font-medium text-st-amber"
-          )}
-        >
-          <option value="">Noch offen</option>
-          {people.map((p) => (
-            <option key={p.id} value={p.id}>
-              {p.name}
-            </option>
-          ))}
-        </select>
-        <ChevronDown className="pointer-events-none absolute right-2 size-3.5 text-fg-3" aria-hidden />
-      </label>
+      <Select
+        aria-label={`Verantwortliche Person für ${area.name}`}
+        value={area.owner_id ?? ""}
+        onChange={change}
+        options={nameOptions(people, "Noch offen")}
+        leading={<Avatar person={owner} size={24} />}
+        className={cn(
+          "-mx-2 h-9 gap-2.5 rounded-[9px] px-2 text-[15px] font-semibold tracking-[-0.01em] hover:bg-hover max-md:h-11 max-md:text-base",
+          !owner && "font-medium text-st-amber"
+        )}
+      />
     </div>
   );
 }

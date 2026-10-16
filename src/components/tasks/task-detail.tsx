@@ -11,7 +11,8 @@ import { useTeam } from "@/components/app-shell/team-provider";
 import { notifyAssignment } from "@/lib/data/use-feed";
 import type { TaskPatch } from "@/lib/data/use-tasks";
 import type { Milestone } from "@/lib/data/use-milestones";
-import { milestoneOptions, shiftDue, TASK_STATUSES, taskStatusName, type Task, type TaskStatus } from "@/lib/tasks";
+import { msSelectOptions, nameOptions } from "@/lib/options";
+import { shiftDue, TASK_STATUSES, taskStatusName, type Task, type TaskStatus } from "@/lib/tasks";
 import { StatusCheck } from "./status-check";
 
 // Aufgaben-Detail (rechts 400px wie in der Pipeline; am Handy als Bottom Sheet).
@@ -103,14 +104,8 @@ export function TaskDetail({
                   onUpdate({ assignee_id: v || null });
                   notifyAssignment("task", task.id, me?.id ?? null, v || null);
                 }}
-              >
-                <option value="">Noch offen</option>
-                {people.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </SelectBox>
+                options={nameOptions(people, "Noch offen")}
+              />
             </span>
           </span>
         </PropRow>
@@ -143,14 +138,7 @@ export function TaskDetail({
               aria-hidden
             />
             <span className="flex-1">
-              <SelectBox id={f("area")} value={task.area_id ?? ""} onChange={(v) => onUpdate({ area_id: v || null })}>
-                <option value="">Kein Bereich</option>
-                {allAreas.map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.name}
-                  </option>
-                ))}
-              </SelectBox>
+              <SelectBox id={f("area")} value={task.area_id ?? ""} onChange={(v) => onUpdate({ area_id: v || null })} options={nameOptions(allAreas, "Kein Bereich")} />
             </span>
           </span>
         </PropRow>
@@ -165,14 +153,8 @@ export function TaskDetail({
                   const ms = milestones.find((m) => m.id === v);
                   onUpdate({ milestone_id: v || null, ...(ms && !task.area_id ? { area_id: ms.area_id } : {}) });
                 }}
-              >
-                <option value="">Kein Meilenstein</option>
-                {milestoneOptions(milestones).map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {`${m.parent_id ? "   " : ""}${m.id} · ${m.title}`}
-                  </option>
-                ))}
-              </SelectBox>
+                options={msSelectOptions(milestones, "Kein Meilenstein")}
+              />
             </span>
             {task.milestone_id && (
               <Link

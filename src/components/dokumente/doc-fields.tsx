@@ -4,7 +4,8 @@ import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { PropRow, SelectBox } from "@/components/detail-fields";
 import { useTeam } from "@/components/app-shell/team-provider";
-import { parseTopic, TopicOptions, topicValue, type Topic } from "@/components/wissen/pickers";
+import { parseTopic, topicOptions, topicValue, type Topic } from "@/components/wissen/pickers";
+import { nameOptions } from "@/lib/options";
 import { targetHref } from "@/lib/links";
 import { formatShort, todayInVienna } from "@/lib/dates";
 import type { Doc, DocPatch, DocTarget } from "@/lib/documents";
@@ -24,14 +25,7 @@ export function DocProps({ doc: d, topics, onUpdate }: { doc: Doc; topics: Topic
         <span className="flex items-center gap-1">
           <span className="ml-1.5 size-[7px] shrink-0 rounded-full bg-line-2" style={area ? { background: area.color } : undefined} aria-hidden />
           <span className="flex-1">
-            <SelectBox id={f("area")} value={d.area_id ?? ""} onChange={(v) => onUpdate({ area_id: v || null })}>
-              <option value="">Kein Bereich</option>
-              {allAreas.map((a) => (
-                <option key={a.id} value={a.id}>
-                  {a.name}
-                </option>
-              ))}
-            </SelectBox>
+            <SelectBox id={f("area")} value={d.area_id ?? ""} onChange={(v) => onUpdate({ area_id: v || null })} options={nameOptions(allAreas, "Kein Bereich")} />
           </span>
         </span>
       </PropRow>
@@ -45,9 +39,8 @@ export function DocProps({ doc: d, topics, onUpdate }: { doc: Doc; topics: Topic
                 const t = parseTopic(v);
                 onUpdate({ target_type: t.target_type as DocTarget | null, target_id: t.target_id });
               }}
-            >
-              <TopicOptions topics={topics} />
-            </SelectBox>
+              options={topicOptions(topics)}
+            />
           </span>
           {d.target_type && d.target_id && (
             <Link

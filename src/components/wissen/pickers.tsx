@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { useTeam } from "@/components/app-shell/team-provider";
+import type { SelectOption } from "@/components/ui/select";
 import type { TargetType } from "@/lib/links";
 
 // Auswahl-Bausteine für Entscheidungen: wer hat entschieden (mehrere), womit hängt es zusammen (ein Thema).
@@ -64,23 +65,14 @@ export function parseTopic(v: string): { target_type: TargetType | null; target_
   return { target_type: v.slice(0, i) as TargetType, target_id: v.slice(i + 1) };
 }
 
-export function TopicOptions({ topics }: { topics: Topic[] }) {
-  return (
-    <>
-      <option value="">Kein Thema</option>
-      {GROUPS.map((g) => {
-        const list = topics.filter((t) => t.type === g.type);
-        if (!list.length) return null;
-        return (
-          <optgroup key={g.type} label={g.name}>
-            {list.map((t) => (
-              <option key={t.id} value={topicValue(t.type, t.id)}>
-                {t.label}
-              </option>
-            ))}
-          </optgroup>
-        );
-      })}
-    </>
-  );
+/** Liste für das Auswahlfeld „Gehört zu“, gruppiert nach Art. Unter-Meilensteine (Label mit Leerzeichen vorn) eingerückt. */
+export function topicOptions(topics: Topic[]): SelectOption[] {
+  return [
+    { value: "", label: "Kein Thema" },
+    ...GROUPS.flatMap((g) =>
+      topics
+        .filter((t) => t.type === g.type)
+        .map((t) => ({ value: topicValue(t.type, t.id), label: t.label.trim(), group: g.name, indent: t.label !== t.label.trimStart() }))
+    ),
+  ];
 }

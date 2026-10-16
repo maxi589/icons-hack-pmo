@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { Feed } from "@/components/feed";
 import { EditText, PropRow, SelectBox } from "@/components/detail-fields";
+import { durationOptions, nameOptions } from "@/lib/options";
 import { NoteEditor } from "@/components/editor/note-editor";
 import { useNotesDraft } from "@/components/editor/notes-card";
 import { DocBlock } from "@/components/dokumente/doc-block";
@@ -17,8 +18,6 @@ import type { Decision } from "@/lib/data/use-knowledge";
 import type { Organization } from "@/lib/pipeline";
 import type { Task } from "@/lib/tasks";
 import {
-  DURATIONS,
-  durationLabel,
   fromVienna,
   meetingHref,
   timeRange,
@@ -165,15 +164,12 @@ export function MeetingDetail({
               Dauer
             </label>
             <span className="w-[92px]">
-              <SelectBox id={f("dur")} value={String(m.duration_min)} onChange={(v) => onUpdate({ duration_min: Number(v) })}>
-                {[...new Set([...DURATIONS, m.duration_min])]
-                  .sort((a, b) => a - b)
-                  .map((d) => (
-                    <option key={d} value={d}>
-                      {durationLabel(d)}
-                    </option>
-                  ))}
-              </SelectBox>
+              <SelectBox
+                id={f("dur")}
+                value={String(m.duration_min)}
+                onChange={(v) => onUpdate({ duration_min: Number(v) })}
+                options={durationOptions(m.duration_min)}
+              />
             </span>
           </span>
         </PropRow>
@@ -202,14 +198,12 @@ export function MeetingDetail({
         <PropRow label="Firma" htmlFor={f("org")}>
           <span className="flex items-center gap-1">
             <span className="min-w-0 flex-1">
-              <SelectBox id={f("org")} value={m.organization_id ?? ""} onChange={(v) => onUpdate({ organization_id: v || null })}>
-                <option value="">Keine</option>
-                {sortedOrgs.map((o) => (
-                  <option key={o.id} value={o.id}>
-                    {o.name}
-                  </option>
-                ))}
-              </SelectBox>
+              <SelectBox
+                id={f("org")}
+                value={m.organization_id ?? ""}
+                onChange={(v) => onUpdate({ organization_id: v || null })}
+                options={nameOptions(sortedOrgs, "Keine")}
+              />
             </span>
             {m.organization_id && (
               <Link
@@ -226,14 +220,7 @@ export function MeetingDetail({
           <span className="flex items-center gap-1">
             <span className="ml-1.5 size-[7px] shrink-0 rounded-full bg-line-2" style={area ? { background: area.color } : undefined} aria-hidden />
             <span className="flex-1">
-              <SelectBox id={f("area")} value={m.area_id ?? ""} onChange={(v) => onUpdate({ area_id: v || null })}>
-                <option value="">Kein Bereich</option>
-                {allAreas.map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.name}
-                  </option>
-                ))}
-              </SelectBox>
+              <SelectBox id={f("area")} value={m.area_id ?? ""} onChange={(v) => onUpdate({ area_id: v || null })} options={nameOptions(allAreas, "Kein Bereich")} />
             </span>
           </span>
         </PropRow>

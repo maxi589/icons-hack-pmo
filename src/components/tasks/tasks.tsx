@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Select, type SelectOption } from "@/components/ui/select";
+import { msSelectOptions, nameOptions } from "@/lib/options";
 import { Avatar } from "@/components/avatar";
 import { DueChip } from "@/components/chip";
 import { Segmented } from "@/components/segmented";
@@ -18,7 +20,7 @@ import { useIsMobile } from "@/lib/use-is-mobile";
 import { useMilestones, type Milestone } from "@/lib/data/use-milestones";
 import { useTasks, type TaskPatch } from "@/lib/data/use-tasks";
 import { logActivity, notifyAssignment } from "@/lib/data/use-feed";
-import { DUE_GROUPS, dueGroup, milestoneOptions, sortTasks, TASK_STATUSES, taskStatusName, type Task, type TaskStatus } from "@/lib/tasks";
+import { DUE_GROUPS, dueGroup, sortTasks, TASK_STATUSES, taskStatusName, type Task, type TaskStatus } from "@/lib/tasks";
 import { NewTaskDialog } from "./new-task-dialog";
 import { StatusCheck } from "./status-check";
 import { TaskDetail } from "./task-detail";
@@ -30,29 +32,25 @@ import { TaskDetail } from "./task-detail";
 type View = "board" | "list";
 
 const filterCls =
-  "h-8 cursor-pointer appearance-none truncate rounded-[9px] border border-field bg-card pr-7 pl-2.5 text-[13px] text-fg focus-visible:outline-solid max-md:h-10 max-md:pr-6 max-md:text-base";
+  "h-8 w-full truncate rounded-[9px] border border-field bg-card pr-2 pl-2.5 text-[13px] text-fg hover:bg-hover max-md:h-10 max-md:pr-1.5 max-md:text-base";
 
 function FilterSelect({
   label,
   value,
   onChange,
   wide = false,
-  children,
+  options,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   wide?: boolean;
-  children: React.ReactNode;
+  options: SelectOption[];
 }) {
   return (
-    <label className={cn("relative inline-flex min-w-0 items-center max-md:basis-0", wide ? "max-md:flex-[1.3] md:w-[240px]" : "max-md:flex-1 md:w-[160px]")}>
-      <span className="sr-only">{label}</span>
-      <select value={value} onChange={(e) => onChange(e.target.value)} className={cn(filterCls, "w-full", value && "bg-active")}>
-        {children}
-      </select>
-      <ChevronDown className="pointer-events-none absolute right-2 size-3.5 text-fg-3 max-md:right-1.5" aria-hidden />
-    </label>
+    <div className={cn("min-w-0 max-md:basis-0", wide ? "max-md:flex-[1.3] md:w-[240px]" : "max-md:flex-1 md:w-[160px]")}>
+      <Select aria-label={label} value={value} onChange={onChange} options={options} className={cn(filterCls, value && "bg-active hover:bg-active")} />
+    </div>
   );
 }
 
@@ -167,31 +165,25 @@ export function Tasks() {
 
       {/* Filter (Handy: drei gleich breite Auswahlen in einer Zeile, kurze Namen) */}
       <div className="flex flex-wrap items-center gap-2 px-3.5 pb-3 md:border-b md:border-line md:px-[18px] md:py-3">
-        <FilterSelect label="Bereich" value={fArea} onChange={(v) => setParams({ bereich: v })}>
-          <option value="">{isMobile ? "Bereich" : "Alle Bereiche"}</option>
-          {allAreas.map((a) => (
-            <option key={a.id} value={a.id}>
-              {a.name}
-            </option>
-          ))}
-        </FilterSelect>
-        <FilterSelect label="Person" value={fPerson} onChange={(v) => setParams({ person: v })}>
-            <option value="">{isMobile ? "Person" : "Alle Personen"}</option>
-            {people.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name}
-              </option>
-            ))}
-            <option value="offen">Noch niemand</option>
-          </FilterSelect>
-        <FilterSelect wide label="Meilenstein" value={fMs} onChange={(v) => setParams({ meilenstein: v })}>
-          <option value="">{isMobile ? "Meilenstein" : "Alle Meilensteine"}</option>
-          {milestoneOptions(msList).map((m) => (
-            <option key={m.id} value={m.id}>
-              {`${m.parent_id ? "   " : ""}${m.id} · ${m.title}`}
-            </option>
-          ))}
-        </FilterSelect>
+        <FilterSelect
+          label="Bereich"
+          value={fArea}
+          onChange={(v) => setParams({ bereich: v })}
+          options={nameOptions(allAreas, isMobile ? "Bereich" : "Alle Bereiche")}
+        />
+        <FilterSelect
+          label="Person"
+          value={fPerson}
+          onChange={(v) => setParams({ person: v })}
+          options={[...nameOptions(people, isMobile ? "Person" : "Alle Personen"), { value: "offen", label: "Noch niemand" }]}
+        />
+        <FilterSelect
+          wide
+          label="Meilenstein"
+          value={fMs}
+          onChange={(v) => setParams({ meilenstein: v })}
+          options={msSelectOptions(msList, isMobile ? "Meilenstein" : "Alle Meilensteine")}
+        />
         {filtered && (
           <button
             type="button"

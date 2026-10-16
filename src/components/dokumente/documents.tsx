@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ChevronDown, FileText, Gavel, Link2, Search, Upload } from "lucide-react";
+import { FileText, Gavel, Link2, Search, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Select } from "@/components/ui/select";
+import { nameOptions } from "@/lib/options";
 import { Avatar } from "@/components/avatar";
 import { useToast } from "@/components/toast";
 import { MobileSheet } from "@/components/mobile-sheet";
@@ -300,25 +302,18 @@ export function Documents() {
                 </button>
               ))}
             </div>
-            <label className="relative inline-flex items-center max-md:order-last max-md:w-[132px]">
-              <span className="sr-only">Bereich</span>
-              <select
+            <div className="max-md:order-last max-md:w-[132px] md:w-[180px]">
+              <Select
+                aria-label="Bereich"
                 value={area}
-                onChange={(e) => setArea(e.target.value)}
+                onChange={setArea}
+                options={nameOptions(allAreas, isMobile ? "Bereich" : "Alle Bereiche")}
                 className={cn(
-                  "h-8 w-full cursor-pointer appearance-none rounded-[9px] border border-field bg-card pr-7 pl-2.5 text-[13px] text-fg focus-visible:outline-solid max-md:h-10 max-md:text-base md:w-[180px]",
-                  area && "bg-active"
+                  "h-8 w-full rounded-[9px] border border-field bg-card pr-2 pl-2.5 text-[13px] text-fg hover:bg-hover max-md:h-10 max-md:text-base",
+                  area && "bg-active hover:bg-active"
                 )}
-              >
-                <option value="">{isMobile ? "Bereich" : "Alle Bereiche"}</option>
-                {allAreas.map((a) => (
-                  <option key={a.id} value={a.id}>
-                    {a.name}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="pointer-events-none absolute right-2 size-3.5 text-fg-3" aria-hidden />
-            </label>
+              />
+            </div>
             <label className="relative flex min-w-0 items-center max-md:flex-1 md:ml-auto md:w-[240px]">
               <Search className="pointer-events-none absolute left-2.5 size-3.5 text-fg-3" aria-hidden />
               <span className="sr-only">Dokumente durchsuchen</span>
