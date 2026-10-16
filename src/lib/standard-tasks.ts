@@ -81,6 +81,26 @@ export async function addStandardTasks(org: Organization, to: Stage, today: stri
   return (data ?? []) as { id: string; title: string }[];
 }
 
+/**
+ * Firma auf „Abgesagt“ (Maxi, 16.10.): offene Aufgaben der Firma (auch „In Arbeit“) löschen, Erledigte bleiben.
+ * Liefert die gelöschten Zeilen vollständig (für „Rückgängig“ mit gleicher ID, Kommentare bleiben verknüpft) oder null.
+ */
+export async function removeOpenTasks(orgId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase.from("tasks").select("*").eq("organization_id", orgId).neq("status", "erledigt");
+  if (error) return null;
+  if (!data.length) return [];
+  const { error: delError } = await supabase.from("tasks").delete().in("id", data.map((t) => t.id));
+  return delError ? null : (data as Record<string, unknown>[]);
+}
+
+/** „Rückgängig“ nach „Abgesagt“: die gelöschten Aufgaben unverändert zurückholen. */
+export async function restoreTasks(rows: Record<string, unknown>[]) {
+  if (!rows.length) return true;
+  const { error } = await createClient().from("tasks").insert(rows);
+  return !error;
+}
+
 /** „Rückgängig“: die eben angelegten Standard-Aufgaben wieder entfernen. false = hat nicht geklappt. */
 export async function removeTasks(ids: string[]) {
   if (!ids.length) return true;

@@ -19,7 +19,7 @@ import { logActivity } from "@/lib/data/use-feed";
 import { formatDayMonth, formatShort } from "@/lib/dates";
 import { FOLLOW_UP_ROUNDS } from "@/lib/phases";
 import { play } from "@/lib/sounds";
-import { addStandardTasks, getsStandardTasks, removeTasks } from "@/lib/standard-tasks";
+import { addStandardTasks, getsStandardTasks, removeOpenTasks, removeTasks, restoreTasks } from "@/lib/standard-tasks";
 import {
   followState,
   inTab,
@@ -120,7 +120,8 @@ export function Pipeline() {
   /** Stufe ändern: sofort speichern, 5 s „Rückgängig“, danach Eintrag im Verlauf.
    *  Auf „Kontaktiert“ ohne Nachfass-Datum kommt automatisch heute + 7 Tage dazu (Maxi, 15.10.), sonst würde die Firma
    *  nie „überfällig“. Ein schon gesetztes Datum bleibt. Auf „Zugesagt“ (oder direkt „Fix“) kommen die Standard-Aufgaben
-   *  dazu (Maxi, 16.10., Liste in lib/standard-tasks.ts). „Rückgängig“ nimmt jeweils alles zurück. */
+   *  dazu (Maxi, 16.10., Liste in lib/standard-tasks.ts); auf „Abgesagt“ verschwinden die offenen Aufgaben der Firma
+   *  (Maxi, 16.10.). „Rückgängig“ nimmt jeweils alles zurück. */
   const changeStage = (org: Organization, to: Stage) => {
     const from = org.stage;
     if (from === to) return;
@@ -129,9 +130,10 @@ export function Pipeline() {
     const saved = update(org.id, autoFollow ? { stage: to, next_follow_up: autoFollow } : { stage: to });
     // Zusage ist ein Erfolg; von Fix zurück auf Zugesagt nicht.
     if (to === "fix" || (to === "zugesagt" && from !== "fix")) play("dealWon");
-    // Standard-Aufgaben erst, wenn die Stufe wirklich gespeichert ist. Der Hinweis steht sofort da (richtige Reihenfolge
-    // auch bei schnellem Doppelklick) und bekommt die Zahl nachgereicht; „Rückgängig“ und Verlauf warten auf das Anlegen.
+    // Aufgaben erst, wenn die Stufe wirklich gespeichert ist. Der Hinweis steht sofort da (richtige Reihenfolge auch bei
+    // schnellem Doppelklick) und bekommt die Zahl nachgereicht; „Rückgängig“ und Verlauf warten auf die Datenbank.
     const added = getsStandardTasks(from, to) ? saved.then((ok) => (ok ? addStandardTasks(org, to, today, meId) : [])) : Promise.resolve([]);
+    const dropped = to === "abgesagt" ? saved.then((ok) => (ok ? removeOpenTasks(org.id) : [])) : Promise.resolve([]);
     const base = `${org.name} → ${stageName(to)}${autoFollow ? ` · nachfassen ${formatShort(autoFollow)}` : ""}`;
     let undone = false;
     const setText = toast({
@@ -142,6 +144,9 @@ export function Pipeline() {
         added.then(async (a) => {
           if (a?.length && !(await removeTasks(a.map((t) => t.id)))) toast({ text: "Aufgaben nicht entfernt. Bitte im Firmen-Detail löschen." });
         });
+        dropped.then(async (d) => {
+          if (d?.length && !(await restoreTasks(d))) toast({ text: "Aufgaben nicht zurückgeholt. Bitte nochmal versuchen." });
+        });
       },
       onExpire: () => {
         logActivity("organization", org.id, meId, "stage_changed", { from, to });
@@ -149,10 +154,16 @@ export function Pipeline() {
       },
     });
     saved.then((ok) => !ok && !undone && setText(`${org.name}: nicht gespeichert. Bitte nochmal versuchen.`));
+    const count = (n: number, what: string) => ` · ${n} ${n === 1 ? "Aufgabe" : "Aufgaben"} ${what}`;
     added.then((a) => {
       if (undone) return;
       if (a === null) setText(`${base} · Aufgaben nicht angelegt`);
-      else if (a.length) setText(`${base} · ${a.length} ${a.length === 1 ? "Aufgabe" : "Aufgaben"} angelegt`);
+      else if (a.length) setText(base + count(a.length, "angelegt"));
+    });
+    dropped.then((d) => {
+      if (undone) return;
+      if (d === null) setText(`${base} · offene Aufgaben nicht gelöscht`);
+      else if (d.length) setText(base + count(d.length, "gelöscht"));
     });
   };
 
