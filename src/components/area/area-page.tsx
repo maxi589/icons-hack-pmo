@@ -24,7 +24,8 @@ import { useMilestones, type Milestone } from "@/lib/data/use-milestones";
 import { useTasks } from "@/lib/data/use-tasks";
 import { useOrganizations } from "@/lib/data/use-organizations";
 import { useAreaNotes } from "@/lib/data/use-area-notes";
-import { followState, inTab, STAGES, TABS, type Organization, type TabId } from "@/lib/pipeline";
+import { followState, formatEuro, inTab, parseEuro, sponsoring, STAGES, TABS, type Organization, type TabId } from "@/lib/pipeline";
+import { EditText } from "@/components/detail-fields";
 import { sortTasks, type Task } from "@/lib/tasks";
 
 // Bereichs-Seite (Umfang v1): verantwortliche Person, Fortschritt, Notizen, Meilensteine und Aufgaben eines Teilprojekts.
@@ -135,6 +136,7 @@ function SummaryStrip({
 }) {
   const msDone = own.filter((m) => m.status === "erledigt").length;
   const taskDone = tasks.filter((t) => t.status === "erledigt").length;
+  const money = areaId === "sponsoren";
 
   return (
     <section
@@ -142,17 +144,23 @@ function SummaryStrip({
       className={cn(
         card,
         "grid grid-cols-2 gap-px overflow-hidden bg-line",
-        tab ? "md:grid-cols-[minmax(0,1fr)_minmax(0,1.9fr)_minmax(0,1fr)_minmax(0,1fr)]" : "md:grid-cols-3"
+        money
+          ? // Fünf Felder erst ab breitem Fenster, sonst würde das Ziel-Feld abgeschnitten (Tablet, Prüfer 16.10.)
+            "md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)_minmax(0,1.3fr)_minmax(0,1fr)_minmax(0,1fr)]"
+          : tab
+            ? "md:grid-cols-[minmax(0,1fr)_minmax(0,1.9fr)_minmax(0,1fr)_minmax(0,1fr)]"
+            : "md:grid-cols-3"
       )}
     >
       <OwnerField areaId={areaId} />
       {tab && <PipelineField tab={tab} orgs={orgs} today={today} />}
+      {money && <MoneyField orgs={orgs} />}
       <div className={field}>
         <h2 className="label-mono">Meilensteine</h2>
         <Count value={msDone} total={own.length} />
         <Bar value={msDone} total={own.length} />
       </div>
-      <div className={field}>
+      <div className={cn(field, money && "md:max-xl:col-span-2")}>
         <h2 className="label-mono">Aufgaben</h2>
         {tasks.length ? <Count value={taskDone} total={tasks.length} /> : <Count value={0} total={null} suffix="noch keine" />}
         <Bar value={taskDone} total={tasks.length} />
@@ -191,6 +199,47 @@ function OwnerField({ areaId }: { areaId: string }) {
   );
 }
 
+/** Sponsoring in € (Maxi, 16.10.): zugesagtes Partner-Geld gegen das Ziel, das das Team hier einträgt (live für alle). */
+function MoneyField({ orgs }: { orgs: Organization[] }) {
+  const { areaById, setAreaGoal } = useTeam();
+  const toast = useToast();
+  const goal = areaById("sponsoren")?.goal_amount ?? null;
+  const { secured, prospect } = sponsoring(orgs);
+
+  const save = async (v: string | null) => {
+    const n = parseEuro(v);
+    if (Number.isNaN(n)) return toast({ text: "Bitte nur eine Zahl, z. B. 30.000", error: true });
+    if (n === goal) return;
+    if (!(await setAreaGoal("sponsoren", n))) toast({ text: "Hat nicht geklappt. Bitte nochmal versuchen." });
+  };
+
+  return (
+    <div className={cn(field, "max-md:col-span-2")}>
+      {/* Gleicher Name wie auf der Übersicht; „inkl. Track-Partner“ erklärt den Unterschied zu „Sponsoren zugesagt“ daneben */}
+      <h2 className="label-mono">Sponsoring zugesagt</h2>
+      <span className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
+        <span className="text-[22px] leading-none font-medium tracking-[-0.03em] whitespace-nowrap tabular">{formatEuro(secured)}</span>
+        <label htmlFor="sponsoring-goal" className="text-[13px] text-fg-3">
+          <span aria-hidden>von</span>
+          <span className="sr-only">Sponsoring-Ziel in €</span>
+        </label>
+        <span className="-my-1 w-[124px]">
+          <EditText
+            id="sponsoring-goal"
+            value={goal !== null ? formatEuro(goal) : null}
+            placeholder="Ziel in €"
+            inputMode="decimal"
+            onSave={save}
+            className="text-[13px] tabular"
+          />
+        </span>
+      </span>
+      <Bar value={Math.min(secured, goal ?? 0)} total={goal ?? 0} />
+      <span className="text-[12px] text-fg-3">inkl. Track-Partner{prospect > 0 && ` · + ${formatEuro(prospect)} im Gespräch`}</span>
+    </div>
+  );
+}
+
 function PipelineField({ tab, orgs, today }: { tab: TabId; orgs: Organization[]; today: string }) {
   const def = TABS.find((t) => t.id === tab)!;
   const list = orgs.filter((o) => inTab(o, tab));
@@ -213,7 +262,7 @@ function PipelineField({ tab, orgs, today }: { tab: TabId; orgs: Organization[];
         </span>
       </span>
       <span className="flex flex-wrap items-baseline gap-x-4 gap-y-1.5">
-        <Count value={won} total={def.goal ?? null} suffix="Ziel offen" />
+        <Count value={won} total={def.goal ?? null} />
         <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12.5px] text-fg-2">
           {stages.length === 0 && <span className="text-fg-3">Noch keine Einträge</span>}
           {stages.map((s) => (

@@ -2,6 +2,7 @@
 
 import { Check, ExternalLink, X } from "lucide-react";
 import { CopyLinkButton } from "@/components/copy-link-button";
+import { useToast } from "@/components/toast";
 import { EditText, miniButton as mini, PropRow, SelectBox } from "@/components/detail-fields";
 import { cn } from "@/lib/utils";
 import { Select } from "@/components/ui/select";
@@ -19,7 +20,10 @@ import { orgArea } from "@/lib/standard-tasks";
 import { useFollowedUp } from "./use-followed-up";
 import {
   followState,
+  formatEuro,
+  hasAmountField,
   initials,
+  parseEuro,
   nextStage,
   ROLE_NAMES,
   shiftFollowUp,
@@ -48,6 +52,7 @@ export function OrgDetail({
   onClose: () => void;
 }) {
   const { me, people, personById } = useTeam();
+  const toast = useToast();
   const followedUp = useFollowedUp();
   const next = nextStage(org.stage);
   const follow = followState(org, today);
@@ -207,6 +212,23 @@ export function OrgDetail({
         <PropRow label="Prio" htmlFor={f("prio")}>
           <SelectBox id={f("prio")} value={org.prio ?? ""} onChange={(v) => onUpdate({ prio: (v || null) as Organization["prio"] })} options={PRIO_OPTIONS} />
         </PropRow>
+        {/* Betrag ab „Im Gespräch“ (Maxi, 16.10.): zählt zum Sponsoring-Ziel, Venues nicht (dort ist der Preis eine Ausgabe) */}
+        {hasAmountField(org) && (
+          <PropRow label="Betrag (€)" htmlFor={f("amount")}>
+            <EditText
+              id={f("amount")}
+              value={org.amount !== null ? formatEuro(org.amount) : null}
+              placeholder="–"
+              inputMode="decimal"
+              onSave={(v) => {
+                const n = parseEuro(v);
+                if (Number.isNaN(n)) toast({ text: "Bitte nur eine Zahl, z. B. 12.000", error: true });
+                else onUpdate({ amount: n });
+              }}
+              className="tabular"
+            />
+          </PropRow>
+        )}
         {!isVenue && warmRow}
         <PropRow label="Ansprechperson" htmlFor={f("contact")}>
           <EditText id={f("contact")} value={org.contact_person} placeholder="–" onSave={(v) => onUpdate({ contact_person: v })} />

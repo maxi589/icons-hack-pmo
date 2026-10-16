@@ -305,7 +305,8 @@ export function Pipeline() {
             {won}
             {tabDef.goal ? ` / ${tabDef.goal}` : ""}
           </b>
-          {tabDef.goal ? (tab === "venues" ? "plus Backup" : "zugesagt") : "zugesagt · Ziel offen"}
+          {/* Sponsoren ohne Stückzahl-Ziel: das Ziel steht in € im Bereich Sponsoren (16.10.) */}
+          {tab === "venues" ? "plus Backup" : "zugesagt"}
         </span>
         {(dueToday > 0 || overdue > 0 || due) && (
           <span className="flex gap-1.5">

@@ -8,7 +8,7 @@ import type { Organization } from "@/lib/pipeline";
 // Änderungen erscheinen sofort (optimistisch) und werden bei Fehler zurückgenommen.
 
 const FIELDS =
-  "id, name, roles, category, location, prio, wave, stage, lost_reason, owner_id, existing_contact, warm_via, contact_person, contact_info, url, next_follow_up, notes, capacity, overnight, price, source, created_at, updated_at";
+  "id, name, roles, category, location, prio, wave, stage, lost_reason, owner_id, existing_contact, warm_via, contact_person, contact_info, url, next_follow_up, notes, capacity, overnight, price, amount, source, created_at, updated_at";
 
 export type OrgPatch = Partial<Omit<Organization, "id" | "created_at" | "updated_at">>;
 

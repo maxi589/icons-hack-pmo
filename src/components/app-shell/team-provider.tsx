@@ -8,7 +8,15 @@ import { createClient } from "@/lib/supabase/client";
 // Bereiche hören live mit: Ändert jemand eine Zuständigkeit, sehen es alle sofort.
 
 export type Person = { id: string; name: string; initials: string; color: string };
-export type Area = { id: string; name: string; color: string; owner_id: string | null; is_project: boolean };
+export type Area = {
+  id: string;
+  name: string;
+  color: string;
+  owner_id: string | null;
+  is_project: boolean;
+  /** Ziel in ganzen Euro (nur Bereich „sponsoren“ genutzt: Sponsoring-Ziel, Maxi 16.10.) */
+  goal_amount: number | null;
+};
 
 type Team = {
   me: Person | null;
@@ -21,6 +29,7 @@ type Team = {
   areaById: (id: string | null | undefined) => Area | null;
   personById: (id: string | null | undefined) => Person | null;
   setAreaOwner: (areaId: string, ownerId: string | null) => Promise<boolean>;
+  setAreaGoal: (areaId: string, amount: number | null) => Promise<boolean>;
   /** Team neu laden, z. B. nach einer Einladung. */
   reloadPeople: () => Promise<void>;
 };
@@ -33,6 +42,7 @@ const TeamContext = createContext<Team>({
   areaById: () => null,
   personById: () => null,
   setAreaOwner: async () => false,
+  setAreaGoal: async () => false,
   reloadPeople: async () => {},
 });
 
@@ -49,7 +59,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     const loadAreas = async () => {
       const { data } = await supabase
         .from("areas")
-        .select("id, name, color, owner_id, is_project")
+        .select("id, name, color, owner_id, is_project, goal_amount")
         .order("sort");
       // Farbe je Hell/Dunkel aus den Tokens (--area-<id> in globals.css), Datenbank-Wert nur als Rückfall.
       if (data) setAreas(data.map((a) => ({ ...a, color: `var(--area-${a.id}, ${a.color})` })));
@@ -87,22 +97,27 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   const areaById = useCallback((id: string | null | undefined) => allAreas.find((a) => a.id === id) ?? null, [allAreas]);
   const personById = useCallback((id: string | null | undefined) => people.find((p) => p.id === id) ?? null, [people]);
 
-  const setAreaOwner = useCallback(async (areaId: string, ownerId: string | null) => {
-    let before: string | null = null;
+  /** Bereich ändern: sofort sichtbar, bei Fehler zurück. */
+  const patchArea = useCallback(async (areaId: string, patch: Partial<Pick<Area, "owner_id" | "goal_amount">>) => {
+    // Bei Fehler nur die geänderten Felder zurück (eine fremde Änderung an anderen Feldern bleibt stehen)
+    let before: Partial<Area> | undefined;
     setAreas((list) =>
       list.map((a) => {
         if (a.id !== areaId) return a;
-        before = a.owner_id;
-        return { ...a, owner_id: ownerId };
+        before = Object.fromEntries(Object.keys(patch).map((k) => [k, a[k as keyof Area]]));
+        return { ...a, ...patch };
       })
     );
-    const { error } = await createClient().from("areas").update({ owner_id: ownerId }).eq("id", areaId);
-    if (error) {
-      setAreas((list) => list.map((a) => (a.id === areaId ? { ...a, owner_id: before } : a)));
+    const { error } = await createClient().from("areas").update(patch).eq("id", areaId);
+    if (error && before) {
+      const restore = before;
+      setAreas((list) => list.map((a) => (a.id === areaId ? { ...a, ...restore } : a)));
       return false;
     }
-    return true;
+    return !error;
   }, []);
+  const setAreaOwner = useCallback((areaId: string, ownerId: string | null) => patchArea(areaId, { owner_id: ownerId }), [patchArea]);
+  const setAreaGoal = useCallback((areaId: string, amount: number | null) => patchArea(areaId, { goal_amount: amount }), [patchArea]);
 
   const reloadPeople = useCallback(async () => {
     const { data } = await createClient().from("people").select("id, name, initials, color").order("sort");
@@ -110,7 +125,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <TeamContext value={{ me, people, areas, allAreas: lanes, areaById, personById, setAreaOwner, reloadPeople }}>{children}</TeamContext>
+    <TeamContext value={{ me, people, areas, allAreas: lanes, areaById, personById, setAreaOwner, setAreaGoal, reloadPeople }}>{children}</TeamContext>
   );
 }
 

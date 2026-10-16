@@ -42,6 +42,7 @@ export function EditText({
   wrap = false,
   className,
   required = false,
+  inputMode,
 }: {
   id: string;
   value: string | null;
@@ -53,6 +54,8 @@ export function EditText({
   className?: string;
   /** Leeren nicht erlaubt (z. B. Titel): leerer Text stellt den alten Wert wieder her. */
   required?: boolean;
+  /** Tastatur am Handy, z. B. "decimal" für Beträge (nur einzeiliges Feld) */
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
 }) {
   const [draft, setDraft] = useState<string | null>(null);
   // Esc verwirft den Entwurf (versehentlich getippt oder eingefügt), das folgende Verlassen speichert dann nichts
@@ -113,6 +116,7 @@ export function EditText({
       id={id}
       value={shown}
       placeholder={placeholder}
+      inputMode={inputMode}
       onChange={(e) => setDraft(e.target.value)}
       onBlur={commit}
       onKeyDown={(e) => !escape(e) && e.key === "Enter" && (e.currentTarget as HTMLInputElement).blur()}

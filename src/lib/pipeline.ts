@@ -28,6 +28,8 @@ export type Organization = {
   capacity: string | null;
   overnight: string | null;
   price: string | null;
+  /** Betrag in ganzen Euro (ab „Im Gespräch“, 16.10.); zählt zum Sponsoring-Ziel */
+  amount: number | null;
   source: string | null;
   created_at: string;
   /** Letzte Änderung (Trigger in der Datenbank), Spalte „Geändert“ in der Tabelle */
@@ -63,7 +65,7 @@ export const ROLE_NAMES: Record<Role, string> = {
 
 export type TabId = "partner" | "sponsoren" | "jury" | "venues";
 
-/** Tabs je Typ, Begriffe wie auf der Website. Sponsoren = Tech-Partner (Credits) + Supporter. Ziel null = „Ziel offen“. */
+/** Tabs je Typ, Begriffe wie auf der Website. Sponsoren = Tech-Partner (Credits) + Supporter. Ziel null = keine Stückzahl (Sponsoren: Ziel in €, Bereich Sponsoren). */
 export const TABS: {
   id: TabId;
   name: string;
@@ -109,4 +111,47 @@ export function followState(o: Organization, today: string): FollowState {
 export function shiftFollowUp(current: string | null, today: string, days: number) {
   const base = current && current > today ? current : today;
   return format(addDays(parseISO(base), days), "yyyy-MM-dd");
+}
+
+// ---------------------------------------------------------------
+// Betrag und Sponsoring-Ziel (Maxi, 16.10.): ganze Euro, alles Partner-Geld zählt (Track-Partner, Supporter,
+// Tech-Partner), keine Jury und keine Venues (dort ist der Preis eine Ausgabe). Gesichert = Zugesagt + Fix,
+// in Aussicht = Im Gespräch.
+// ---------------------------------------------------------------
+
+/** Typen, die Geld geben (nur sie haben „Betrag (€)“ und zählen zum Sponsoring). */
+const MONEY_ROLES: Role[] = ["challenge", "sponsor", "tokens"];
+const givesMoney = (o: Pick<Organization, "roles">) => o.roles.some((r) => MONEY_ROLES.includes(r));
+
+/** Ab dieser Stufe hat eine Firma das Feld „Betrag (€)“. */
+export const AMOUNT_STAGES: Stage[] = ["im_gespraech", "zugesagt", "fix"];
+
+export const hasAmountField = (o: Pick<Organization, "roles" | "stage" | "amount">) =>
+  givesMoney(o) && (AMOUNT_STAGES.includes(o.stage) || o.amount !== null);
+
+/** 12000 → „12.000 €“ */
+export const formatEuro = (n: number) => `${new Intl.NumberFormat("de-DE", { maximumFractionDigits: 0 }).format(n)} €`;
+
+/** Höchster Betrag (die Spalte ist integer; alles darüber wäre ohnehin ein Tippfehler). */
+const MAX_EURO = 100_000_000;
+
+/**
+ * Genau eine Zahl in Euro: „12.000 €“, „12000“, „12 000“, „12.000,50“ (gerundet), „5.000,-“ → Zahl; leer → null.
+ * Alles andere („5-10k“, „1,5 Mio“, „-500“, „offen“) → NaN: dann nicht speichern, sondern nachfragen
+ * (vorher wurden daraus still falsche Zahlen, Prüfer 16.10.).
+ */
+export function parseEuro(v: string | null): number | null {
+  const s = (v ?? "").replace(/€/g, "").replace(/\s/g, "").replace(/,[-–]+$/, "");
+  if (!s) return null;
+  let n = NaN;
+  if (/^\d{1,3}(\.\d{3})+(,\d{1,2})?$/.test(s) || /^\d+(,\d{1,2})?$/.test(s)) n = Number(s.replace(/\./g, "").replace(",", "."));
+  else if (/^\d+\.\d{1,2}$/.test(s)) n = Number(s);
+  return Number.isFinite(n) && n <= MAX_EURO ? Math.round(n) : NaN;
+}
+
+/** Summen fürs Sponsoring-Ziel. */
+export function sponsoring(orgs: Pick<Organization, "roles" | "stage" | "amount">[]) {
+  const money = orgs.filter((o) => o.amount && givesMoney(o));
+  const sum = (stages: Stage[]) => money.filter((o) => stages.includes(o.stage)).reduce((a, o) => a + (o.amount ?? 0), 0);
+  return { secured: sum(["zugesagt", "fix"]), prospect: sum(["im_gespraech"]) };
 }

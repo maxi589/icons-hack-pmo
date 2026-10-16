@@ -22,6 +22,7 @@ import { MilestoneChecklist } from "@/components/milestone-checklist";
 import { StatusCheck } from "@/components/tasks/status-check";
 import { useFollowedUp } from "@/components/pipeline/use-followed-up";
 import { createClient } from "@/lib/supabase/client";
+import { formatEuro, sponsoring } from "@/lib/pipeline";
 import { OwnersDialog } from "./owners-dialog";
 import { TodayCard } from "./today-card";
 import { useOverviewData, type Milestone, type Org, type Task } from "./use-overview-data";
@@ -206,34 +207,52 @@ function GoalTiles({ orgs, milestones }: { orgs: Org[]; milestones: Milestone[] 
     { label: "Track-Partner zugesagt", short: "Track-Partner", value: won("challenge"), target: 4, note: `bis ${due("M3")}` },
     { label: "Jury zugesagt", short: "Jury", value: won("jury"), target: 4, note: `bis ${due("M4")}` },
     { label: "Venue fixiert", short: "Venue", value: won("venue", ["fix"]), target: 1, note: `plus Backup · bis ${due("M2")}` },
-    { label: "Sponsoren zugesagt", short: "Sponsoren", value: won("sponsor") + won("tokens"), target: null, note: "Ziel offen" },
   ];
+
+  // Sponsoring in € (Maxi, 16.10.): alles Partner-Geld ab „Zugesagt“, Ziel setzt das Team im Bereich Sponsoren
+  const { areaById } = useTeam();
+  const goal = areaById("sponsoren")?.goal_amount ?? null;
+  const { secured, prospect } = sponsoring(orgs);
+  const share = goal ? Math.min(1, secured / goal) : 0;
+  const prospectNote = prospect ? `+ ${formatEuro(prospect)} im Gespräch` : null;
+  const moneyBar = (cls: string) => (
+    <span className={cn("h-1 overflow-hidden rounded-sm bg-line-2", cls)} aria-hidden>
+      <span className="block h-full rounded-sm bg-acc-line" style={{ width: `${share * 100}%` }} />
+    </span>
+  );
 
   return (
     <>
       {/* Handy (15.10.): eine Karte mit vier Zeilen statt vier Kacheln */}
-      <Link href="/pipeline" className={cn(card, "flex flex-col md:hidden")}>
+      <div className={cn(card, "flex flex-col md:hidden")}>
         <span className="label-mono px-4 pt-3 pb-1">Ziele</span>
         {goals.map((g) => (
-          <span key={g.label} className="flex min-h-12 items-center gap-3 border-t border-line px-4 py-1.5 nth-[2]:border-t-0">
+          <Link key={g.label} href="/pipeline" className="flex min-h-12 items-center gap-3 border-t border-line px-4 py-1.5 nth-[2]:border-t-0">
             <span className="flex min-w-0 flex-1 flex-col">
               <span className="truncate text-[15px] font-medium">{g.short}</span>
               {g.note && <span className="truncate text-[12.5px] text-fg-3">{g.note}</span>}
             </span>
-            {g.target && (
-              <span className="flex w-[84px] gap-1" aria-hidden>
-                {Array.from({ length: g.target }, (_, i) => (
-                  <span key={i} className={cn("h-1 flex-1 rounded-sm", i < g.value ? "bg-acc-line" : "bg-line-2")} />
-                ))}
-              </span>
-            )}
+            <span className="flex w-[84px] gap-1" aria-hidden>
+              {Array.from({ length: g.target }, (_, i) => (
+                <span key={i} className={cn("h-1 flex-1 rounded-sm", i < g.value ? "bg-acc-line" : "bg-line-2")} />
+              ))}
+            </span>
             <span className="w-12 text-right tabular">
               <span className="text-[20px] leading-none font-medium tracking-[-0.03em]">{g.value}</span>
-              {g.target && <span className="text-[13px] text-fg-3"> / {g.target}</span>}
+              <span className="text-[13px] text-fg-3"> / {g.target}</span>
             </span>
-          </span>
+          </Link>
         ))}
-      </Link>
+        <Link href="/bereiche/sponsoren" className="flex min-h-12 items-center gap-3 border-t border-line px-4 py-1.5">
+          <span className="flex min-w-0 flex-1 flex-col">
+            <span className="truncate text-[15px] font-medium">Sponsoring</span>
+            {/* Handy: nur das Ziel, „im Gespräch“ stünde abgeschnitten da (375px); es steht auf dem Desktop und im Bereich */}
+            <span className="truncate text-[12.5px] text-fg-3">{goal ? `von ${formatEuro(goal)}` : "Ziel offen"}</span>
+          </span>
+          {goal ? moneyBar("w-[60px] shrink-0") : null}
+          <span className="shrink-0 text-right text-[20px] leading-none font-medium tracking-[-0.03em] tabular">{formatEuro(secured)}</span>
+        </Link>
+      </div>
     <div className="hidden gap-3 md:grid md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] md:gap-4">
       {goals.map((g) => (
         <Link
@@ -244,18 +263,29 @@ function GoalTiles({ orgs, milestones }: { orgs: Org[]; milestones: Milestone[] 
           <span className="text-[13px] text-fg-2">{g.label}</span>
           <span className="flex items-baseline gap-1.5">
             <span className="text-[28px] leading-none font-medium tracking-[-0.04em] tabular md:text-[34px]">{g.value}</span>
-            <span className="text-[14px] text-fg-3 tabular md:text-[15px]">{g.target ? `/ ${g.target}` : "Ziel offen"}</span>
+            <span className="text-[14px] text-fg-3 tabular md:text-[15px]">/ {g.target}</span>
           </span>
-          {g.target && (
-            <span className="flex gap-1" aria-hidden>
-              {Array.from({ length: g.target }, (_, i) => (
-                <span key={i} className={cn("h-1 flex-1 rounded-sm", i < g.value ? "bg-acc-line" : "bg-line-2")} />
-              ))}
-            </span>
-          )}
-          {g.note && g.target && <span className="text-[12px] text-fg-3">{g.note}</span>}
+          <span className="flex gap-1" aria-hidden>
+            {Array.from({ length: g.target }, (_, i) => (
+              <span key={i} className={cn("h-1 flex-1 rounded-sm", i < g.value ? "bg-acc-line" : "bg-line-2")} />
+            ))}
+          </span>
+          <span className="text-[12px] text-fg-3">{g.note}</span>
         </Link>
       ))}
+      {/* Führt zum Bereich Sponsoren: dort steht das Ziel zum Ändern */}
+      <Link
+        href="/bereiche/sponsoren"
+        className={cn(card, "flex flex-col gap-3 px-4 py-3.5 transition-shadow duration-150 hover:shadow-[0_0_0_1px_var(--line2)] md:px-5 md:py-[18px]")}
+      >
+        <span className="text-[13px] text-fg-2">Sponsoring zugesagt</span>
+        <span className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5">
+          <span className="text-[28px] leading-none font-medium tracking-[-0.04em] whitespace-nowrap tabular md:text-[34px]">{formatEuro(secured)}</span>
+          <span className="text-[14px] whitespace-nowrap text-fg-3 tabular md:text-[15px]">{goal ? `/ ${formatEuro(goal)}` : "Ziel offen"}</span>
+        </span>
+        {goal ? moneyBar("flex") : null}
+        {prospectNote && <span className="text-[12px] text-fg-3">{prospectNote}</span>}
+      </Link>
     </div>
     </>
   );
