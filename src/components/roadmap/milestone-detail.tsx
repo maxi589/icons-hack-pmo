@@ -33,7 +33,7 @@ export function MilestoneDetail({
   today,
   onToggle,
   onToggleTask,
-  onNewTask,
+  onAddTask,
   onDate,
   onText,
   onSelect,
@@ -50,7 +50,8 @@ export function MilestoneDetail({
   today: string;
   onToggle: (id: string, done: boolean) => void;
   onToggleTask: (t: Task) => void;
-  onNewTask: () => void;
+  /** „+ Aufgabe“: legt mit diesem Titel an (vorbelegt), true = geklappt */
+  onAddTask: (title: string) => Promise<boolean>;
   onDate: (to: string) => void;
   onText: (field: "title" | "description", value: string | null) => void;
   onSelect?: (id: string) => void;
@@ -174,7 +175,9 @@ export function MilestoneDetail({
                 {owner.name}
               </span>
             ) : (
-              <span className="text-st-amber">Verantwortlich offen</span>
+              <span className="text-st-amber">
+                <span className="sr-only">Verantwortlich </span>offen
+              </span>
             )}
           </span>
         </div>
@@ -245,19 +248,65 @@ export function MilestoneDetail({
               </li>
             );
           })}
-          <li className="border-t border-line first:border-t-0">
-            <button
-              type="button"
-              onClick={onNewTask}
-              className="flex min-h-11 w-full items-center gap-2.5 px-3 text-left text-[13px] text-fg-2 transition-colors duration-150 hover:bg-hover hover:text-fg md:min-h-[38px]"
-            >
-              <Plus className="size-3.5" aria-hidden />
-              Aufgabe
-            </button>
-          </li>
+          <AddTaskRow id={f("add")} onAdd={onAddTask} />
         </MilestoneChecklist>
       </div>
     </Tag>
+  );
+}
+
+/** Letzte Zeile „+ Aufgabe“ (schlanke Fassung, Maxi 16.10.): Klick macht eine Eingabezeile daraus, Enter legt an
+ *  (vorbelegt mit Meilenstein, Bereich und Bereichsperson) und lässt die Zeile für die nächste offen, Esc schließt. */
+function AddTaskRow({ id, onAdd }: { id: string; onAdd: (title: string) => Promise<boolean> }) {
+  const [open, setOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [busy, setBusy] = useState(false);
+  const row = "flex min-h-11 w-full items-center gap-2.5 px-3 text-[13px] md:min-h-[38px]";
+
+  const submit = async () => {
+    const t = title.trim();
+    if (!t || busy) return;
+    setBusy(true);
+    const ok = await onAdd(t);
+    setBusy(false);
+    if (ok) setTitle("");
+  };
+
+  return (
+    <li className="border-t border-line first:border-t-0">
+      {open ? (
+        <span className={cn(row, "focus-within:shadow-[inset_0_0_0_1.5px_var(--accLine)]")}>
+          <Plus className="size-3.5 shrink-0 text-fg-3" aria-hidden />
+          <label htmlFor={id} className="sr-only">
+            Neue Aufgabe
+          </label>
+          <input
+            id={id}
+            autoFocus
+            value={title}
+            disabled={busy}
+            placeholder="Neue Aufgabe …"
+            onChange={(e) => setTitle(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                submit();
+              } else if (e.key === "Escape") {
+                setTitle("");
+                setOpen(false);
+              }
+            }}
+            onBlur={() => !title.trim() && setOpen(false)}
+            className="h-8 min-w-0 flex-1 bg-transparent text-fg outline-none placeholder:text-fg-3 max-md:h-11 max-md:text-base"
+          />
+        </span>
+      ) : (
+        <button type="button" onClick={() => setOpen(true)} className={cn(row, "text-left text-fg-2 transition-colors duration-150 hover:bg-hover hover:text-fg")}>
+          <Plus className="size-3.5" aria-hidden />
+          Aufgabe
+        </button>
+      )}
+    </li>
   );
 }
 

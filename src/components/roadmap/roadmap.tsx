@@ -15,7 +15,6 @@ import { daysBetween, formatDayMonth, formatShort, relativeDays } from "@/lib/da
 import { FOLLOW_UP_ROUNDS } from "@/lib/phases";
 import { AXIS_DAYS, axisEdge, axisPos, MONTHS, PLAN_BARS } from "@/lib/roadmap";
 import { Segmented } from "@/components/segmented";
-import { NewTaskDialog } from "@/components/tasks/new-task-dialog";
 import { useTaskActions } from "@/components/tasks/use-task-actions";
 import { useTasks } from "@/lib/data/use-tasks";
 import type { Task } from "@/lib/tasks";
@@ -36,7 +35,6 @@ export function Roadmap() {
   const tasksApi = useTasks();
   const { toggleDone, createTask } = useTaskActions(tasksApi);
   const edit = useMilestoneEdit(updateMilestone);
-  const [newFor, setNewFor] = useState<Milestone | null>(null);
   const { me, areaById } = useTeam();
 
   // Direktlink ?m=M2.1 (z. B. aus der Übersicht oder per WhatsApp): einmal beim Öffnen lesen.
@@ -70,9 +68,11 @@ export function Roadmap() {
       pin(m.id);
       toggleDone(t);
     },
-    onNewTask: () => {
+    // „+ Aufgabe“ in der Zeile: Meilenstein, Bereich und dessen Verantwortliche/r vorbelegt (sonst du)
+    onAddTask: async (title: string) => {
       pin(m.id);
-      setNewFor(m);
+      const assignee_id = areaById(m.area_id)?.owner_id ?? me?.id ?? null;
+      return !!(await createTask({ title, milestone_id: m.id, area_id: m.area_id, assignee_id }, (id) => "/aufgaben?aufgabe=" + id));
     },
     onDate: (to: string) => {
       pin(m.id);
@@ -180,19 +180,6 @@ export function Roadmap() {
         </MobileSheet>
       )}
 
-      {/* „+ Aufgabe“ im Cockpit: Meilenstein und Bereich vorbelegt, zuständig die/der Verantwortliche des Bereichs */}
-      <NewTaskDialog
-        open={!!newFor}
-        onOpenChange={(o) => !o && setNewFor(null)}
-        milestones={milestones ?? []}
-        context={newFor ? `${newFor.id} · ${newFor.title}` : undefined}
-        defaults={{
-          milestone_id: newFor?.id ?? null,
-          area_id: newFor?.area_id ?? null,
-          assignee_id: areaById(newFor?.area_id ?? null)?.owner_id ?? me?.id ?? null,
-        }}
-        onCreate={async (input) => !!(await createTask(input, (id) => `/aufgaben?aufgabe=${id}`))}
-      />
     </>
   );
 }
