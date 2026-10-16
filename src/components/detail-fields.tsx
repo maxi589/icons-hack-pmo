@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Select, type SelectOption } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 
@@ -55,12 +55,26 @@ export function EditText({
   required?: boolean;
 }) {
   const [draft, setDraft] = useState<string | null>(null);
+  // Esc verwirft den Entwurf (versehentlich getippt oder eingefügt), das folgende Verlassen speichert dann nichts
+  const discard = useRef(false);
   const shown = draft ?? value ?? "";
   const commit = () => {
+    if (discard.current) {
+      discard.current = false;
+      setDraft(null);
+      return;
+    }
     if (draft === null) return;
     const v = draft.trim() || null;
     if (v !== (value ?? null) && (v || !required)) onSave(v);
     setDraft(null);
+  };
+  const escape = (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (e.key !== "Escape" || draft === null) return false;
+    discard.current = true;
+    setDraft(null);
+    e.currentTarget.blur();
+    return true;
   };
   const cls =
     "w-full rounded-lg bg-transparent px-2 text-[13px] text-fg placeholder:text-fg-3 transition-colors duration-150 max-md:text-base hover:bg-hover focus-visible:bg-panel focus-visible:shadow-[inset_0_0_0_1px_var(--field)] focus-visible:outline-none";
@@ -74,6 +88,7 @@ export function EditText({
         onChange={(e) => setDraft(e.target.value.replace(/\n/g, " "))}
         onBlur={commit}
         onKeyDown={(e) => {
+          if (escape(e)) return;
           if (e.key === "Enter") {
             e.preventDefault();
             e.currentTarget.blur();
@@ -90,6 +105,7 @@ export function EditText({
       placeholder={placeholder}
       onChange={(e) => setDraft(e.target.value)}
       onBlur={commit}
+      onKeyDown={escape}
       className={cn(cls, "resize-y py-1.5 leading-normal", className)}
     />
   ) : (
@@ -99,7 +115,7 @@ export function EditText({
       placeholder={placeholder}
       onChange={(e) => setDraft(e.target.value)}
       onBlur={commit}
-      onKeyDown={(e) => e.key === "Enter" && (e.currentTarget as HTMLInputElement).blur()}
+      onKeyDown={(e) => !escape(e) && e.key === "Enter" && (e.currentTarget as HTMLInputElement).blur()}
       className={cn(cls, "h-8", className)}
     />
   );

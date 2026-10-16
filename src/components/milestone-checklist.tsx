@@ -14,11 +14,14 @@ export function MilestoneChecklist({
   onToggle,
   showDate = false,
   showId = false,
+  children,
 }: {
   items: Milestone[];
   onToggle: (id: string, done: boolean) => void;
   showDate?: boolean;
   showId?: boolean;
+  /** Weitere Zeilen in derselben Liste (Roadmap-Cockpit: Aufgaben und „+ Aufgabe“) */
+  children?: React.ReactNode;
 }) {
   const { areaById, personById } = useTeam();
   return (
@@ -53,6 +56,7 @@ export function MilestoneChecklist({
           </li>
         );
       })}
+      {children}
     </ul>
   );
 }

@@ -15,7 +15,12 @@ import { daysBetween, formatDayMonth, formatShort, relativeDays } from "@/lib/da
 import { FOLLOW_UP_ROUNDS } from "@/lib/phases";
 import { AXIS_DAYS, axisEdge, axisPos, MONTHS, PLAN_BARS } from "@/lib/roadmap";
 import { Segmented } from "@/components/segmented";
+import { NewTaskDialog } from "@/components/tasks/new-task-dialog";
+import { useTaskActions } from "@/components/tasks/use-task-actions";
+import { useTasks } from "@/lib/data/use-tasks";
+import type { Task } from "@/lib/tasks";
 import { MilestoneDetail } from "./milestone-detail";
+import { useMilestoneEdit } from "./use-milestone-edit";
 
 // Roadmap (Board „Graphit-Roadmap“): Zeitstrahl je Bereich mit Rauten und Balken, darunter das
 // Detail-Panel. Umschalter Zeitstrahl/Liste; am Handy nur die Liste. Auswahl steht in der Adresse (?m=M2).
@@ -24,9 +29,15 @@ type View = "timeline" | "list";
 
 export function Roadmap() {
   const today = useToday();
-  const { milestones, setMilestoneDone } = useMilestones();
+  const { milestones, setMilestoneDone, updateMilestone } = useMilestones();
   const [view, setView] = useState<View>("timeline");
   const [picked, setPicked] = useState<string | null>(null);
+  // Aufgaben einmal für die Seite (die Liste zeigt viele Karten; je Karte laden hieße je Karte ein Live-Kanal)
+  const tasksApi = useTasks();
+  const { toggleDone, createTask } = useTaskActions(tasksApi);
+  const edit = useMilestoneEdit(updateMilestone);
+  const [newFor, setNewFor] = useState<Milestone | null>(null);
+  const { me, areaById } = useTeam();
 
   // Direktlink ?m=M2.1 (z. B. aus der Übersicht oder per WhatsApp): einmal beim Öffnen lesen.
   useEffect(() => {
@@ -48,6 +59,30 @@ export function Roadmap() {
     window.history.replaceState(null, "", "/roadmap");
   };
   const childrenOf = (id: string) => (milestones ?? []).filter((m) => m.parent_id === id).sort((a, b) => a.sort - b.sort);
+  const tasksOf = (id: string) => (tasksApi.tasks ?? []).filter((t) => t.milestone_id === id);
+  /** Jede Aktion im Detail hält die Auswahl fest: Ohne ?m= zeigt das Detail den ersten offenen Meilenstein, und nach einer
+   *  Datumsänderung wäre das sonst plötzlich ein anderer (Prüfer, 16.10.). */
+  const pin = (id: string) => picked !== id && select(id);
+  /** Was jedes Cockpit braucht: Aufgaben, Abhaken, „+ Aufgabe“, Datum/Titel/Beschreibung ändern. */
+  const cockpit = (m: Milestone) => ({
+    tasks: tasksOf(m.id),
+    onToggleTask: (t: Task) => {
+      pin(m.id);
+      toggleDone(t);
+    },
+    onNewTask: () => {
+      pin(m.id);
+      setNewFor(m);
+    },
+    onDate: (to: string) => {
+      pin(m.id);
+      edit.changeDate(m, to);
+    },
+    onText: (field: "title" | "description", value: string | null) => {
+      pin(m.id);
+      edit.changeText(m, field, value);
+    },
+  });
   const tops = (milestones ?? []).filter((m) => !m.parent_id);
   const selected = byId(picked) ?? tops.find((m) => m.status !== "erledigt") ?? tops[0] ?? null;
   // In der Liste stehen Unterpunkte in der Karte ihres Meilensteins.
@@ -89,12 +124,18 @@ export function Roadmap() {
               <Timeline milestones={milestones} today={today} selectedId={selected?.id ?? null} onSelect={select} />
               {selected && (
                 <div data-detail className="px-5 pt-4">
+                  {/* key: frisches Detail je Meilenstein (kein halber Kommentar oder Entwurf wandert mit) */}
                   <MilestoneDetail
+                    key={selected.id}
+                    {...cockpit(selected)}
                     milestone={selected}
                     subs={childrenOf(selected.id)}
                     parent={byId(selected.parent_id)}
                     today={today}
-                    onToggle={setMilestoneDone}
+                    onToggle={(id, done) => {
+                      pin(selected.id);
+                      setMilestoneDone(id, done);
+                    }}
                     onSelect={select}
                     feed="open"
                   />
@@ -102,11 +143,13 @@ export function Roadmap() {
               )}
             </div>
           )}
-          {view === "list" && (
+          {/* Wie der Zeitstrahl nicht am Handy rendern (sonst gäbe es ms-…/cm-… doppelt neben dem Sheet) */}
+          {view === "list" && !isMobile && (
             <div className="hidden flex-col gap-4 px-5 pt-5 pb-8 md:flex">
               <MilestoneList
                 tops={tops}
                 childrenOf={childrenOf}
+                cockpit={cockpit}
                 today={today}
                 onToggle={setMilestoneDone}
                 highlightId={picked ? listTarget : null}
@@ -124,6 +167,8 @@ export function Roadmap() {
         <MobileSheet open onClose={closeSheet} title={`${sheetItem.id} ${sheetItem.title}`}>
           <MilestoneDetail
             key={sheetItem.id}
+            {...cockpit(sheetItem)}
+            feed="open"
             milestone={sheetItem}
             subs={childrenOf(sheetItem.id)}
             parent={byId(sheetItem.parent_id)}
@@ -134,6 +179,20 @@ export function Roadmap() {
           />
         </MobileSheet>
       )}
+
+      {/* „+ Aufgabe“ im Cockpit: Meilenstein und Bereich vorbelegt, zuständig die/der Verantwortliche des Bereichs */}
+      <NewTaskDialog
+        open={!!newFor}
+        onOpenChange={(o) => !o && setNewFor(null)}
+        milestones={milestones ?? []}
+        context={newFor ? `${newFor.id} · ${newFor.title}` : undefined}
+        defaults={{
+          milestone_id: newFor?.id ?? null,
+          area_id: newFor?.area_id ?? null,
+          assignee_id: areaById(newFor?.area_id ?? null)?.owner_id ?? me?.id ?? null,
+        }}
+        onCreate={async (input) => !!(await createTask(input, (id) => `/aufgaben?aufgabe=${id}`))}
+      />
     </>
   );
 }
@@ -390,12 +449,14 @@ function Timeline({
 function MilestoneList({
   tops,
   childrenOf,
+  cockpit,
   today,
   onToggle,
   highlightId,
 }: {
   tops: Milestone[];
   childrenOf: (id: string) => Milestone[];
+  cockpit: (m: Milestone) => Omit<React.ComponentProps<typeof MilestoneDetail>, "milestone" | "subs" | "parent" | "today" | "onToggle">;
   today: string;
   onToggle: (id: string, done: boolean) => void;
   highlightId: string | null | undefined;
@@ -413,6 +474,7 @@ function MilestoneList({
             .map((m) => (
               <MilestoneDetail
                 key={m.id}
+                {...cockpit(m)}
                 as="article"
                 milestone={m}
                 subs={childrenOf(m.id)}
