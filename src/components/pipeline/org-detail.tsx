@@ -29,6 +29,8 @@ import {
   type Stage,
 } from "@/lib/pipeline";
 
+const tasksWord = (n: number) => `${n} offene ${n === 1 ? "Aufgabe" : "Aufgaben"}`;
+
 // Firmen-Detail (Board „Pipeline“, rechts 400px; am Handy als Bottom Sheet).
 // Felder speichern beim Verlassen (Text) bzw. sofort (Auswahl). Stufe mit „Rückgängig“ über die Seite.
 
@@ -290,7 +292,11 @@ export function OrgDetail({
                   ? `hat die Firma aus ${String(a.data.source ?? "der Excel").replace(/ Z\. \d+.*$/, "")} übernommen`
                   : a.action === "meeting_linked"
                     ? `hat den Termin „${String(a.data.title ?? "")}“ am ${formatShort(todayInVienna(new Date(String(a.data.starts_at))))} eingetragen`
-                    : a.action
+                    : a.action === "tasks_removed"
+                      ? `hat ${tasksWord(Array.isArray(a.data.tasks) ? a.data.tasks.length : 0)} entfernt (Absage)`
+                      : a.action === "tasks_restored"
+                        ? `hat ${tasksWord(Number(a.data.count ?? 0))} zurückgeholt`
+                        : a.action
           }
         />
       </div>

@@ -28,12 +28,20 @@ export function useTasks() {
 
   useEffect(() => {
     load();
+    // Ereignisse kurz sammeln: 5 Standard-Aufgaben auf einmal lösten sonst 5 gleichzeitige Abfragen aus, die zusammen
+    // bis 2,4 s brauchten (gemessen 16.10.); so ist es eine.
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const schedule = () => {
+      clearTimeout(timer);
+      timer = setTimeout(load, 120);
+    };
     const supabase = createClient();
     const channel = supabase
       .channel(`tasks-${Math.random().toString(36).slice(2)}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "tasks" }, load)
+      .on("postgres_changes", { event: "*", schema: "public", table: "tasks" }, schedule)
       .subscribe();
     return () => {
+      clearTimeout(timer);
       supabase.removeChannel(channel);
     };
   }, [load]);

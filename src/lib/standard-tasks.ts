@@ -81,24 +81,42 @@ export async function addStandardTasks(org: Organization, to: Stage, today: stri
   return (data ?? []) as { id: string; title: string }[];
 }
 
+export type TaskRow = Record<string, unknown> & { id: string };
+
 /**
- * Firma auf „Abgesagt“ (Maxi, 16.10.): offene Aufgaben der Firma (auch „In Arbeit“) löschen, Erledigte bleiben.
- * Liefert die gelöschten Zeilen vollständig (für „Rückgängig“ mit gleicher ID, Kommentare bleiben verknüpft) oder null.
+ * Firma auf „Abgesagt“ (Maxi, 16.10.): offene Aufgaben der Firma (auch „In Arbeit“) entfernen, Erledigte bleiben.
+ * Ein einziger Befehl, der genau die gelöschten Zeilen vollständig zurückgibt (für „Rückgängig“ und fürs Zurückholen
+ * mit gleicher ID, Kommentare bleiben verknüpft). null = hat nicht geklappt.
  */
 export async function removeOpenTasks(orgId: string) {
-  const supabase = createClient();
-  const { data, error } = await supabase.from("tasks").select("*").eq("organization_id", orgId).neq("status", "erledigt");
-  if (error) return null;
-  if (!data.length) return [];
-  const { error: delError } = await supabase.from("tasks").delete().in("id", data.map((t) => t.id));
-  return delError ? null : (data as Record<string, unknown>[]);
+  const { data, error } = await createClient().from("tasks").delete().eq("organization_id", orgId).neq("status", "erledigt").select("*");
+  return error ? null : ((data ?? []) as TaskRow[]);
 }
 
-/** „Rückgängig“ nach „Abgesagt“: die gelöschten Aufgaben unverändert zurückholen. */
-export async function restoreTasks(rows: Record<string, unknown>[]) {
+/** Entfernte Aufgaben unverändert zurückholen; schon vorhandene IDs bleiben, wie sie sind. */
+export async function restoreTasks(rows: TaskRow[]) {
   if (!rows.length) return true;
-  const { error } = await createClient().from("tasks").insert(rows);
+  const { error } = await createClient().from("tasks").upsert(rows, { onConflict: "id", ignoreDuplicates: true });
   return !error;
+}
+
+/**
+ * Was beim letzten Absagen entfernt und seitdem nicht zurückgeholt wurde (Verlauf der Firma: „tasks_removed“ mit den
+ * vollständigen Zeilen, „tasks_restored“ danach). So kommen die Aufgaben zurück, wenn jemand eine versehentliche
+ * Absage über die Stufe korrigiert statt mit „Rückgängig“ (Prüfer, 16.10.). null = Lesen hat nicht geklappt.
+ */
+export async function lastRemovedTasks(orgId: string) {
+  const { data, error } = await createClient()
+    .from("activity")
+    .select("action, data")
+    .eq("target_type", "organization")
+    .eq("target_id", orgId)
+    .in("action", ["tasks_removed", "tasks_restored"])
+    .order("created_at", { ascending: false })
+    .limit(1);
+  if (error) return null;
+  const last = data?.[0];
+  return last?.action === "tasks_removed" ? (((last.data as { tasks?: TaskRow[] }).tasks ?? []) as TaskRow[]) : [];
 }
 
 /** „Rückgängig“: die eben angelegten Standard-Aufgaben wieder entfernen. false = hat nicht geklappt. */

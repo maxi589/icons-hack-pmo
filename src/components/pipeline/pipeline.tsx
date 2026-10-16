@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Search, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,7 @@ import { logActivity } from "@/lib/data/use-feed";
 import { formatDayMonth, formatShort } from "@/lib/dates";
 import { FOLLOW_UP_ROUNDS } from "@/lib/phases";
 import { play } from "@/lib/sounds";
-import { addStandardTasks, getsStandardTasks, removeOpenTasks, removeTasks, restoreTasks } from "@/lib/standard-tasks";
+import { addStandardTasks, getsStandardTasks, lastRemovedTasks, removeOpenTasks, removeTasks, restoreTasks, type TaskRow } from "@/lib/standard-tasks";
 import {
   followState,
   inTab,
@@ -117,11 +117,20 @@ export function Pipeline() {
   const overdue = inThisTab.filter((o) => followState(o, today)?.tone === "red").length;
   const nextRound = FOLLOW_UP_ROUNDS.find((d) => d >= today);
 
+  // Datenbank-Schritte je Firma streng nacheinander (Standard-Aufgaben, Entfernen, Zurückholen, Rückgängig)
+  const chains = useRef(new Map<string, Promise<unknown>>());
+  const queue = <T,>(orgId: string, job: () => Promise<T>): Promise<T> => {
+    const next = (chains.current.get(orgId) ?? Promise.resolve()).catch(() => {}).then(job);
+    chains.current.set(orgId, next.catch(() => {}));
+    return next;
+  };
+
   /** Stufe ändern: sofort speichern, 5 s „Rückgängig“, danach Eintrag im Verlauf.
    *  Auf „Kontaktiert“ ohne Nachfass-Datum kommt automatisch heute + 7 Tage dazu (Maxi, 15.10.), sonst würde die Firma
    *  nie „überfällig“. Ein schon gesetztes Datum bleibt. Auf „Zugesagt“ (oder direkt „Fix“) kommen die Standard-Aufgaben
    *  dazu (Maxi, 16.10., Liste in lib/standard-tasks.ts); auf „Abgesagt“ verschwinden die offenen Aufgaben der Firma
-   *  (Maxi, 16.10.). „Rückgängig“ nimmt jeweils alles zurück. */
+   *  (Maxi, 16.10.) und kommen zurück, sobald sie „Abgesagt“ wieder verlässt (Fehlklick, Prüfer 16.10.).
+   *  „Rückgängig“ nimmt jeweils alles zurück. */
   const changeStage = (org: Organization, to: Stage) => {
     const from = org.stage;
     if (from === to) return;
@@ -130,10 +139,38 @@ export function Pipeline() {
     const saved = update(org.id, autoFollow ? { stage: to, next_follow_up: autoFollow } : { stage: to });
     // Zusage ist ein Erfolg; von Fix zurück auf Zugesagt nicht.
     if (to === "fix" || (to === "zugesagt" && from !== "fix")) play("dealWon");
-    // Aufgaben erst, wenn die Stufe wirklich gespeichert ist. Der Hinweis steht sofort da (richtige Reihenfolge auch bei
-    // schnellem Doppelklick) und bekommt die Zahl nachgereicht; „Rückgängig“ und Verlauf warten auf die Datenbank.
-    const added = getsStandardTasks(from, to) ? saved.then((ok) => (ok ? addStandardTasks(org, to, today, meId) : [])) : Promise.resolve([]);
-    const dropped = to === "abgesagt" ? saved.then((ok) => (ok ? removeOpenTasks(org.id) : [])) : Promise.resolve([]);
+
+    // Aufgaben erst, wenn die Stufe wirklich gespeichert ist, und je Firma streng nacheinander (sonst überholt bei
+    // schnellem Umstellen das Zurückholen das Entfernen). Der Hinweis steht sofort da und bekommt die Zahl nachgereicht.
+    const work = queue(org.id, async () => {
+      const none = { back: [] as TaskRow[], added: [] as { id: string }[], dropped: [] as TaskRow[], failed: false };
+      if (!(await saved)) return none;
+      const res = { ...none };
+      if (from === "abgesagt") {
+        const rows = await lastRemovedTasks(org.id);
+        if (rows === null || !(await restoreTasks(rows ?? []))) res.failed = true;
+        else if (rows.length) {
+          res.back = rows;
+          await logActivity("organization", org.id, meId, "tasks_restored", { count: rows.length });
+        }
+      }
+      if (getsStandardTasks(from, to)) {
+        const a = await addStandardTasks(org, to, today, meId);
+        if (a === null) res.failed = true;
+        else res.added = a;
+      }
+      if (to === "abgesagt") {
+        const d = await removeOpenTasks(org.id);
+        if (d === null) res.failed = true;
+        else if (d.length) {
+          res.dropped = d;
+          // Vollständige Zeilen im Verlauf der Firma: daraus holt das Verlassen von „Abgesagt“ sie zurück
+          await logActivity("organization", org.id, meId, "tasks_removed", { tasks: d });
+        }
+      }
+      return res;
+    });
+
     const base = `${org.name} → ${stageName(to)}${autoFollow ? ` · nachfassen ${formatShort(autoFollow)}` : ""}`;
     let undone = false;
     const setText = toast({
@@ -141,29 +178,35 @@ export function Pipeline() {
       onAction: () => {
         undone = true;
         update(org.id, autoFollow ? { stage: from, next_follow_up: null } : { stage: from });
-        added.then(async (a) => {
-          if (a?.length && !(await removeTasks(a.map((t) => t.id)))) toast({ text: "Aufgaben nicht entfernt. Bitte im Firmen-Detail löschen." });
-        });
-        dropped.then(async (d) => {
-          if (d?.length && !(await restoreTasks(d))) toast({ text: "Aufgaben nicht zurückgeholt. Bitte nochmal versuchen." });
+        queue(org.id, async () => {
+          const r = await work;
+          const ok = await removeTasks([...r.added, ...r.back].map((t) => t.id));
+          if (r.back.length && ok) await logActivity("organization", org.id, meId, "tasks_removed", { tasks: r.back });
+          if (!ok) toast({ text: "Aufgaben nicht ganz zurückgesetzt. Bitte im Firmen-Detail prüfen.", error: true });
+          // Entfernte Aufgaben zurückholen; klappt es nicht, bietet der Hinweis „Nochmal“ (die Zeilen gibt es nur hier)
+          const bringBack = async () => {
+            if (await restoreTasks(r.dropped)) await logActivity("organization", org.id, meId, "tasks_restored", { count: r.dropped.length });
+            else toast({ text: "Aufgaben nicht zurückgeholt.", error: true, actionLabel: "Nochmal", onAction: () => queue(org.id, bringBack) });
+          };
+          if (r.dropped.length) await bringBack();
         });
       },
       onExpire: () => {
         logActivity("organization", org.id, meId, "stage_changed", { from, to });
-        added.then((a) => a?.forEach((t) => logActivity("task", t.id, meId, "created")));
+        work.then((r) => r.added.forEach((t) => logActivity("task", t.id, meId, "created")));
       },
     });
     saved.then((ok) => !ok && !undone && setText(`${org.name}: nicht gespeichert. Bitte nochmal versuchen.`));
     const count = (n: number, what: string) => ` · ${n} ${n === 1 ? "Aufgabe" : "Aufgaben"} ${what}`;
-    added.then((a) => {
+    work.then((r) => {
       if (undone) return;
-      if (a === null) setText(`${base} · Aufgaben nicht angelegt`);
-      else if (a.length) setText(base + count(a.length, "angelegt"));
-    });
-    dropped.then((d) => {
-      if (undone) return;
-      if (d === null) setText(`${base} · offene Aufgaben nicht gelöscht`);
-      else if (d.length) setText(base + count(d.length, "gelöscht"));
+      const notes = [
+        r.back.length ? count(r.back.length, "zurück") : "",
+        r.added.length ? count(r.added.length, "angelegt") : "",
+        r.dropped.length ? count(r.dropped.length, "entfernt") : "",
+        r.failed ? " · Aufgaben nicht vollständig angepasst" : "",
+      ];
+      if (notes.some(Boolean)) setText(base + notes.join(""));
     });
   };
 
