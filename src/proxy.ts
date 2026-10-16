@@ -4,7 +4,8 @@ import { createServerClient } from "@supabase/ssr";
 // Läuft vor jeder Seite: frischt die Supabase-Sitzung auf und schickt Abgemeldete zum Login.
 // Die eigentliche Absicherung der Daten macht Row Level Security in der Datenbank.
 
-const PUBLIC_PATHS = ["/login", "/auth"];
+// /api/ping: täglicher Aufruf von Vercel zum Wachhalten der Datenbank (gibt nur „ok“ zurück).
+const PUBLIC_PATHS = ["/login", "/auth", "/api/ping"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
