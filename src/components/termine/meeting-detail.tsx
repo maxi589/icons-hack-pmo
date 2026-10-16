@@ -13,6 +13,7 @@ import { useNotesDraft } from "@/components/editor/notes-card";
 import { DocBlock } from "@/components/dokumente/doc-block";
 import { StatusCheck } from "@/components/tasks/status-check";
 import { PeoplePicker } from "@/components/wissen/pickers";
+import { PrivateToggle } from "./private-toggle";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { formatLong } from "@/lib/dates";
 import type { Decision } from "@/lib/data/use-knowledge";
@@ -68,7 +69,7 @@ export function MeetingDetail({
   onDelete: () => void;
   onClose: () => void;
 }) {
-  const { allAreas, areaById } = useTeam();
+  const { allAreas, areaById, me } = useTeam();
   const f = (name: string) => `meeting-${m.id}-${name}`;
   const start = viennaParts(m.starts_at);
   const area = areaById(m.area_id);
@@ -128,10 +129,12 @@ export function MeetingDetail({
               Beitreten
             </a>
           )}
-          <button type="button" onClick={onCalendar} className={actionBtn}>
-            <CalendarPlus className="size-3.5" aria-hidden />
-            In Google Kalender
-          </button>
+          {!m.private_for && (
+            <button type="button" onClick={onCalendar} className={actionBtn}>
+              <CalendarPlus className="size-3.5" aria-hidden />
+              In Google Kalender
+            </button>
+          )}
           <button type="button" onClick={onNext} className={actionBtn}>
             <Repeat className="size-3.5" aria-hidden />
             Nächster Termin
@@ -190,33 +193,37 @@ export function MeetingDetail({
             }}
           />
         </PropRow>
-        <PropRow label="Wer">
-          <div className="py-1">
-            <PeoplePicker label="Wer ist dabei" size="sm" value={m.attendees} onChange={(ids) => onUpdate({ attendees: ids })} />
-          </div>
-        </PropRow>
-        <PropRow label="Firma" htmlFor={f("org")}>
-          <span className="flex items-center gap-1">
-            <span className="min-w-0 flex-1">
-              <SelectBox
-                id={f("org")}
-                value={m.organization_id ?? ""}
-                onChange={(v) => onUpdate({ organization_id: v || null })}
-                options={nameOptions(sortedOrgs, "Keine")}
-                searchable
-              />
-            </span>
-            {m.organization_id && (
-              <Link
-                href={`/pipeline?firma=${m.organization_id}`}
-                className="grid size-8 shrink-0 place-items-center rounded-lg text-fg-3 hover:bg-hover hover:text-fg"
-                aria-label="Firma in der Pipeline öffnen"
-              >
-                <ArrowUpRight className="size-3.5" aria-hidden />
-              </Link>
-            )}
-          </span>
-        </PropRow>
+        {!m.private_for && (
+          <>
+            <PropRow label="Wer">
+              <div className="py-1">
+                <PeoplePicker label="Wer ist dabei" size="sm" value={m.attendees} onChange={(ids) => onUpdate({ attendees: ids })} />
+              </div>
+            </PropRow>
+            <PropRow label="Firma" htmlFor={f("org")}>
+              <span className="flex items-center gap-1">
+                <span className="min-w-0 flex-1">
+                  <SelectBox
+                    id={f("org")}
+                    value={m.organization_id ?? ""}
+                    onChange={(v) => onUpdate({ organization_id: v || null })}
+                    options={nameOptions(sortedOrgs, "Keine")}
+                    searchable
+                  />
+                </span>
+                {m.organization_id && (
+                  <Link
+                    href={`/pipeline?firma=${m.organization_id}`}
+                    className="grid size-8 shrink-0 place-items-center rounded-lg text-fg-3 hover:bg-hover hover:text-fg"
+                    aria-label="Firma in der Pipeline öffnen"
+                  >
+                    <ArrowUpRight className="size-3.5" aria-hidden />
+                  </Link>
+                )}
+              </span>
+            </PropRow>
+          </>
+        )}
         <PropRow label="Bereich" htmlFor={f("area")}>
           <span className="flex items-center gap-1">
             <span className="ml-1.5 size-[7px] shrink-0 rounded-full bg-line-2" style={area ? { background: area.color } : undefined} aria-hidden />
@@ -225,6 +232,16 @@ export function MeetingDetail({
             </span>
           </span>
         </PropRow>
+        {/* Privat stellen darf nur, wer den Termin angelegt hat (sonst verschwände er für alle anderen; die Datenbank prüft das auch).
+            Privat = nur ich, ohne Firma (sonst stünde er im Verlauf der Firma). Zurück auf Team behält mich als dabei. */}
+        {me && (m.private_for || m.created_by === me.id) && (
+          <PropRow label="Sichtbar">
+            <PrivateToggle
+              on={!!m.private_for}
+              onChange={(on) => onUpdate(on ? { private_for: me.id, attendees: [me.id], organization_id: null } : { private_for: null })}
+            />
+          </PropRow>
+        )}
       </div>
 
       <TextSection
@@ -248,79 +265,84 @@ export function MeetingDetail({
         onCreateTask={onCreateTask}
       />
 
-      <div className="border-b border-line px-[18px] py-3.5">
-        <DocBlock
-          variant="plain"
-          title="Unterlagen"
-          defaults={{ area_id: m.area_id, target_type: "meeting", target_id: m.id }}
-          match={(d) => d.target_type === "meeting" && d.target_id === m.id}
-        />
-      </div>
+      {/* Privat: keine Unterlagen, Ergebnisse und Kommentare. Die lägen in Tabellen, die das ganze Team sieht. */}
+      {!m.private_for && (
+        <>
+          <div className="border-b border-line px-[18px] py-3.5">
+            <DocBlock
+              variant="plain"
+              title="Unterlagen"
+              defaults={{ area_id: m.area_id, target_type: "meeting", target_id: m.id }}
+              match={(d) => d.target_type === "meeting" && d.target_id === m.id}
+            />
+          </div>
 
-      {/* Ergebnisse */}
-      <section aria-label="Ergebnisse" className="border-b border-line px-[18px] py-3.5">
-        <div className="flex items-center justify-between gap-2 pb-2">
-          <h3 className="flex items-center gap-2 text-[13px] font-semibold">
-            Ergebnisse
-            {tasks.length + decisions.length > 0 && <span className="font-normal text-fg-3 tabular">{tasks.length + decisions.length}</span>}
-          </h3>
-          <span className="flex gap-1.5">
-            <button type="button" onClick={onNewTask} className={cn(actionBtn, "h-8 max-md:h-10")}>
-              <Plus className="size-3.5" aria-hidden />
-              Aufgabe
-            </button>
-            <button type="button" onClick={onNewDecision} className={cn(actionBtn, "h-8 max-md:h-10")}>
-              <Plus className="size-3.5" aria-hidden />
-              Entscheidung
-            </button>
-          </span>
-        </div>
-        {tasks.length + decisions.length > 0 && (
-          <ul className="overflow-hidden rounded-[10px] shadow-[0_0_0_1px_var(--line)]">
-            {decisions.map((d) => (
-              <li
-                key={d.id}
-                className="relative flex min-h-11 items-center gap-2.5 border-t border-line px-3.5 first:border-t-0 hover:bg-hover max-md:min-h-12"
-              >
-                <Gavel className="size-3.5 shrink-0 text-fg-3" aria-label="Entscheidung" />
-                <Link
-                  href={`/dokumente?entscheidung=${d.id}`}
-                  className="min-w-0 flex-1 truncate rounded-sm text-[13.5px] after:absolute after:inset-0 max-md:text-[15px]"
-                >
-                  {d.title}
-                </Link>
-              </li>
-            ))}
-            {tasks.map((t) => (
-              <li
-                key={t.id}
-                className="relative flex min-h-11 items-center gap-2.5 border-t border-line px-3.5 first:border-t-0 hover:bg-hover max-md:min-h-12"
-              >
-                <StatusCheck status={t.status} title={t.title} onToggle={() => onToggleTask(t)} />
-                <Link
-                  href={`/aufgaben?aufgabe=${t.id}`}
-                  className={cn(
-                    "min-w-0 flex-1 truncate rounded-sm text-[13.5px] after:absolute after:inset-0 max-md:text-[15px]",
-                    t.status === "erledigt" && "text-fg-3 line-through"
-                  )}
-                >
-                  {t.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+          {/* Ergebnisse */}
+          <section aria-label="Ergebnisse" className="border-b border-line px-[18px] py-3.5">
+            <div className="flex items-center justify-between gap-2 pb-2">
+              <h3 className="flex items-center gap-2 text-[13px] font-semibold">
+                Ergebnisse
+                {tasks.length + decisions.length > 0 && <span className="font-normal text-fg-3 tabular">{tasks.length + decisions.length}</span>}
+              </h3>
+              <span className="flex gap-1.5">
+                <button type="button" onClick={onNewTask} className={cn(actionBtn, "h-8 max-md:h-10")}>
+                  <Plus className="size-3.5" aria-hidden />
+                  Aufgabe
+                </button>
+                <button type="button" onClick={onNewDecision} className={cn(actionBtn, "h-8 max-md:h-10")}>
+                  <Plus className="size-3.5" aria-hidden />
+                  Entscheidung
+                </button>
+              </span>
+            </div>
+            {tasks.length + decisions.length > 0 && (
+              <ul className="overflow-hidden rounded-[10px] shadow-[0_0_0_1px_var(--line)]">
+                {decisions.map((d) => (
+                  <li
+                    key={d.id}
+                    className="relative flex min-h-11 items-center gap-2.5 border-t border-line px-3.5 first:border-t-0 hover:bg-hover max-md:min-h-12"
+                  >
+                    <Gavel className="size-3.5 shrink-0 text-fg-3" aria-label="Entscheidung" />
+                    <Link
+                      href={`/dokumente?entscheidung=${d.id}`}
+                      className="min-w-0 flex-1 truncate rounded-sm text-[13.5px] after:absolute after:inset-0 max-md:text-[15px]"
+                    >
+                      {d.title}
+                    </Link>
+                  </li>
+                ))}
+                {tasks.map((t) => (
+                  <li
+                    key={t.id}
+                    className="relative flex min-h-11 items-center gap-2.5 border-t border-line px-3.5 first:border-t-0 hover:bg-hover max-md:min-h-12"
+                  >
+                    <StatusCheck status={t.status} title={t.title} onToggle={() => onToggleTask(t)} />
+                    <Link
+                      href={`/aufgaben?aufgabe=${t.id}`}
+                      className={cn(
+                        "min-w-0 flex-1 truncate rounded-sm text-[13.5px] after:absolute after:inset-0 max-md:text-[15px]",
+                        t.status === "erledigt" && "text-fg-3 line-through"
+                      )}
+                    >
+                      {t.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
 
-      <div className="px-[18px] pt-3.5 pb-6">
-        <Feed
-          targetType="meeting"
-          targetId={m.id}
-          describe={(a) =>
-            a.action === "created" ? "hat den Termin angelegt" : a.action === "next_created" ? "hat den nächsten Termin angelegt" : a.action
-          }
-        />
-      </div>
+          <div className="px-[18px] pt-3.5 pb-6">
+            <Feed
+              targetType="meeting"
+              targetId={m.id}
+              describe={(a) =>
+                a.action === "created" ? "hat den Termin angelegt" : a.action === "next_created" ? "hat den nächsten Termin angelegt" : a.action
+              }
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }

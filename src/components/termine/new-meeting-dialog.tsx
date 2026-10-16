@@ -7,6 +7,7 @@ import { Select } from "@/components/ui/select";
 import { DateInput } from "@/components/ui/date-input";
 import { PeoplePicker } from "@/components/wissen/pickers";
 import { durationOptions, nameOptions } from "@/lib/options";
+import { PrivateToggle } from "./private-toggle";
 
 // „+ Termin“: nötig sind nur Titel und Zeit, der Rest ist freiwillig und lässt sich im Detail ergänzen.
 // Kein Meet-Link hier: Er kommt aus Google, nachdem man den Termin dort eingetragen hat.
@@ -23,6 +24,7 @@ export type NewMeetingInput = {
   duration_min: number;
   attendees: string[];
   area_id: string | null;
+  private_for: string | null;
 };
 
 export type MeetingDefaults = { date: string; time: string; duration_min?: number; area_id?: string | null };
@@ -46,6 +48,7 @@ export function NewMeetingDialog({
   const [duration, setDuration] = useState<number | null>(null);
   const [who, setWho] = useState<string[] | null>(null);
   const [area, setArea] = useState<string | null>(null);
+  const [priv, setPriv] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -58,6 +61,7 @@ export function NewMeetingDialog({
     setDuration(null);
     setWho(null);
     setArea(null);
+    setPriv(false);
     setError(null);
   };
 
@@ -71,8 +75,10 @@ export function NewMeetingDialog({
       date: date ?? defaults.date,
       time: time ?? defaults.time,
       duration_min: durValue,
-      attendees: whoValue,
+      // Privat: nur ich, unabhängig davon, wen man vorher ausgewählt hatte
+      attendees: priv && me ? [me.id] : whoValue,
       area_id: (area ?? defaults.area_id ?? "") || null,
+      private_for: priv && me ? me.id : null,
     });
     setBusy(false);
     if (ok) {
@@ -111,23 +117,26 @@ export function NewMeetingDialog({
               <Select aria-label="Dauer" value={String(durValue)} onChange={(v) => setDuration(Number(v))} options={durationOptions(durValue)} className={field} />
             </div>
           </div>
-          <div className="flex flex-col gap-1.5">
-            <span className="flex items-center justify-between">
-              <span className={label}>Wer</span>
-              <button
-                type="button"
-                onClick={() => setWho(whoValue.length === people.length ? (me ? [me.id] : []) : people.map((p) => p.id))}
-                className="rounded-md text-[12.5px] text-fg-2 hover:text-fg max-md:min-h-10"
-              >
-                {whoValue.length === people.length ? "Nur ich" : "Ganzes Team"}
-              </button>
-            </span>
-            <PeoplePicker label="Wer ist dabei" value={whoValue} onChange={setWho} />
-          </div>
+          {!priv && (
+            <div className="flex flex-col gap-1.5">
+              <span className="flex items-center justify-between">
+                <span className={label}>Wer</span>
+                <button
+                  type="button"
+                  onClick={() => setWho(whoValue.length === people.length ? (me ? [me.id] : []) : people.map((p) => p.id))}
+                  className="rounded-md text-[12.5px] text-fg-2 hover:text-fg max-md:min-h-10"
+                >
+                  {whoValue.length === people.length ? "Nur ich" : "Ganzes Team"}
+                </button>
+              </span>
+              <PeoplePicker label="Wer ist dabei" value={whoValue} onChange={setWho} />
+            </div>
+          )}
           <div className="flex flex-col gap-1.5">
             <span className={label}>Bereich</span>
             <Select aria-label="Bereich" value={area ?? defaults.area_id ?? ""} onChange={setArea} options={nameOptions(allAreas, "Keiner")} className={field} />
           </div>
+          {me && <PrivateToggle on={priv} onChange={setPriv} className="self-start" />}
           {error && (
             <p role="alert" className="text-[13px] text-st-red">
               {error}

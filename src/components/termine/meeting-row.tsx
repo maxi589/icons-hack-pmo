@@ -8,6 +8,7 @@ import { useTeam } from "@/components/app-shell/team-provider";
 import { joinUrl, timeRange, type Meeting } from "@/lib/meetings";
 import type { Organization } from "@/lib/pipeline";
 import { MeetingMenu } from "./meeting-menu";
+import { PrivateMark } from "./private-toggle";
 
 // Eine Termin-Zeile (Liste am Desktop, Woche am Handy): Uhrzeit · Bereichsstrich · Titel (darunter Bereich, Ort, Firma)
 // · Beitreten · Teilnehmende. Rechtsklick bzw. langes Drücken öffnet das Menü (Öffnen, Link kopieren, Löschen).
@@ -52,6 +53,7 @@ export function MeetingRow({
             className="flex min-w-0 items-center gap-1.5 rounded-sm text-left text-[14px] font-medium after:absolute after:inset-0 max-md:text-[15px]"
           >
             <span className="truncate">{m.title}</span>
+            {m.private_for && <PrivateMark />}
             {me && m.attendees.includes(me.id) && <span className="sr-only">, du bist dabei</span>}
           </button>
           {sub && <span className="truncate text-[12.5px] text-fg-3">{sub}</span>}

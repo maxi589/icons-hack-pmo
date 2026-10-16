@@ -30,6 +30,7 @@ import { useMeetingActions } from "./use-meeting-actions";
 import { WeekView, type AllDay } from "./week-view";
 import { MeetingOrgs, MeetingRow } from "./meeting-row";
 import { MobileWeek } from "./mobile-week";
+import { GoogleCalendarButton } from "./google-calendar-button";
 
 // Termine (Plan Welle 1, Schritt 3): Team-Meetings und Partner-Calls an einem Ort, mit Agenda, Notizen, Unterlagen
 // und Ergebnissen. Desktop: Woche (Standard) oder Liste; Handy: Liste. Detail rechts, zweiter Klick schließt.
@@ -182,6 +183,7 @@ export function Termine() {
               </div>
             )}
             <div className="ml-auto flex items-center gap-2">
+              <GoogleCalendarButton />
               <button
                 type="button"
                 aria-pressed={mine}
@@ -207,19 +209,24 @@ export function Termine() {
 
           {api.meetings === false && <p className="px-5 py-8 text-center text-[13.5px] text-st-red">Termine konnten nicht geladen werden.</p>}
           {isMobile ? (
-            <MobileWeek
-              monday={monday}
-              today={today}
-              meetings={shown}
-              allDay={allDay}
-              selected={selId}
-              mine={mine}
-              onMine={() => setMine((v) => !v)}
-              onWeek={(w) => setParams({ woche: w, termin: null })}
-              // Woche festhalten, sonst springt sie beim Öffnen eines Termins aus „Danach“ hinter dem Sheet um
-              onOpen={(m) => setParams({ termin: m.id === selId ? null : m.id, woche: monday })}
-              onDelete={remove}
-            />
+            <>
+              <MobileWeek
+                monday={monday}
+                today={today}
+                meetings={shown}
+                allDay={allDay}
+                selected={selId}
+                mine={mine}
+                onMine={() => setMine((v) => !v)}
+                onWeek={(w) => setParams({ woche: w, termin: null })}
+                // Woche festhalten, sonst springt sie beim Öffnen eines Termins aus „Danach“ hinter dem Sheet um
+                onOpen={(m) => setParams({ termin: m.id === selId ? null : m.id, woche: monday })}
+                onDelete={remove}
+              />
+              <div className="flex justify-center px-3.5 pb-8">
+                <GoogleCalendarButton />
+              </div>
+            </>
           ) : list ? (
             <div className="min-h-0 flex-1 md:overflow-y-auto">
               <MeetingList meetings={shown} today={today} selected={selId} onOpen={open} onDelete={remove} onNew={() => startDraft()} />

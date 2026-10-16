@@ -36,16 +36,20 @@ export function useMeetingActions(
     orgId && logActivity("organization", orgId, meId, "meeting_linked", { meeting_id: m.id, title: m.title, starts_at: m.starts_at });
 
   const created = (m: Meeting, text: string) => {
-    logActivity("meeting", m.id, meId, "created");
-    notify(m, m.attendees);
-    linkOrg(m, m.organization_id);
+    // Private Termine hinterlassen keine Spuren, die andere sehen (Verlauf, Inbox, Firma).
+    if (!m.private_for) {
+      logActivity("meeting", m.id, meId, "created");
+      notify(m, m.attendees);
+      linkOrg(m, m.organization_id);
+    }
     opts.onOpen?.(m);
     toast({ text });
   };
 
   const create = async (input: NewMeetingInput & { organization_id?: string | null }) => {
     const { date, time, ...rest } = input;
-    const m = await api.create({ ...rest, starts_at: fromVienna(date, time), created_by: meId });
+    // Privat: ohne Firma, auch wenn der Termin auf einer Firmen-Seite angelegt wird
+    const m = await api.create({ ...rest, ...(rest.private_for ? { organization_id: null } : {}), starts_at: fromVienna(date, time), created_by: meId });
     if (!m) return false;
     created(m, `„${m.title}“ angelegt`);
     return true;
@@ -53,21 +57,22 @@ export function useMeetingActions(
 
   const update = (m: Meeting, patch: MeetingPatch) => {
     api.update(m.id, patch);
-    // Verschoben: Google-Termin ändert sich nicht mit (Einbahnstraße), daran erinnern. Google fragt dann, ob die Gäste Bescheid bekommen.
+    // Verschoben: neue Zeit mit „Rückgängig“ zeigen. Der Kalender „hack-vienna HQ“ in Google zieht von selbst nach.
     const moved = (patch.starts_at && patch.starts_at !== m.starts_at) || (patch.duration_min && patch.duration_min !== m.duration_min);
     if (moved) {
       const next = { ...m, ...patch };
       toast({
-        text: `Jetzt ${formatShort(viennaParts(next.starts_at).date)}, ${timeRange(next)}. Google-Termin auch anpassen.`,
+        text: `Jetzt ${formatShort(viennaParts(next.starts_at).date)}, ${timeRange(next)}`,
         onAction: () => api.update(m.id, { starts_at: m.starts_at, duration_min: m.duration_min }),
       });
     }
-    if (patch.attendees)
+    const isPrivate = patch.private_for !== undefined ? patch.private_for : m.private_for;
+    if (patch.attendees && !isPrivate)
       notify(
         m,
         patch.attendees.filter((id) => !m.attendees.includes(id))
       );
-    if (patch.organization_id !== undefined && patch.organization_id !== m.organization_id) linkOrg({ ...m, ...patch }, patch.organization_id);
+    if (patch.organization_id !== undefined && patch.organization_id !== m.organization_id && !isPrivate) linkOrg({ ...m, ...patch }, patch.organization_id);
   };
 
   /** Löschen mit „Rückgängig“: gleiche ID, Kommentare, Unterlagen und Entscheidungen bleiben verknüpft, Aufgaben werden neu verknüpft. */
@@ -100,6 +105,7 @@ export function useMeetingActions(
       area_id: m.area_id,
       organization_id: m.organization_id,
       attendees: m.attendees,
+      private_for: m.private_for,
       agenda,
       created_by: meId,
     });
@@ -107,7 +113,7 @@ export function useMeetingActions(
       toast({ text: "Hat nicht geklappt. Bitte nochmal versuchen." });
       return;
     }
-    logActivity("meeting", m.id, meId, "next_created", { meeting_id: next.id });
+    if (!m.private_for) logActivity("meeting", m.id, meId, "next_created", { meeting_id: next.id });
     created(next, `Nächster Termin am ${formatShort(date)} angelegt`);
   };
 

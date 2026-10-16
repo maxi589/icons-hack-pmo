@@ -8,7 +8,7 @@
 //   <JJJJ-MM-TT>/dateien.json              welche Dateien es an dem Tag gab
 //   dateien/<speicher>/<pfad>              gemeinsam für alle Tage, nur neue oder geänderte Dateien werden geladen
 //   _letzte-sicherung.txt                  Ergebnis des letzten Laufs (auch Fehler)
-// Nur lesen, nie schreiben. Bewusst ohne „notepads“: das sind private Notizblöcke der einzelnen Personen.
+// Nur lesen, nie schreiben. Bewusst ohne „notepads“ und ohne private Termine: das gehört den einzelnen Personen.
 
 import { createClient } from "@supabase/supabase-js";
 import { mkdir, rename, rm, stat, writeFile } from "node:fs/promises";
@@ -81,10 +81,17 @@ async function main() {
   await rm(fresh, { recursive: true, force: true });
   await mkdir(fresh, { recursive: true });
 
+  // Private Termine („Nur für mich“, 17.10.) bleiben wie die Notizblöcke draußen. Aufgaben, die an einem hängen, verlieren
+  // in der Sicherung nur diesen Bezug (sonst scheitert das Einspielen am Fremdschlüssel tasks.meeting_id).
+  const priv = await db.from("meetings").select("id").not("private_for", "is", null);
+  const privateIds = new Set(priv.error ? [] : priv.data.map((m) => m.id));
+
   const counts = [];
   for (const t of await tableNames()) {
     if (SKIP_TABLES.has(t.name)) continue;
-    const rows = await dumpTable(db, t);
+    const rows = (await dumpTable(db, t))
+      .filter((r) => !(t.name === "meetings" && privateIds.has(r.id)))
+      .map((r) => (t.name === "tasks" && privateIds.has(r.meeting_id) ? { ...r, meeting_id: null } : r));
     await writeFile(join(fresh, `${t.name}.json`), JSON.stringify(rows, null, 1));
     counts.push(`${t.name} ${rows.length}`);
   }

@@ -10,6 +10,7 @@ import { useTeam } from "@/components/app-shell/team-provider";
 import { viennaParts, timeRange, plusDays, type Meeting } from "@/lib/meetings";
 import type { MeetingDefaults } from "./new-meeting-dialog";
 import { MeetingMenu } from "./meeting-menu";
+import { PrivateMark } from "./private-toggle";
 
 // Wochenansicht (nur Desktop): Mo–So mit Zeitraster. Oben ganztägig Meilensteine und Nachfass-Runden (nur lesen).
 // Ziehen über die Zeit legt einen Termin an (15-min-Raster), ein Klick auf eine freie Stelle ebenso (1 h).
@@ -301,6 +302,7 @@ export function WeekView({
                         <span className="flex min-w-0 items-start gap-1 text-[12px] leading-tight font-medium">
                           {m.meet_url && <Video className="mt-px size-3 shrink-0 text-fg-2" aria-label="mit Meet-Link" />}
                           <span className={cn("min-w-0", short ? "truncate" : "line-clamp-2")}>{m.title}</span>
+                          {m.private_for && <PrivateMark className="mt-px" />}
                         </span>
                         {!short && <span className="truncate text-[11px] text-fg-2 tabular">{timeRange(m)}</span>}
                         <span data-resize className="absolute inset-x-0 bottom-0 h-2 cursor-ns-resize" aria-hidden />
