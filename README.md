@@ -1,6 +1,6 @@
-# icons Hackathon PMO
+# hack-vienna HQ
 
-Internes Steuerungs-Tool für den icons Hackathon (27./28.2.2027): Roadmap, Pipeline (CRM), Aufgaben, Inbox, Wissen.
+Internes Steuerungs-Tool für hack-vienna, den icons Hackathon (27./28.2.2027): Roadmap, Pipeline (CRM), Aufgaben, Inbox, Wissen.
 
 **Technik:** Next.js 16 (App Router) · Tailwind v4 · shadcn/ui mit Base UI · Supabase · Vercel
 

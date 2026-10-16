@@ -1,6 +1,6 @@
-# icons Hackathon PMO-Tool: Projektregeln
+# hack-vienna HQ: Projektregeln
 
-Internes Steuerungs-Tool für **hack-vienna**, den icons Hackathon (27./28.2.2027). Ersetzt WhatsApp als Ort für Aufgaben, Entscheidungen und Outreach-Stand. 5 Nutzer ohne Rollen: Maxi S, Maxi D, Manu, Tim, Kilian. **Kernstück ist die Pipeline (CRM).** Go-live 30.10.2026, Design-Freeze 24.10.2026.
+Internes Steuerungs-Tool **hack-vienna HQ** für **hack-vienna**, den icons Hackathon (27./28.2.2027). Bis 16.10. hieß es „PMO“; Repo, Vercel-Adresse, Supabase-Projekt und OneDrive-Ordner heißen bewusst weiter „pmo“ (Pfade in Skripten, Backup-Aufgabe, Chat-Gedächtnis). Ersetzt WhatsApp als Ort für Aufgaben, Entscheidungen und Outreach-Stand. 5 Nutzer ohne Rollen: Maxi S, Maxi D, Manu, Tim, Kilian. **Kernstück ist die Pipeline (CRM).** Go-live 30.10.2026, Design-Freeze 24.10.2026.
 
 Auftraggeber ist Maxi S (kein Entwickler): Deutsch, Ergebnis zuerst, einfache Sprache, Fachbegriffe beim ersten Mal übersetzen.
 

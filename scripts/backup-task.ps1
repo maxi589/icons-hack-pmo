@@ -9,5 +9,5 @@ $node = (Get-Command node -ErrorAction Stop).Source
 $action = New-ScheduledTaskAction -Execute "conhost.exe" -Argument "--headless `"$node`" --env-file=.env.local scripts/backup.mjs" -WorkingDirectory $repo
 $trigger = New-ScheduledTaskTrigger -Daily -At 12:00
 $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -ExecutionTimeLimit (New-TimeSpan -Minutes 30)
-Register-ScheduledTask -TaskName "hack-vienna Backup" -Description "Sichert alle Tabellen und Dateien des hack-vienna PMO-Tools in den OneDrive-Projektordner (scripts/backup.mjs)." -Action $action -Trigger $trigger -Settings $settings -Force | Out-Null
+Register-ScheduledTask -TaskName "hack-vienna Backup" -Description "Sichert alle Tabellen und Dateien von hack-vienna HQ in den OneDrive-Projektordner (scripts/backup.mjs)." -Action $action -Trigger $trigger -Settings $settings -Force | Out-Null
 Get-ScheduledTask -TaskName "hack-vienna Backup" | Select-Object TaskName, State
