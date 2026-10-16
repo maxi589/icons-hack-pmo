@@ -129,7 +129,7 @@ export function Termine() {
             : { notes: md, notes_updated_at: new Date().toISOString(), notes_updated_by: me?.id ?? null }
         )
       }
-      onCreateTask={(title) => taskActions.createTask({ title, area_id: meeting.area_id, meeting_id: meeting.id }, (id) => `/aufgaben?aufgabe=${id}`)}
+      onCreateTask={(title) => taskActions.createTask({ title, area_id: meeting.area_id, meeting_id: meeting.id, organization_id: meeting.organization_id }, (id) => `/aufgaben?aufgabe=${id}`)}
       onToggleTask={taskActions.toggleDone}
       onNewTask={() => setNewTask(true)}
       onNewDecision={() => setNewDecision(true)}
@@ -274,7 +274,7 @@ export function Termine() {
             onOpenChange={setNewTask}
             milestones={milestones}
             defaults={{ area_id: meeting.area_id }}
-            onCreate={async (input) => !!(await taskActions.createTask({ ...input, meeting_id: meeting.id }, (id) => `/aufgaben?aufgabe=${id}`))}
+            onCreate={async (input) => !!(await taskActions.createTask({ ...input, meeting_id: meeting.id, organization_id: meeting.organization_id }, (id) => `/aufgaben?aufgabe=${id}`))}
           />
           <NewDecisionDialog
             open={newDecision}

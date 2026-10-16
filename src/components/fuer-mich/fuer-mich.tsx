@@ -9,7 +9,7 @@ import { NotesCard } from "@/components/editor/notes-card";
 import { useDocActions } from "@/components/dokumente/use-doc-actions";
 import { NewTaskDialog } from "@/components/tasks/new-task-dialog";
 import { TaskDetail } from "@/components/tasks/task-detail";
-import { TaskList } from "@/components/tasks/tasks";
+import { TaskList, TaskOrgs } from "@/components/tasks/tasks";
 import { useTaskActions } from "@/components/tasks/use-task-actions";
 import { useToday } from "@/lib/use-today";
 import { useIsMobile } from "@/lib/use-is-mobile";
@@ -18,6 +18,7 @@ import { useNotepad } from "@/lib/data/use-notepad";
 import { useDocuments } from "@/lib/data/use-documents";
 import { docHref } from "@/lib/documents";
 import { useTasks, type TaskPatch } from "@/lib/data/use-tasks";
+import { useOrganizations } from "@/lib/data/use-organizations";
 
 // „Für mich“ (Plan Welle 1, ersetzt „Meine Aufgaben“): Aufbau wie die Bereichs-Seite.
 // Oben die eigenen Aufgaben nach Fälligkeit, darunter der private Notizblock über die ganze Breite (Maxi, 15.10.:
@@ -37,6 +38,7 @@ export function FuerMich() {
   const { tasks, update } = tasksApi;
   const { changeStatus, toggleDone, deleteTask, createTask } = useTaskActions(tasksApi);
   const { milestones } = useMilestones();
+  const { orgs } = useOrganizations();
   const notepad = useNotepad(me?.id);
   const docActions = useDocActions(useDocuments());
   const [showDone, setShowDone] = useState(false);
@@ -80,6 +82,7 @@ export function FuerMich() {
       task={selected}
       today={today}
       milestones={milestones}
+      orgs={orgs ?? []}
       onUpdate={(p: TaskPatch) => update(selected.id, p)}
       onStatus={(to) => changeStatus(selected, to)}
       onDelete={() => {
@@ -115,6 +118,7 @@ export function FuerMich() {
                 {openCount === 0 && (
                   <p className="rounded-[14px] bg-card-2 px-4 py-6 text-[13.5px] text-fg-2 max-md:bg-card max-md:shadow-card">Dir ist gerade nichts zugewiesen.</p>
                 )}
+                <TaskOrgs value={orgs}>
                 <TaskList
                   className=""
                   tasks={mine}
@@ -127,6 +131,7 @@ export function FuerMich() {
                   onOpen={toggle}
                   onToggle={toggleDone}
                 />
+                </TaskOrgs>
               </section>
               <NotesCard
                 title="Notizblock"

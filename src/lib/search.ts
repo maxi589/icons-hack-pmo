@@ -75,7 +75,7 @@ const SOURCES: Source[] = [
   {
     type: "task",
     table: "tasks",
-    select: "id, title, description, status, due_date",
+    select: "id, title, description, status, due_date, org:organization_id(name)",
     fields: ["title", "description"],
     order: { column: "updated_at", ascending: false },
     limit: 12,
@@ -83,7 +83,8 @@ const SOURCES: Source[] = [
       id: str(r.id),
       title: str(r.title),
       href: targetHref("task", str(r.id)),
-      meta: r.status === "erledigt" ? "erledigt" : r.due_date ? formatShort(str(r.due_date)) : "",
+      // Firma vorne: Standard-Aufgaben heißen bei jeder Firma gleich
+      meta: [(r.org as { name?: string } | null)?.name, r.status === "erledigt" ? "erledigt" : r.due_date ? formatShort(str(r.due_date)) : ""].filter(Boolean).join(" · "),
       done: r.status === "erledigt",
     }),
   },

@@ -333,6 +333,18 @@ async function remove() {
   const ids = (await importedRows()).map((r) => r.id);
   for (let i = 0; i < ids.length; i += 100) {
     const chunk = ids.slice(i, i + 100);
+    // Aufgaben dieser Firmen (z. B. Standard-Aufgaben nach „Zugesagt“) mit entfernen, sonst blieben sie ohne Firma übrig
+    const { data: tasks, error: te } = await db.from("tasks").select("id").in("organization_id", chunk);
+    if (te) throw te;
+    const taskIds = tasks.map((t) => t.id);
+    if (taskIds.length) {
+      for (const table of ["notifications", "comments", "activity"]) {
+        const { error } = await db.from(table).delete().eq("target_type", "task").in("target_id", taskIds);
+        if (error) throw new Error(`${table}: ${error.message}`);
+      }
+      const { error } = await db.from("tasks").delete().in("id", taskIds);
+      if (error) throw error;
+    }
     for (const table of ["notifications", "comments", "activity"]) {
       const { error } = await db.from(table).delete().eq("target_type", "organization").in("target_id", chunk);
       if (error) throw new Error(`${table}: ${error.message}`);

@@ -17,6 +17,7 @@ import { useTaskActions } from "@/components/tasks/use-task-actions";
 import { PageHeader } from "@/components/app-shell/page-header";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { StatusCheck } from "@/components/tasks/status-check";
+import { OrgName } from "@/components/tasks/org-name";
 import { useToday } from "@/lib/use-today";
 import { daysBetween, formatShort } from "@/lib/dates";
 import { useMilestones, type Milestone } from "@/lib/data/use-milestones";
@@ -82,7 +83,7 @@ export function AreaPage({ id }: { id: string }) {
           />
           <div className="flex min-w-0 flex-col items-stretch gap-4 self-start max-lg:order-first md:gap-5">
             <MilestonesCard milestones={milestones} own={own} today={today} onToggle={setMilestoneDone} />
-            <TasksCard areaId={id} tasks={areaTasks} milestones={milestones} today={today} onToggle={toggleDone} onNew={newTask} />
+            <TasksCard areaId={id} tasks={areaTasks} milestones={milestones} orgs={orgs ?? []} today={today} onToggle={toggleDone} onNew={newTask} />
             <MeetingBlock area_id={id} match={(m) => m.area_id === id} />
             <DocBlock defaults={{ area_id: id }} match={(d) => d.area_id === id} />
           </div>
@@ -373,6 +374,7 @@ function TasksCard({
   areaId,
   tasks,
   milestones,
+  orgs,
   today,
   onToggle,
   onNew,
@@ -380,6 +382,7 @@ function TasksCard({
   areaId: string;
   tasks: Task[];
   milestones: Milestone[];
+  orgs: Organization[];
   today: string;
   onToggle: (t: Task) => void;
   onNew: () => void;
@@ -413,6 +416,7 @@ function TasksCard({
         <ul>
           {open.map((t) => {
             const ms = milestones.find((m) => m.id === t.milestone_id);
+            const org = t.organization_id ? orgs.find((o) => o.id === t.organization_id) : null;
             return (
               <li key={t.id} className="relative flex min-h-14 items-center gap-3 border-t border-line px-4 py-2 has-[a:hover]:bg-hover md:min-h-11">
                 <StatusCheck status={t.status} title={t.title} onToggle={() => onToggle(t)} />
@@ -423,8 +427,10 @@ function TasksCard({
                   >
                     {t.title}
                   </Link>
-                  {(ms || t.due_date) && (
-                    <span className="flex shrink-0 items-center gap-2">
+                  {/* Höchstens die halbe Zeile, damit ein langer Firmenname den Titel nicht verdrängt (er kürzt sich selbst) */}
+                  {(ms || t.due_date || org) && (
+                    <span className="flex min-w-0 items-center gap-2 md:max-w-[50%]">
+                      {org && <OrgName name={org.name} />}
                       {ms && (
                         <span className="font-mono text-[12px] text-fg-3" title={ms.title}>
                           {ms.id}

@@ -19,6 +19,7 @@ import { logActivity } from "@/lib/data/use-feed";
 import { formatDayMonth, formatShort } from "@/lib/dates";
 import { FOLLOW_UP_ROUNDS } from "@/lib/phases";
 import { play } from "@/lib/sounds";
+import { addStandardTasks, getsStandardTasks, removeTasks } from "@/lib/standard-tasks";
 import {
   followState,
   inTab,
@@ -118,18 +119,40 @@ export function Pipeline() {
 
   /** Stufe ändern: sofort speichern, 5 s „Rückgängig“, danach Eintrag im Verlauf.
    *  Auf „Kontaktiert“ ohne Nachfass-Datum kommt automatisch heute + 7 Tage dazu (Maxi, 15.10.), sonst würde die Firma
-   *  nie „überfällig“. Ein schon gesetztes Datum bleibt. „Rückgängig“ nimmt beides zurück. */
+   *  nie „überfällig“. Ein schon gesetztes Datum bleibt. Auf „Zugesagt“ (oder direkt „Fix“) kommen die Standard-Aufgaben
+   *  dazu (Maxi, 16.10., Liste in lib/standard-tasks.ts). „Rückgängig“ nimmt jeweils alles zurück. */
   const changeStage = (org: Organization, to: Stage) => {
     const from = org.stage;
     if (from === to) return;
+    const meId = me?.id ?? null;
     const autoFollow = to === "kontaktiert" && !org.next_follow_up ? shiftFollowUp(null, today, 7) : null;
-    update(org.id, autoFollow ? { stage: to, next_follow_up: autoFollow } : { stage: to });
+    const saved = update(org.id, autoFollow ? { stage: to, next_follow_up: autoFollow } : { stage: to });
     // Zusage ist ein Erfolg; von Fix zurück auf Zugesagt nicht.
     if (to === "fix" || (to === "zugesagt" && from !== "fix")) play("dealWon");
-    toast({
-      text: `${org.name} → ${stageName(to)}${autoFollow ? ` · nachfassen ${formatShort(autoFollow)}` : ""}`,
-      onAction: () => update(org.id, autoFollow ? { stage: from, next_follow_up: null } : { stage: from }),
-      onExpire: () => logActivity("organization", org.id, me?.id ?? null, "stage_changed", { from, to }),
+    // Standard-Aufgaben erst, wenn die Stufe wirklich gespeichert ist. Der Hinweis steht sofort da (richtige Reihenfolge
+    // auch bei schnellem Doppelklick) und bekommt die Zahl nachgereicht; „Rückgängig“ und Verlauf warten auf das Anlegen.
+    const added = getsStandardTasks(from, to) ? saved.then((ok) => (ok ? addStandardTasks(org, to, today, meId) : [])) : Promise.resolve([]);
+    const base = `${org.name} → ${stageName(to)}${autoFollow ? ` · nachfassen ${formatShort(autoFollow)}` : ""}`;
+    let undone = false;
+    const setText = toast({
+      text: base,
+      onAction: () => {
+        undone = true;
+        update(org.id, autoFollow ? { stage: from, next_follow_up: null } : { stage: from });
+        added.then(async (a) => {
+          if (a?.length && !(await removeTasks(a.map((t) => t.id)))) toast({ text: "Aufgaben nicht entfernt. Bitte im Firmen-Detail löschen." });
+        });
+      },
+      onExpire: () => {
+        logActivity("organization", org.id, meId, "stage_changed", { from, to });
+        added.then((a) => a?.forEach((t) => logActivity("task", t.id, meId, "created")));
+      },
+    });
+    saved.then((ok) => !ok && !undone && setText(`${org.name}: nicht gespeichert. Bitte nochmal versuchen.`));
+    added.then((a) => {
+      if (undone) return;
+      if (a === null) setText(`${base} · Aufgaben nicht angelegt`);
+      else if (a.length) setText(`${base} · ${a.length} ${a.length === 1 ? "Aufgabe" : "Aufgaben"} angelegt`);
     });
   };
 

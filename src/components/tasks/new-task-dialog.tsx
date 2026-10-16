@@ -26,12 +26,15 @@ export function NewTaskDialog({
   onOpenChange,
   milestones,
   defaults,
+  context,
   onCreate,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   milestones: Milestone[];
   defaults: { assignee_id?: string | null; area_id?: string | null; milestone_id?: string | null };
+  /** Zeile unter dem Titel, z. B. die Firma, zu der die Aufgabe gehört */
+  context?: string;
   onCreate: (input: NewTaskInput) => Promise<boolean>;
 }) {
   const { me, people, allAreas } = useTeam();
@@ -88,6 +91,7 @@ export function NewTaskDialog({
       <DialogContent className="gap-4 p-5 sm:max-w-[460px]">
         <div className="flex flex-col gap-1 pr-8">
           <DialogTitle className="text-base font-semibold">Neue Aufgabe</DialogTitle>
+          {context && <p className="truncate text-[13px] text-fg-3">{context}</p>}
         </div>
         <form onSubmit={submit} className="flex flex-col gap-3.5">
           <label className="flex flex-col gap-1.5">

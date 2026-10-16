@@ -59,7 +59,7 @@ export function TodayCard({ tasks, orgs, meetings, today }: { tasks: Task[]; org
         title: t.title,
         href: targetHref("task", t.id),
         late: t.due_date! < today,
-        meta: [t.milestone_id, areaById(t.area_id)?.name].filter(Boolean).join(" · "),
+        meta: [orgs.find((o) => o.id === t.organization_id)?.name, t.milestone_id, areaById(t.area_id)?.name].filter(Boolean).join(" · "),
         date: t.due_date,
       })),
     ...orgs

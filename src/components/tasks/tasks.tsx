@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -19,9 +19,11 @@ import { useToday } from "@/lib/use-today";
 import { useIsMobile } from "@/lib/use-is-mobile";
 import { useMilestones, type Milestone } from "@/lib/data/use-milestones";
 import { useTasks, type TaskPatch } from "@/lib/data/use-tasks";
+import { useOrganizations } from "@/lib/data/use-organizations";
 import { logActivity, notifyAssignment } from "@/lib/data/use-feed";
 import { DUE_GROUPS, dueGroup, sortTasks, TASK_STATUSES, taskStatusName, type Task, type TaskStatus } from "@/lib/tasks";
 import { NewTaskDialog } from "./new-task-dialog";
+import { OrgName } from "./org-name";
 import { StatusCheck } from "./status-check";
 import { TaskDetail } from "./task-detail";
 
@@ -30,6 +32,10 @@ import { TaskDetail } from "./task-detail";
 // Zustand in der Adresse (teilbar): ?aufgabe=<id>, ?bereich=, ?person= (id oder „offen“), ?meilenstein=, ?neu=1.
 
 type View = "board" | "list";
+
+/** Firmen für die Anzeige „zu welcher Firma“ in Zeilen und Karten. Kommen einmal von der Seite (wie MeetingOrgs),
+ *  nicht je Zeile: sonst lädt jede Zeile die ganze Pipeline. */
+export const TaskOrgs = createContext<{ id: string; name: string }[] | null>(null);
 
 const filterCls =
   "h-8 w-full truncate rounded-[9px] border border-field bg-card pr-2 pl-2.5 text-[13px] text-fg hover:bg-hover max-md:h-10 max-md:pr-1.5 max-md:text-base";
@@ -64,6 +70,7 @@ export function Tasks() {
   const { me, people, allAreas } = useTeam();
   const { tasks, update, create, remove, restore } = useTasks();
   const { milestones } = useMilestones();
+  const { orgs } = useOrganizations();
 
   const [view, setView] = useState<View>("list");
   const [showDone, setShowDone] = useState(false);
@@ -137,6 +144,7 @@ export function Tasks() {
       task={selected}
       today={today}
       milestones={msList}
+      orgs={orgs ?? []}
       onUpdate={(p: TaskPatch) => update(selected.id, p)}
       onStatus={(to) => changeStatus(selected, to)}
       onDelete={() => deleteTask(selected)}
@@ -145,6 +153,7 @@ export function Tasks() {
   );
 
   return (
+    <TaskOrgs value={orgs}>
     <div className="flex min-h-0 flex-1 flex-col">
       <PageHeader title={title} action={{ label: "Aufgabe", onClick: () => setParams({ neu: "1" }) }}>
         <Segmented
@@ -295,6 +304,7 @@ export function Tasks() {
         }}
       />
     </div>
+    </TaskOrgs>
   );
 }
 
@@ -303,18 +313,22 @@ export function Tasks() {
 // ---------------------------------------------------------------
 function TaskMeta({ task, milestones }: { task: Task; milestones: Milestone[] }) {
   const { areaById } = useTeam();
+  const orgs = useContext(TaskOrgs);
   const area = areaById(task.area_id);
   const ms = milestones.find((m) => m.id === task.milestone_id);
-  if (!area && !ms) return null;
+  const org = task.organization_id ? orgs?.find((o) => o.id === task.organization_id) : null;
+  if (!area && !ms && !org) return null;
   return (
     <span className="flex min-w-0 items-center gap-2 text-[12px] text-fg-2">
+      {org && <OrgName name={org.name} />}
       {ms && (
         <span className="shrink-0 font-mono text-fg-3" title={ms.title}>
           {ms.id}
         </span>
       )}
       {area && (
-        <span className="inline-flex min-w-0 items-center gap-1.5">
+        // Am Handy reicht die Firma (sie verrät den Bereich), sonst würden beide abgeschnitten
+        <span className={cn("inline-flex min-w-0 items-center gap-1.5", org && "max-md:hidden")}>
           <span className="size-[7px] shrink-0 rounded-full" style={{ background: area.color }} aria-hidden />
           <span className="truncate">{area.name}</span>
         </span>
@@ -460,7 +474,8 @@ function TaskRow({
         >
           {task.title}
         </button>
-        <span className="flex min-w-0 items-center gap-2 md:shrink-0">
+        {/* Höchstens die halbe Zeile, damit ein langer Firmenname den Titel nicht verdrängt (er kürzt sich selbst) */}
+        <span className="flex min-w-0 items-center gap-2 md:max-w-[50%]">
           <TaskMeta task={task} milestones={milestones} />
           {task.due_date && !done && (
             <span className="md:hidden">

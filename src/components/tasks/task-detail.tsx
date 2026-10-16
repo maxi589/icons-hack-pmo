@@ -22,6 +22,7 @@ export function TaskDetail({
   task,
   today,
   milestones,
+  orgs,
   onUpdate,
   onStatus,
   onDelete,
@@ -30,6 +31,8 @@ export function TaskDetail({
   task: Task;
   today: string;
   milestones: Milestone[];
+  /** Firmen für das Feld „Firma“ (ohne: kein Feld) */
+  orgs?: { id: string; name: string }[];
   onUpdate: (patch: TaskPatch) => void;
   onStatus: (to: TaskStatus) => void;
   onDelete: () => void;
@@ -130,6 +133,29 @@ export function TaskDetail({
             )}
           </span>
         </PropRow>
+        {orgs && (
+          <PropRow label="Firma" htmlFor={f("org")}>
+            <span className="flex items-center gap-1">
+              <span className="min-w-0 flex-1">
+                <SelectBox
+                  id={f("org")}
+                  value={task.organization_id ?? ""}
+                  onChange={(v) => onUpdate({ organization_id: v || null })}
+                  options={nameOptions([...orgs].sort((a, b) => a.name.localeCompare(b.name, "de")), "Keine")}
+                />
+              </span>
+              {task.organization_id && (
+                <Link
+                  href={`/pipeline?firma=${task.organization_id}`}
+                  className="grid size-8 shrink-0 max-md:size-11 place-items-center rounded-lg text-fg-3 hover:bg-hover hover:text-fg"
+                  aria-label="Firma in der Pipeline öffnen"
+                >
+                  <ArrowUpRight className="size-3.5" aria-hidden />
+                </Link>
+              )}
+            </span>
+          </PropRow>
+        )}
         <PropRow label="Bereich" htmlFor={f("area")}>
           <span className="flex items-center gap-1">
             <span

@@ -68,7 +68,7 @@ export function Overview() {
       <GoalTiles orgs={data.orgs} milestones={data.milestones} />
 
       <div className="flex flex-wrap gap-3 md:gap-4">
-        <DueCard milestones={data.milestones} tasks={data.tasks} meetings={meetings || []} today={today} />
+        <DueCard milestones={data.milestones} tasks={data.tasks} orgs={data.orgs} meetings={meetings || []} today={today} />
         {/* Handy: eigene Nachfass-Fälle stehen in „Heute für dich“, das ganze Team in der Pipeline (15.10.) */}
         <div className="flex min-w-0 flex-[1_1_320px] max-md:hidden">
           <FollowUpCard orgs={data.orgs} today={today} />
@@ -264,9 +264,9 @@ function GoalTiles({ orgs, milestones }: { orgs: Org[]; milestones: Milestone[] 
 // ---------------------------------------------------------------
 // Als Nächstes (Termine, Meilensteine und Aufgaben, nach Tag gruppiert)
 // ---------------------------------------------------------------
-type DueItem = { key: string; kind: "milestone" | "task" | "meeting"; id?: string; time?: string; title: string; due: string; areaId: string | null; ownerId: string | null; video?: boolean };
+type DueItem = { key: string; kind: "milestone" | "task" | "meeting"; id?: string; time?: string; title: string; org?: string; due: string; areaId: string | null; ownerId: string | null; video?: boolean };
 
-function DueCard({ milestones, tasks, meetings, today }: { milestones: Milestone[]; tasks: Task[]; meetings: Meeting[]; today: string }) {
+function DueCard({ milestones, tasks, orgs, meetings, today }: { milestones: Milestone[]; tasks: Task[]; orgs: Org[]; meetings: Meeting[]; today: string }) {
   const { areaById, personById, me } = useTeam();
   const now = useNow();
   const parentsWithChildren = new Set(milestones.map((m) => m.parent_id).filter(Boolean));
@@ -280,7 +280,8 @@ function DueCard({ milestones, tasks, meetings, today }: { milestones: Milestone
     ...milestones
       .filter((m) => m.status !== "erledigt" && !parentsWithChildren.has(m.id) && !shownAbove(m))
       .map((m) => ({ key: m.id, kind: "milestone" as const, id: m.id, title: m.title, due: m.due_date, areaId: m.area_id, ownerId: areaOwner(m.area_id) })),
-    ...tasks.map((t) => ({ key: t.id, kind: "task" as const, title: t.title, due: t.due_date!, areaId: t.area_id, ownerId: t.assignee_id })),
+    // Firma hinter dem Titel: Standard-Aufgaben heißen bei jeder Firma gleich (Maxi, 16.10.)
+    ...tasks.map((t) => ({ key: t.id, kind: "task" as const, title: t.title, org: orgs.find((o) => o.id === t.organization_id)?.name, due: t.due_date!, areaId: t.area_id, ownerId: t.assignee_id })),
     // Termine: nur kommende bzw. laufende, mit Uhrzeit vor Meilensteinen und Aufgaben des Tages
     ...meetings
       .filter((m) => endOf(m).getTime() >= now)
@@ -339,6 +340,7 @@ function DueCard({ milestones, tasks, meetings, today }: { milestones: Milestone
                   ) : (
                     <Link href={`/aufgaben?aufgabe=${it.key}`} className="min-w-0 flex-1 truncate rounded-sm after:absolute after:inset-0">
                       {it.title}
+                      {it.org && <span className="text-fg-3"> · {it.org}</span>}
                     </Link>
                   )}
                   {area && (

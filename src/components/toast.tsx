@@ -9,7 +9,11 @@ import { play, richPlayedWithin } from "@/lib/sounds";
 
 type Toast = { text: string; actionLabel?: string; onAction?: () => void; onExpire?: () => void };
 
-const ToastContext = createContext<(t: Toast) => void>(() => {});
+/** Liefert eine Funktion, die den Text nachträglich ändert, solange genau dieser Hinweis noch steht
+ *  (z. B. „… · 5 Aufgaben angelegt“, sobald die Datenbank fertig ist). */
+type Show = (t: Toast) => (text: string) => void;
+
+const ToastContext = createContext<Show>(() => () => {});
 
 export function useToast() {
   return useContext(ToastContext);
@@ -21,6 +25,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toast, setToast] = useState<(Toast & { key: number }) | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const current = useRef<Toast | null>(null);
+  const counter = useRef(0);
 
   const finish = useCallback((runExpire: boolean) => {
     if (timer.current) clearTimeout(timer.current);
@@ -34,10 +39,12 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       // Ein laufender Hinweis gilt als abgelaufen, sobald ein neuer kommt.
       if (current.current) finish(true);
       current.current = t;
-      setToast({ ...t, key: Date.now() });
+      const key = ++counter.current;
+      setToast({ ...t, key });
       // Leiser Ton beim Erscheinen; still, wenn gerade ein eigener Ton lief (z. B. Abhaken, Zusage).
       if (!richPlayedWithin(400)) play("toast");
       timer.current = setTimeout(() => finish(true), DURATION);
+      return (text: string) => setToast((cur) => (cur?.key === key ? { ...cur, text } : cur));
     },
     [finish]
   );
@@ -56,7 +63,8 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             className="pointer-events-auto relative flex max-w-full animate-in items-center gap-3.5 overflow-hidden rounded-xl bg-card-2 py-2.5 pr-3 pl-4 text-[13px] shadow-[0_0_0_1px_var(--line2),0_12px_32px_rgba(0,0,0,.35)] duration-200 fade-in-0 slide-in-from-bottom-2"
           >
             <Check className="size-[15px] shrink-0 text-st-green" strokeWidth={2.4} aria-hidden />
-            <span className="min-w-0 truncate">{toast.text}</span>
+            {/* Bis drei Zeilen: am Handy (375px) wäre „Test · Kessel Robotics → Zugesagt · 5 Aufgaben angelegt“ sonst abgeschnitten (gemessen) */}
+            <span className="line-clamp-3 min-w-0">{toast.text}</span>
             {toast.onAction && (
               <button
                 type="button"

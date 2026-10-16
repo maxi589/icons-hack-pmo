@@ -7,7 +7,7 @@ import type { Task } from "@/lib/tasks";
 // Alle Aufgaben mit Live-Updates. Änderungen erscheinen sofort (optimistisch) und werden bei Fehler
 // zurückgenommen. Versionszähler wie in use-organizations.ts: eine ältere Antwort überschreibt keine eigene Änderung.
 
-const FIELDS = "id, title, description, status, assignee_id, due_date, area_id, milestone_id, meeting_id, done_at, created_by, created_at";
+const FIELDS = "id, title, description, status, assignee_id, due_date, area_id, milestone_id, meeting_id, organization_id, done_at, created_by, created_at";
 
 export type TaskPatch = Partial<Omit<Task, "id" | "created_at">>;
 
@@ -15,11 +15,15 @@ export function useTasks() {
   const [tasks, setTasks] = useState<Task[] | null>(null);
   const version = useRef(0);
   const pending = useRef(0);
+  // Viele Ereignisse auf einmal (z. B. 5 Standard-Aufgaben anlegen und gleich wieder entfernen) lösen mehrere
+  // Neuladevorgänge aus; nur die Antwort des letzten zählt, sonst stünden kurz Aufgaben da, die es nicht mehr gibt.
+  const seq = useRef(0);
 
   const load = useCallback(async () => {
     const v = version.current;
+    const n = ++seq.current;
     const { data } = await createClient().from("tasks").select(FIELDS).order("created_at");
-    if (data && pending.current === 0 && v === version.current) setTasks(data as Task[]);
+    if (data && n === seq.current && pending.current === 0 && v === version.current) setTasks(data as Task[]);
   }, []);
 
   useEffect(() => {

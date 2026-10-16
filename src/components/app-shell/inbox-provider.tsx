@@ -56,10 +56,11 @@ async function targetNames(rows: Row[]) {
   const load = async (t: TargetType, table: string, field: string) => {
     const list = ids(t);
     if (!list.length) return;
-    const extra = t === "feedback" ? ", status" : "";
+    // Aufgaben mit Firma: „Vereinbarung schicken · Erste Bank“ (Standard-Aufgaben heißen bei jeder Firma gleich)
+    const extra = t === "feedback" ? ", status" : t === "task" ? ", org:organization_id(name)" : "";
     const { data } = await supabase.from(table).select(`id, ${field}${extra}`).in("id", list);
-    for (const d of (data ?? []) as unknown as Record<string, string>[]) {
-      names.set(`${t}:${d.id}`, d[field]);
+    for (const d of (data ?? []) as unknown as (Record<string, string> & { org?: { name: string } | null })[]) {
+      names.set(`${t}:${d.id}`, d.org?.name ? `${d[field]} · ${d.org.name}` : d[field]);
       if (d.status) statuses.set(`${t}:${d.id}`, d.status);
     }
   };

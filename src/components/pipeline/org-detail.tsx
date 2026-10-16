@@ -14,6 +14,8 @@ import { formatDayMonth, formatShort, todayInVienna } from "@/lib/dates";
 import type { OrgPatch } from "@/lib/data/use-organizations";
 import { DocBlock } from "@/components/dokumente/doc-block";
 import { MeetingBlock } from "@/components/termine/meeting-block";
+import { TaskBlock } from "@/components/tasks/task-block";
+import { orgArea } from "@/lib/standard-tasks";
 import { useFollowedUp } from "./use-followed-up";
 import {
   followState,
@@ -246,6 +248,16 @@ export function OrgDetail({
           </label>
           <EditText id={f("notes")} value={org.notes} placeholder="–" onSave={(v) => onUpdate({ notes: v })} multiline />
         </div>
+      </div>
+
+      {/* Was für die Firma zu tun ist (Maxi, 16.10.); Standard-Aufgaben kommen bei „Zugesagt“ von selbst */}
+      <div className="border-b border-line px-[18px] py-3.5">
+        <TaskBlock
+          variant="plain"
+          context={org.name}
+          match={(t) => t.organization_id === org.id}
+          defaults={{ organization_id: org.id, area_id: orgArea(org), assignee_id: org.owner_id ?? me?.id ?? null }}
+        />
       </div>
 
       {/* Calls und Meetings mit der Firma */}

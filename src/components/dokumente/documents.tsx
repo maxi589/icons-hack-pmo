@@ -213,7 +213,11 @@ export function Documents() {
           return docsApi.update(doc.id, title ? { content, title } : { content }, me?.id ?? null);
         }}
         onCreateTask={(title) =>
-          createTask({ title, area_id: doc.area_id }, (id) => `/aufgaben?aufgabe=${id}`)
+          // Dokument einer Firma: die Aufgabe gehört dann auch zur Firma (steht in deren Block „Aufgaben“)
+          createTask(
+            { title, area_id: doc.area_id, organization_id: doc.target_type === "organization" ? doc.target_id : null },
+            (id) => `/aufgaben?aufgabe=${id}`
+          )
         }
         onDelete={() => {
           close();

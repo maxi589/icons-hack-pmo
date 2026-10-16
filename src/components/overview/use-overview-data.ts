@@ -26,6 +26,7 @@ export type Task = {
   area_id: string | null;
   assignee_id: string | null;
   milestone_id: string | null;
+  organization_id: string | null;
 };
 
 export function useOverviewData() {
@@ -38,7 +39,7 @@ export function useOverviewData() {
       supabase.from("organizations").select("id, name, roles, stage, next_follow_up, owner_id, wave"),
       supabase
         .from("tasks")
-        .select("id, title, due_date, area_id, assignee_id, milestone_id")
+        .select("id, title, due_date, area_id, assignee_id, milestone_id, organization_id")
         .neq("status", "erledigt")
         .not("due_date", "is", null),
     ]);

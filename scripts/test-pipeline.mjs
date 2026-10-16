@@ -27,6 +27,18 @@ async function remove() {
   if (error) throw error;
   const ids = rows.map((r) => r.id);
   if (ids.length) {
+    // Aufgaben der Testfirmen (z. B. Standard-Aufgaben nach „Zugesagt“) mit entfernen, sonst blieben sie ohne Firma übrig
+    const { data: tasks, error: te } = await db.from("tasks").select("id").in("organization_id", ids);
+    if (te) throw te;
+    const taskIds = tasks.map((t) => t.id);
+    if (taskIds.length) {
+      for (const table of ["notifications", "comments", "activity"]) {
+        const { error: e } = await db.from(table).delete().eq("target_type", "task").in("target_id", taskIds);
+        if (e) throw new Error(`${table}: ${e.message}`);
+      }
+      const { error: e } = await db.from("tasks").delete().in("id", taskIds);
+      if (e) throw e;
+    }
     for (const table of ["notifications", "comments", "activity"]) {
       const { error: e } = await db.from(table).delete().eq("target_type", "organization").in("target_id", ids);
       if (e) throw new Error(`${table}: ${e.message}`);
