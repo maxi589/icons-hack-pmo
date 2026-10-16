@@ -6,6 +6,7 @@ import { useToast } from "@/components/toast";
 import { EditText, miniButton as mini, PropRow, SelectBox } from "@/components/detail-fields";
 import { cn } from "@/lib/utils";
 import { Select } from "@/components/ui/select";
+import { DateInput } from "@/components/ui/date-input";
 import { nameOptions, PRIO_OPTIONS } from "@/lib/options";
 import { Avatar } from "@/components/avatar";
 import { Feed } from "@/components/feed";
@@ -170,15 +171,14 @@ export function OrgDetail({
         <PropRow label="Nachfassen" htmlFor={f("follow")}>
           {/* flex-wrap: Ist „Nachgefasst“ da und wird es eng (Detail 400px), rutschen die Knöpfe in eine zweite Zeile */}
           <span className="flex flex-wrap items-center gap-1">
-            <input
+            <DateInput
               id={f("follow")}
-              type="date"
               value={org.next_follow_up ?? ""}
               onChange={(e) => onUpdate({ next_follow_up: e.target.value || null })}
               aria-describedby={follow && follow.tone !== "gray" ? f("follow-state") : undefined}
               className={cn(
                 // min-w-0 + flex-1: Datum gibt nach, damit „+1 W“ auch auf 375px-Handys sichtbar bleibt
-                "h-8 min-w-0 flex-1 rounded-lg bg-transparent px-2 text-[13px] tabular hover:bg-hover max-md:[&::-webkit-calendar-picker-indicator]:hidden md:flex-none",
+                "h-8 min-w-0 flex-1 rounded-lg px-2 text-[13px] hover:bg-hover max-md:text-base md:flex-none",
                 follow?.tone === "red" ? "font-medium text-st-red" : follow?.tone === "today" ? "font-medium text-acc-line" : "text-fg"
               )}
             />

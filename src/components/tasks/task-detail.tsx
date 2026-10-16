@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { Feed } from "@/components/feed";
 import { EditText, miniButton, PropRow, SelectBox } from "@/components/detail-fields";
+import { DateInput } from "@/components/ui/date-input";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { notifyAssignment } from "@/lib/data/use-feed";
 import type { TaskPatch } from "@/lib/data/use-tasks";
@@ -114,12 +115,11 @@ export function TaskDetail({
         </PropRow>
         <PropRow label="Fällig" htmlFor={f("due")}>
           <span className="flex flex-wrap items-center gap-1.5">
-            <input
+            <DateInput
               id={f("due")}
-              type="date"
               value={task.due_date ?? ""}
               onChange={(e) => onUpdate({ due_date: e.target.value || null })}
-              className="h-8 rounded-lg bg-transparent px-2 text-[13px] text-fg tabular hover:bg-hover"
+              className="h-8 rounded-lg px-2 text-[13px] text-fg hover:bg-hover max-md:text-base"
             />
             {!done && (
               <>
@@ -142,6 +142,7 @@ export function TaskDetail({
                   value={task.organization_id ?? ""}
                   onChange={(v) => onUpdate({ organization_id: v || null })}
                   options={nameOptions([...orgs].sort((a, b) => a.name.localeCompare(b.name, "de")), "Keine")}
+                  searchable
                 />
               </span>
               {task.organization_id && (

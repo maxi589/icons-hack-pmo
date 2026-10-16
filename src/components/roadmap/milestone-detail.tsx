@@ -18,6 +18,7 @@ import { formatShort } from "@/lib/dates";
 import { sortTasks, type Task } from "@/lib/tasks";
 import type { Milestone } from "@/lib/data/use-milestones";
 import { DATE_MAX, DATE_MIN, describeMilestone, shiftDays } from "./use-milestone-edit";
+import { DateInput } from "@/components/ui/date-input";
 
 // Roadmap-Cockpit (Entwurf Chat 18, Maxi 16.10.): links der Meilenstein (Titel, Beschreibung und Datum direkt änderbar,
 // „verschoben +X T“, Erledigt, Kommentar in einer Zeile, kurzer Verlauf), rechts „Gehört dazu“: Unterpunkte und
@@ -389,24 +390,16 @@ function DateField({
       <label htmlFor={id} className="sr-only">
         {label}
       </label>
-      <input
+      {/* Eigenes Kalender-Symbol links; Klick aufs Datum öffnet den Kalender des Systems (DateInput) */}
+      <DateInput
         id={id}
-        type="date"
         value={draft ?? value}
         min={min && min > DATE_MIN ? min : DATE_MIN}
         max={max && max < DATE_MAX ? max : DATE_MAX}
         onChange={(e) => setDraft(e.target.value)}
         onBlur={commit}
         onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}
-        // Eigenes Kalender-Symbol links, das des Browsers ist versteckt: Klick aufs Datum öffnet den Kalender trotzdem
-        onClick={(e) => {
-          try {
-            e.currentTarget.showPicker();
-          } catch {
-            // ältere Browser: Tippen ins Feld geht weiterhin
-          }
-        }}
-        className="field-sizing-content h-8 cursor-pointer rounded-lg bg-transparent pr-1.5 text-[13px] text-fg tabular max-md:h-11 max-md:text-base [&::-webkit-calendar-picker-indicator]:hidden"
+        className="h-8 rounded-lg pr-1.5 text-[13px] text-fg max-md:h-11 max-md:text-base"
       />
     </span>
   );

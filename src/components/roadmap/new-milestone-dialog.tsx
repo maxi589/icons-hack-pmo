@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Select } from "@/components/ui/select";
+import { DateInput } from "@/components/ui/date-input";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { nameOptions } from "@/lib/options";
 import type { Milestone } from "@/lib/data/use-milestones";
@@ -82,7 +83,7 @@ export function NewMilestoneDialog({
           <div className="grid grid-cols-2 gap-2.5">
             <label className="flex flex-col gap-1.5">
               <span className="text-[13px] text-fg-2">Datum</span>
-              <input type="date" required min={DATE_MIN} max={DATE_MAX} value={due} onChange={(e) => setDue(e.target.value)} className={field} />
+              <DateInput required min={DATE_MIN} max={DATE_MAX} value={due} onChange={(e) => setDue(e.target.value)} className={field} />
             </label>
             <div className="flex flex-col gap-1.5">
               <span className="text-[13px] text-fg-2">Bereich</span>

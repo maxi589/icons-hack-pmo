@@ -5,6 +5,7 @@ import { ArrowUpRight, Trash2, X } from "lucide-react";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { Feed } from "@/components/feed";
 import { EditText, PropRow, SelectBox } from "@/components/detail-fields";
+import { DateInput } from "@/components/ui/date-input";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { targetHref } from "@/lib/links";
 import type { Decision, DecisionPatch } from "@/lib/data/use-knowledge";
@@ -64,12 +65,11 @@ export function DecisionDetail({
           <EditText id={f("reason")} value={d.reason} placeholder="–" onSave={(v) => onUpdate({ reason: v })} multiline />
         </div>
         <PropRow label="Wann" htmlFor={f("date")}>
-          <input
+          <DateInput
             id={f("date")}
-            type="date"
             value={d.decided_on}
             onChange={(e) => e.target.value && onUpdate({ decided_on: e.target.value })}
-            className="h-8 rounded-lg bg-transparent px-2 text-[13px] text-fg tabular hover:bg-hover max-md:text-base"
+            className="h-8 w-fit rounded-lg px-2 text-[13px] text-fg hover:bg-hover max-md:text-base"
           />
         </PropRow>
         <div className="flex flex-col gap-1.5 py-1.5">

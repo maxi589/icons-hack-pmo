@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { Select } from "@/components/ui/select";
+import { DateInput } from "@/components/ui/date-input";
 import type { DecisionPatch } from "@/lib/data/use-knowledge";
 import { nameOptions } from "@/lib/options";
 import { parseTopic, PeoplePicker, topicOptions, type Topic } from "./pickers";
@@ -110,7 +111,7 @@ export function NewDecisionDialog({
           <div className="grid grid-cols-2 gap-2.5">
             <label className="flex flex-col gap-1.5">
               <span className={label}>Wann</span>
-              <input type="date" required value={date ?? today} onChange={(e) => setDate(e.target.value)} className={field} />
+              <DateInput required value={date ?? today} onChange={(e) => setDate(e.target.value)} className={field} />
             </label>
             <div className="flex flex-col gap-1.5">
               <span className={label}>Bereich</span>

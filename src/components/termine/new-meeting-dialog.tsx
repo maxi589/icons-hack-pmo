@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { Select } from "@/components/ui/select";
+import { DateInput } from "@/components/ui/date-input";
 import { PeoplePicker } from "@/components/wissen/pickers";
 import { durationOptions, nameOptions } from "@/lib/options";
 
@@ -99,7 +100,7 @@ export function NewMeetingDialog({
           <div className="grid grid-cols-2 gap-2.5 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)]">
             <label className="flex flex-col gap-1.5 max-md:col-span-2">
               <span className={label}>Datum</span>
-              <input type="date" required value={date ?? defaults.date} onChange={(e) => setDate(e.target.value)} className={field} />
+              <DateInput required value={date ?? defaults.date} onChange={(e) => setDate(e.target.value)} className={field} />
             </label>
             <label className="flex flex-col gap-1.5">
               <span className={label}>Beginn</span>

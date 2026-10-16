@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { Select } from "@/components/ui/select";
+import { DateInput } from "@/components/ui/date-input";
 import type { Milestone } from "@/lib/data/use-milestones";
 import { msSelectOptions, nameOptions } from "@/lib/options";
 
@@ -105,7 +106,7 @@ export function NewTaskDialog({
             </div>
             <label className="flex flex-col gap-1.5">
               <span className="text-[13px] text-fg-2">Fällig</span>
-              <input type="date" value={due} onChange={(e) => setDue(e.target.value)} className={field} />
+              <DateInput value={due} onChange={(e) => setDue(e.target.value)} placeholder="Ohne Frist" className={field} />
             </label>
           </div>
           <div className="flex flex-col gap-1.5">

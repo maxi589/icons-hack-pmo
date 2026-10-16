@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { Feed } from "@/components/feed";
 import { EditText, PropRow, SelectBox } from "@/components/detail-fields";
+import { DateInput } from "@/components/ui/date-input";
 import { durationOptions, nameOptions } from "@/lib/options";
 import { NoteEditor } from "@/components/editor/note-editor";
 import { useNotesDraft } from "@/components/editor/notes-card";
@@ -142,12 +143,11 @@ export function MeetingDetail({
       <div className="flex flex-col border-b border-line px-[18px] py-2.5">
         <PropRow label="Wann" htmlFor={f("date")}>
           <span className="flex flex-wrap items-center gap-1">
-            <input
+            <DateInput
               id={f("date")}
-              type="date"
               value={start.date}
               onChange={(e) => setStart(e.target.value, start.time)}
-              className="h-8 rounded-lg bg-transparent px-2 text-[13px] text-fg tabular hover:bg-hover max-md:text-base"
+              className="h-8 rounded-lg px-2 text-[13px] text-fg hover:bg-hover max-md:text-base"
             />
             <label className="sr-only" htmlFor={f("time")}>
               Beginn
@@ -203,6 +203,7 @@ export function MeetingDetail({
                 value={m.organization_id ?? ""}
                 onChange={(v) => onUpdate({ organization_id: v || null })}
                 options={nameOptions(sortedOrgs, "Keine")}
+                searchable
               />
             </span>
             {m.organization_id && (

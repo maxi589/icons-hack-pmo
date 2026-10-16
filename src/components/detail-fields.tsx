@@ -28,8 +28,21 @@ export function PropRow({ label, htmlFor, children }: { label: string; htmlFor?:
   );
 }
 
-export function SelectBox({ id, value, onChange, options }: { id: string; value: string; onChange: (v: string) => void; options: SelectOption[] }) {
-  return <Select id={id} value={value} onChange={onChange} options={options} className={selectCls} />;
+export function SelectBox({
+  id,
+  value,
+  onChange,
+  options,
+  searchable,
+}: {
+  id: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: SelectOption[];
+  /** Suchfeld in der Liste (lange Listen wie Firmen) */
+  searchable?: boolean;
+}) {
+  return <Select id={id} value={value} onChange={onChange} options={options} className={selectCls} searchable={searchable} />;
 }
 
 /** Textfeld, das wie Text aussieht und beim Verlassen speichert. */
