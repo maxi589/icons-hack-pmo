@@ -159,8 +159,10 @@ export function MilestoneDetail({
             <DueChip due={m.due_date} today={today} />
           )}
           {shift !== 0 && m.baseline_due && (
-            <span title={`Geplant war ${formatShort(m.baseline_due)}`}>
-              <Chip tone={shift > 0 ? "amber" : "gray"}>verschoben {shift > 0 ? `+${shift}` : `−${-shift}`} T</Chip>
+            // Schlanke Fassung (Maxi, 16.10.): nur „+2 T“, was es heißt, steht beim Drüberfahren und für Screenreader
+            <span title={`Verschoben, geplant war ${formatShort(m.baseline_due)}`}>
+              <span className="sr-only">Verschoben um </span>
+              <Chip tone={shift > 0 ? "amber" : "gray"}>{shift > 0 ? `+${shift}` : `−${-shift}`} T</Chip>
               <span className="sr-only">, geplant war {formatShort(m.baseline_due)}</span>
             </span>
           )}
@@ -206,7 +208,8 @@ export function MilestoneDetail({
         )}
         {showFeed && (
           <div className="pt-2">
-            <CompactFeed targetType="milestone" targetId={m.id} describe={describeMilestone} />
+            {/* Schlanke Fassung: Verlauf nur, wenn es Einträge gibt, und höchstens 2 Zeilen (Rest per „Alle n anzeigen“) */}
+            <CompactFeed targetType="milestone" targetId={m.id} describe={describeMilestone} limit={2} />
           </div>
         )}
       </div>
