@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { CalendarDays, Check, ChevronDown, MessageSquare, Plus, RotateCcw, X } from "lucide-react";
+import { CalendarDays, Check, ChevronDown, MessageSquare, Plus, RotateCcw, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { Chip, DueChip } from "@/components/chip";
@@ -10,6 +10,8 @@ import { MilestoneChecklist } from "@/components/milestone-checklist";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import { CompactFeed, Composer } from "@/components/feed";
 import { EditText } from "@/components/detail-fields";
+import { Select } from "@/components/ui/select";
+import { nameOptions } from "@/lib/options";
 import { StatusCheck } from "@/components/tasks/status-check";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { formatShort } from "@/lib/dates";
@@ -36,6 +38,9 @@ export function MilestoneDetail({
   onAddTask,
   onDate,
   onText,
+  onArea,
+  onStart,
+  onDelete,
   onSelect,
   highlighted = false,
   as: Tag = "section",
@@ -54,6 +59,12 @@ export function MilestoneDetail({
   onAddTask: (title: string) => Promise<boolean>;
   onDate: (to: string) => void;
   onText: (field: "title" | "description", value: string | null) => void;
+  /** Bereich wechseln (Punkt 5) */
+  onArea: (to: string) => void;
+  /** Beginn eines Zeitraums ändern (nur bei Meilensteinen mit start_date) */
+  onStart: (to: string) => void;
+  /** Löschen mit Rückgängig (Punkt 5) */
+  onDelete: () => void;
   onSelect?: (id: string) => void;
   highlighted?: boolean;
   as?: "section" | "article";
@@ -61,7 +72,7 @@ export function MilestoneDetail({
   /** Im Handy-Sheet: ohne Kartenrahmen, mit „Detail schließen“ in der Kopfzeile */
   onClose?: () => void;
 }) {
-  const { areaById, personById } = useTeam();
+  const { areaById, personById, allAreas } = useTeam();
   const area = areaById(m.area_id);
   const owner = personById(area?.owner_id);
   const done = m.status === "erledigt";
@@ -86,10 +97,16 @@ export function MilestoneDetail({
       <div className="flex min-w-0 flex-[1.4_1_420px] flex-col gap-1.5">
         <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-[12.5px] text-fg-2">
           <span className="font-mono text-fg-3">{m.id}</span>
-          <span className="inline-flex items-center gap-1.5">
-            <span className="size-[7px] rounded-full" style={{ background: area?.color }} aria-hidden />
-            {area?.name}
-          </span>
+          {/* Bereich sieht aus wie Text, Klick öffnet die Liste (Punkt 5): die Raute wandert in die andere Zeile */}
+          <Select
+            aria-label={`Bereich von ${m.id}`}
+            value={m.area_id}
+            onChange={onArea}
+            options={nameOptions(allAreas, "–").slice(1)}
+            leading={<span className="size-[7px] shrink-0 rounded-full" style={{ background: area?.color }} aria-hidden />}
+            hideChevron
+            className="-mx-1.5 h-7 gap-1.5 rounded-lg px-1.5 text-[12.5px] text-fg-2 hover:bg-hover hover:text-fg max-md:h-11"
+          />
           {parent && (
             <span className="text-fg-3">
               Teil von{" "}
@@ -110,6 +127,16 @@ export function MilestoneDetail({
             </span>
           )}
           <CopyLinkButton path={`/roadmap?m=${m.id}`} label={`Link zu ${m.id} kopieren`} className="-my-1 ml-auto" />
+          {/* Löschen wie bei Terminen (Punkt 5): Hinweis mit Rückgängig statt Sicherheitsfrage */}
+          <button
+            type="button"
+            onClick={onDelete}
+            title={`${m.id} löschen`}
+            aria-label={`${m.id} löschen`}
+            className="-my-1 grid size-8 shrink-0 place-items-center rounded-lg text-fg-3 transition-colors duration-150 hover:bg-hover hover:text-st-red max-md:size-11"
+          >
+            <Trash2 className="size-4" aria-hidden />
+          </button>
           {onClose && (
             <button
               type="button"
@@ -150,7 +177,16 @@ export function MilestoneDetail({
         </div>
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12.5px] text-fg-2">
-          <DateField id={f("due")} value={m.due_date} min={m.start_date ?? undefined} onCommit={onDate} />
+          {/* Zeitraum (M2, M3): Beginn ebenfalls per Klick änderbar, „19.10.2026 – 30.11.2026“ */}
+          {m.start_date && (
+            <>
+              <DateField id={f("start")} label="Beginnt am" value={m.start_date} max={m.due_date} onCommit={onStart} />
+              <span className="-mx-1.5 text-fg-3" aria-hidden>
+                –
+              </span>
+            </>
+          )}
+          <DateField id={f("due")} value={m.due_date} min={m.start_date ?? undefined} onCommit={onDate} icon={!m.start_date} />
           {done ? (
             <Chip tone="green">
               <Check className="size-3" strokeWidth={3} aria-hidden />
@@ -212,7 +248,7 @@ export function MilestoneDetail({
         {showFeed && (
           <div className="pt-2">
             {/* Schlanke Fassung: Verlauf nur, wenn es Einträge gibt, und höchstens 2 Zeilen (Rest per „Alle n anzeigen“) */}
-            <CompactFeed targetType="milestone" targetId={m.id} describe={describeMilestone} limit={2} />
+            <CompactFeed targetType="milestone" targetId={m.id} describe={(a) => describeMilestone(a, (id) => areaById(id)?.name ?? id)} limit={2} />
           </div>
         )}
       </div>
@@ -312,7 +348,24 @@ function AddTaskRow({ id, onAdd }: { id: string; onAdd: (title: string) => Promi
 
 /** Datum, das wie Text aussieht; gespeichert wird beim Verlassen bzw. mit Enter (Tippen in den Teilfeldern löst
  *  sonst bei jeder Ziffer eine Änderung aus) und, falls das Feld dabei verschwindet (Handy-Sheet zu), beim Abbauen. */
-function DateField({ id, value, min, onCommit }: { id: string; value: string; min?: string; onCommit: (v: string) => void }) {
+function DateField({
+  id,
+  value,
+  min,
+  max,
+  label = "Fällig am",
+  icon = true,
+  onCommit,
+}: {
+  id: string;
+  value: string;
+  min?: string;
+  max?: string;
+  label?: string;
+  /** Kalender-Symbol davor (beim Ende eines Zeitraums nicht, das Symbol steht schon vor dem Beginn) */
+  icon?: boolean;
+  onCommit: (v: string) => void;
+}) {
   const [draft, setDraft] = useState<string | null>(null);
   const pending = useRef<{ draft: string | null; value: string; onCommit: (v: string) => void }>({ draft: null, value, onCommit });
   useEffect(() => {
@@ -332,16 +385,16 @@ function DateField({ id, value, min, onCommit }: { id: string; value: string; mi
   };
   return (
     <span className="inline-flex items-center gap-1 rounded-lg pl-1.5 hover:bg-hover">
-      <CalendarDays className="size-3.5 shrink-0 text-fg-3" aria-hidden />
+      {icon && <CalendarDays className="size-3.5 shrink-0 text-fg-3" aria-hidden />}
       <label htmlFor={id} className="sr-only">
-        Fällig am
+        {label}
       </label>
       <input
         id={id}
         type="date"
         value={draft ?? value}
         min={min && min > DATE_MIN ? min : DATE_MIN}
-        max={DATE_MAX}
+        max={max && max < DATE_MAX ? max : DATE_MAX}
         onChange={(e) => setDraft(e.target.value)}
         onBlur={commit}
         onKeyDown={(e) => e.key === "Enter" && e.currentTarget.blur()}

@@ -11,9 +11,10 @@ import type { Milestone, MilestonePatch } from "@/lib/data/use-milestones";
 // zurücknehmen lassen). In den Verlauf kommt sie erst nach Ablauf des Hinweises und nur, wenn sie gespeichert ist,
 // immer mit altem und neuem Wert.
 
-/** Datum nur im Rahmen des Zeitstrahls (sonst z. B. „0002-10-21“ aus einem halb getippten Jahr, Prüfer 16.10.). */
-export const DATE_MIN = "2026-09-01";
-export const DATE_MAX = "2027-03-31";
+/** Datum nur im Rahmen des Zeitstrahls 1.10.2026–28.2.2027 (sonst z. B. „0002-10-21“ aus einem halb getippten Jahr oder
+ *  eine Raute, die optisch am Rand klebt; Prüfer 16.10.). */
+export const DATE_MIN = "2026-10-01";
+export const DATE_MAX = "2027-02-28";
 
 const clean = (v: unknown) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "");
 
@@ -45,8 +46,13 @@ export function useMilestoneEdit(update: (id: string, patch: MilestonePatch) => 
 
   const changeDate = (m: Milestone, to: string) => {
     if (!to || to === m.due_date) return;
+    // Das Event-Datum hängt am Countdown und an der Zeitachse (Prüfer 16.10.)
+    if (m.id === "M8") {
+      toast({ text: "M8 ist der Hackathon selbst, sein Datum bleibt fest.", error: true });
+      return;
+    }
     if (to < DATE_MIN || to > DATE_MAX) {
-      toast({ text: "Datum bitte zwischen 1.9.2026 und 31.3.2027.", error: true });
+      toast({ text: "Datum bitte zwischen 1.10.2026 und 28.2.2027.", error: true });
       return;
     }
     // Balken (M2, M3): Ende nicht vor dem Beginn
@@ -64,7 +70,27 @@ export function useMilestoneEdit(update: (id: string, patch: MilestonePatch) => 
     change(m, field, value, `${m.id}: ${field === "title" ? "Titel" : "Beschreibung"} geändert`, logged);
   };
 
-  return { changeDate, changeText };
+  /** Bereich wechseln (Punkt 5): die Raute wandert in die andere Zeile des Zeitstrahls. */
+  const changeArea = (m: Milestone, to: string, toName: string) => {
+    if (!to || to === m.area_id) return;
+    change(m, "area_id", to, `${m.id} → ${toName}`, true);
+  };
+
+  /** Beginn eines Zeitraums (M2, M3) ändern: nicht nach dem Ende, nicht außerhalb des Rahmens. */
+  const changeStart = (m: Milestone, to: string) => {
+    if (!to || to === m.start_date) return;
+    if (to < DATE_MIN || to > DATE_MAX) {
+      toast({ text: "Datum bitte zwischen 1.10.2026 und 28.2.2027.", error: true });
+      return;
+    }
+    if (to > m.due_date) {
+      toast({ text: `${m.id} endet am ${formatShort(m.due_date)}, später beginnen geht nicht.`, error: true });
+      return;
+    }
+    change(m, "start_date", to, `${m.id} beginnt ${formatShort(to)}`, true);
+  };
+
+  return { changeDate, changeText, changeArea, changeStart };
 }
 
 /** „verschoben +2 T“: Abstand zum ursprünglich geplanten Datum (Spalte baseline_due), 0 = wie geplant. */
@@ -92,12 +118,16 @@ const shortText = (v: unknown) => {
   return s.length > 60 ? `${s.slice(0, 59)}…` : s;
 };
 
-/** Verlauf eines Meilensteins in Worten (vorher stand hier der Rohtext der Aktion). */
-export function describeMilestone(a: Extract<FeedItem, { kind: "activity" }>) {
+/** Verlauf eines Meilensteins in Worten (vorher stand hier der Rohtext der Aktion). `areaName` übersetzt Bereichs-IDs. */
+export function describeMilestone(a: Extract<FeedItem, { kind: "activity" }>, areaName: (id: string) => string = (id) => id) {
   const d = a.data;
+  if (a.action === "created") return "hat den Meilenstein angelegt";
+  if (a.action === "sub_deleted") return `hat den Unterpunkt ${String(d.id)} „${shortText(d.title)}“ gelöscht`;
   if (a.action === "status_changed") return d.to === "erledigt" ? "hat abgehakt" : "hat wieder geöffnet";
   if (a.action === "updated") {
     if (d.field === "due_date") return `hat das Datum von ${formatShort(String(d.from))} auf ${formatShort(String(d.to))} verschoben`;
+    if (d.field === "start_date") return `hat den Beginn von ${formatShort(String(d.from))} auf ${formatShort(String(d.to))} verschoben`;
+    if (d.field === "area_id") return `hat den Bereich von ${areaName(String(d.from))} auf ${areaName(String(d.to))} geändert`;
     if (d.field === "title") return `hat den Titel geändert: ${pair(d.from, d.to)}`;
     if (d.field === "description") {
       if (!clean(d.to)) return "hat die Beschreibung entfernt";

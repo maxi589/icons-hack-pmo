@@ -24,7 +24,18 @@ export function axisEdge(isoDate: string) {
 }
 
 // Zeiträume ohne eigenen Meilenstein. M2 und M3 kommen mit start_date aus der Datenbank.
+// Seit 16.10. (Punkt 5) folgen sie den Meilensteinen: Welle 3 von M3.3 bis M3, Bewerbung von M5 bis M7.
+// Die festen Daten gelten nur, wenn ein Meilenstein fehlt.
 export const PLAN_BARS = [
-  { areaId: "sponsoren", from: "2026-11-16", to: "2026-12-18", label: "Welle 3 Sponsoren bis zur Fixierung", faint: true },
-  { areaId: "marketing", from: "2026-11-30", to: "2027-01-22", label: "Bewerbung (Luma) bis zur Auswahl", faint: false },
+  { areaId: "sponsoren", from: "2026-11-16", to: "2026-12-18", label: "Welle 3 Sponsoren bis zur Fixierung", faint: true, fromId: "M3.3", toId: "M3" },
+  { areaId: "marketing", from: "2026-11-30", to: "2027-01-22", label: "Bewerbung (Luma) bis zur Auswahl", faint: false, fromId: "M5", toId: "M7" },
 ];
+
+export function planBarsFor(list?: readonly { id: string; due_date: string }[] | null) {
+  const due = (id: string) => list?.find((m) => m.id === id)?.due_date;
+  return PLAN_BARS.map(({ fromId, toId, ...b }) => {
+    const from = due(fromId) ?? b.from;
+    const to = due(toId) ?? b.to;
+    return { ...b, from, to: to < from ? from : to };
+  });
+}

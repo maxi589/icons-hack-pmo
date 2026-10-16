@@ -17,7 +17,7 @@ import { useIsMobile } from "@/lib/use-is-mobile";
 import { useMeetings } from "@/lib/data/use-meetings";
 import { endOf, meetingHref, viennaParts, type Meeting } from "@/lib/meetings";
 import { daysBetween, EVENT_START, EVENT_START_UTC, formatDayMonth, formatHeaderDate, formatLong, formatShort, relativeDays, TIME_ZONE } from "@/lib/dates";
-import { currentPhase, phaseFill, PHASES, WAVE_1 } from "@/lib/phases";
+import { currentPhase, phaseFill, phasesFor, wave1For, type Phase } from "@/lib/phases";
 import { MilestoneChecklist } from "@/components/milestone-checklist";
 import { StatusCheck } from "@/components/tasks/status-check";
 import { useFollowedUp } from "@/components/pipeline/use-followed-up";
@@ -35,10 +35,11 @@ const card = "rounded-[12px] bg-card shadow-card md:rounded-[14px]";
 const EVENT_UNTIL = `bis ${format(parseISO(EVENT_START), "EEEEEE d.M.", { locale: de })}, ${new Intl.DateTimeFormat("de-AT", { timeZone: TIME_ZONE, hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(EVENT_START_UTC)}`;
 
 /** „noch 4 Tage Vorbereitung“ bzw. „letzter Tag Vorbereitung“ */
-function phaseLeft(today: string, phase: number) {
-  const n = daysBetween(today, PHASES[phase].end);
-  if (n < 0) return PHASES[phase].name;
-  return n === 0 ? `letzter Tag ${PHASES[phase].name}` : `noch ${n} ${n === 1 ? "Tag" : "Tage"} ${PHASES[phase].name}`;
+function phaseLeft(today: string, phase: number, phases: readonly Phase[]) {
+  const p = phases[phase];
+  const n = daysBetween(today, p.end);
+  if (n < 0) return p.name;
+  return n === 0 ? `letzter Tag ${p.name}` : `noch ${n} ${n === 1 ? "Tag" : "Tage"} ${p.name}`;
 }
 
 export function Overview() {
@@ -48,7 +49,9 @@ export function Overview() {
 
   if (!today || !data) return <OverviewSkeleton />;
 
-  const phase = currentPhase(today);
+  // Phasen folgen den Meilensteinen (Punkt 5): wer M1 verschiebt, verschiebt die Vorbereitung
+  const phases = phasesFor(data.milestones);
+  const phase = currentPhase(today, phases);
 
   return (
     <div className="mx-auto flex w-full max-w-[1440px] flex-col gap-3 px-3.5 pt-1.5 pb-6 md:gap-5 md:px-8 md:pt-8 md:pb-12">
@@ -57,11 +60,11 @@ export function Overview() {
       <p className="label-mono -mb-1 pt-1 md:pt-0">
         <span className="max-md:hidden">{formatLong(today)} · </span>
         <span className="md:hidden">{formatHeaderDate(today)} · </span>
-        {phaseLeft(today, phase)}
+        {phaseLeft(today, phase, phases)}
       </p>
 
       <div className="flex flex-wrap gap-3 md:gap-4">
-        <CountdownCard today={today} phase={phase} />
+        <CountdownCard today={today} phase={phase} phases={phases} />
         <TodayCard tasks={data.tasks} orgs={data.orgs} meetings={meetings || []} today={today} />
         <NextMilestoneCard milestones={data.milestones} today={today} onToggle={setMilestoneDone} />
       </div>
@@ -72,7 +75,7 @@ export function Overview() {
         <DueCard milestones={data.milestones} tasks={data.tasks} orgs={data.orgs} meetings={meetings || []} today={today} />
         {/* Handy: eigene Nachfass-Fälle stehen in „Heute für dich“, das ganze Team in der Pipeline (15.10.) */}
         <div className="flex min-w-0 flex-[1_1_320px] max-md:hidden">
-          <FollowUpCard orgs={data.orgs} today={today} />
+          <FollowUpCard orgs={data.orgs} today={today} wave1={wave1For(data.milestones)} />
         </div>
       </div>
 
@@ -84,7 +87,7 @@ export function Overview() {
 // ---------------------------------------------------------------
 // Countdown mit Phasen-Leiste
 // ---------------------------------------------------------------
-function CountdownCard({ today, phase }: { today: string; phase: number }) {
+function CountdownCard({ today, phase, phases }: { today: string; phase: number; phases: readonly Phase[] }) {
   return (
     <section className={cn(card, "relative isolate flex min-w-0 flex-[1.45_1_440px] flex-col justify-between gap-[22px] overflow-hidden px-4 py-3.5 md:px-6 md:py-[22px]")}>
       <RasterField />
@@ -93,10 +96,10 @@ function CountdownCard({ today, phase }: { today: string; phase: number }) {
       <Countdown />
       <p className="-mt-2 text-[13px] text-fg-2 max-md:hidden">{EVENT_UNTIL}</p>
       <ol className="grid grid-cols-5 gap-1.5 max-md:hidden" aria-label="Phasen">
-        {PHASES.map((p, i) => (
+        {phases.map((p, i) => (
           <li key={p.name} className="flex flex-col gap-2" aria-current={i === phase ? "step" : undefined}>
             <div className="h-1 overflow-hidden rounded-sm bg-line-2">
-              <div className={cn("h-full rounded-sm bg-acc-line", i === phase && "bar-sheen")} style={{ width: `${Math.round(phaseFill(i, today) * 100)}%` }} />
+              <div className={cn("h-full rounded-sm bg-acc-line", i === phase && "bar-sheen")} style={{ width: `${Math.round(phaseFill(i, today, phases) * 100)}%` }} />
             </div>
             <div className="hidden flex-col gap-0.5 sm:flex">
               <span className={cn("text-[12.5px] font-medium", i === phase ? "text-fg" : "text-fg-3")}>{i === phase ? <span className="phase-sweep">{p.name}</span> : p.name}</span>
@@ -198,15 +201,16 @@ function NextMilestoneCard({
 function GoalTiles({ orgs, milestones }: { orgs: Org[]; milestones: Milestone[] }) {
   const won = (role: Org["roles"][number], stages: Org["stage"][] = ["zugesagt", "fix"]) =>
     orgs.filter((o) => o.roles.includes(role) && stages.includes(o.stage)).length;
-  const due = (id: string) => {
+  // „bis Fr, 18.12.“; fehlt der Meilenstein (gelöscht, Punkt 5), steht nichts statt „bis “
+  const until = (id: string) => {
     const m = milestones.find((x) => x.id === id);
-    return m ? formatShort(m.due_date) : "";
+    return m ? `bis ${formatShort(m.due_date)}` : "";
   };
 
   const goals = [
-    { label: "Track-Partner zugesagt", short: "Track-Partner", value: won("challenge"), target: 4, note: `bis ${due("M3")}` },
-    { label: "Jury zugesagt", short: "Jury", value: won("jury"), target: 4, note: `bis ${due("M4")}` },
-    { label: "Venue fixiert", short: "Venue", value: won("venue", ["fix"]), target: 1, note: `plus Backup · bis ${due("M2")}` },
+    { label: "Track-Partner zugesagt", short: "Track-Partner", value: won("challenge"), target: 4, note: until("M3") },
+    { label: "Jury zugesagt", short: "Jury", value: won("jury"), target: 4, note: until("M4") },
+    { label: "Venue fixiert", short: "Venue", value: won("venue", ["fix"]), target: 1, note: ["plus Backup", until("M2")].filter(Boolean).join(" · ") },
   ];
 
   // Sponsoring in € (Maxi, 16.10.): alles Partner-Geld ab „Zugesagt“, Ziel setzt das Team im Bereich Sponsoren
@@ -394,7 +398,7 @@ function DueCard({ milestones, tasks, orgs, meetings, today }: { milestones: Mil
 // Heute nachfassen
 // ---------------------------------------------------------------
 // Kreis abhaken = nachgefasst (Maxi, 15.10., wie „Heute für dich“ am Handy): nächstes Mal in 7 Tagen, Verlaufseintrag.
-function FollowUpCard({ orgs, today }: { orgs: Org[]; today: string }) {
+function FollowUpCard({ orgs, today, wave1 }: { orgs: Org[]; today: string; wave1: string }) {
   const { personById } = useTeam();
   const followedUp = useFollowedUp();
   // Abgehakte Zeilen verschwinden sofort, solange die Live-Daten noch das alte Datum zeigen; „Rückgängig“ holt sie zurück.
@@ -441,7 +445,7 @@ function FollowUpCard({ orgs, today }: { orgs: Org[]; today: string }) {
       ) : (
         <div className="flex flex-1 flex-col items-center justify-center gap-2.5 rounded-[10px] bg-card-2 px-3 py-5 text-center">
           <p className="text-[14px] font-medium">Noch nichts nachzufassen</p>
-          {today < WAVE_1 && <p className="text-[13px] text-fg-2">Welle 1 startet am {formatShort(WAVE_1)}</p>}
+          {today < wave1 && <p className="text-[13px] text-fg-2">Welle 1 startet am {formatShort(wave1)}</p>}
         </div>
       )}
     </section>

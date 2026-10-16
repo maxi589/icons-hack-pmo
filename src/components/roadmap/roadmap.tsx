@@ -10,16 +10,19 @@ import { useIsMobile } from "@/lib/use-is-mobile";
 import { MobileTitle, PageHeader } from "@/components/app-shell/page-header";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { useToday } from "@/lib/use-today";
-import { useMilestones, type Milestone } from "@/lib/data/use-milestones";
+import { nextMilestoneId, usedMilestoneIds, useMilestones, type Milestone } from "@/lib/data/use-milestones";
+import { logActivity } from "@/lib/data/use-feed";
+import { useToast } from "@/components/toast";
 import { daysBetween, formatDayMonth, formatShort, relativeDays } from "@/lib/dates";
 import { FOLLOW_UP_ROUNDS } from "@/lib/phases";
-import { AXIS_DAYS, axisEdge, axisPos, MONTHS, PLAN_BARS } from "@/lib/roadmap";
+import { AXIS_DAYS, axisEdge, axisPos, MONTHS, planBarsFor } from "@/lib/roadmap";
 import { Segmented } from "@/components/segmented";
 import { useTaskActions } from "@/components/tasks/use-task-actions";
 import { useTasks } from "@/lib/data/use-tasks";
 import type { Task } from "@/lib/tasks";
 import { MilestoneDetail } from "./milestone-detail";
 import { useMilestoneEdit } from "./use-milestone-edit";
+import { NewMilestoneDialog, type NewMilestoneInput } from "./new-milestone-dialog";
 
 // Roadmap (Board „Graphit-Roadmap“): Zeitstrahl je Bereich mit Rauten und Balken, darunter das
 // Detail-Panel. Umschalter Zeitstrahl/Liste; am Handy nur die Liste. Auswahl steht in der Adresse (?m=M2).
@@ -28,7 +31,7 @@ type View = "timeline" | "list";
 
 export function Roadmap() {
   const today = useToday();
-  const { milestones, setMilestoneDone, updateMilestone } = useMilestones();
+  const { milestones, setMilestoneDone, updateMilestone, createMilestone, deleteMilestone, restoreMilestone } = useMilestones();
   const [view, setView] = useState<View>("timeline");
   const [picked, setPicked] = useState<string | null>(null);
   // Aufgaben einmal für die Seite (die Liste zeigt viele Karten; je Karte laden hieße je Karte ein Live-Kanal)
@@ -82,11 +85,96 @@ export function Roadmap() {
       pin(m.id);
       edit.changeText(m, field, value);
     },
+    onArea: (to: string) => {
+      pin(m.id);
+      edit.changeArea(m, to, areaById(to)?.name ?? to);
+    },
+    onStart: (to: string) => {
+      pin(m.id);
+      edit.changeStart(m, to);
+    },
+    onDelete: () => removeMilestone(m),
   });
+
+  // ---- Roadmap pflegen (Maxi, 16.10., Punkt 5) ----
+  const toast = useToast();
+  const [creating, setCreating] = useState(false);
+
+  /** „+ Meilenstein“: Nummer vergibt das Tool (nie eine schon benutzte), danach steht das neue Cockpit offen;
+   *  Rückgängig löscht wieder. Ist die Nummer inzwischen vergeben (zwei Personen gleichzeitig), nimmt es die nächste. */
+  const addMilestone = async (input: NewMilestoneInput) => {
+    const list = milestones ?? [];
+    const used = await usedMilestoneIds();
+    const sort = Math.max(0, ...list.map((x) => x.sort)) + 1;
+    let id = "";
+    for (let tries = 0; ; tries++) {
+      id = nextMilestoneId(list, input.parent_id, used);
+      const res = await createMilestone({ id, sort, ...input });
+      if (res === "ok") break;
+      if (res === "error" || tries >= 2) return false;
+      used.push(id);
+    }
+    // Erst wenn der Dialog zu ist (sonst landet der Fokus am Handy hinter dem Sheet)
+    setTimeout(() => select(id), 200);
+    const meId = me?.id ?? null;
+    let undone = false;
+    toast({
+      text: `${id} angelegt`,
+      onAction: async () => {
+        undone = true;
+        const res = await deleteMilestone(id);
+        if (!res || "blocked" in res) return toast({ text: `${id} nicht gelöscht. Bitte im Cockpit löschen.`, error: true });
+        // Auswahl und Adresse nicht auf dem gelöschten Meilenstein stehen lassen
+        setPicked((p) => (p === id ? null : p));
+        if (new URLSearchParams(window.location.search).get("m") === id) window.history.replaceState(null, "", "/roadmap");
+      },
+      onExpire: () => !undone && logActivity("milestone", id, meId, "created"),
+    });
+    return true;
+  };
+
+  /** Löschen mit Rückgängig. Unterpunkte zuerst (die Datenbank prüft mit; sonst löschte „on delete cascade“ sie still
+   *  mit); Aufgaben bleiben und verlieren nur die Verknüpfung, Rückgängig verknüpft sie wieder. Unterpunkte hinterlassen
+   *  eine Spur im Verlauf des Oberpunkts. M8 ist das Event selbst (Countdown, Zeitachse) und bleibt. */
+  const removeMilestone = async (m: Milestone) => {
+    if (m.id === "M8") return toast({ text: "M8 ist der Hackathon selbst und bleibt.", error: true });
+    const deleted = await deleteMilestone(m.id);
+    if (!deleted) return toast({ text: `${m.id} nicht gelöscht. Bitte nochmal versuchen.`, error: true });
+    if ("blocked" in deleted) {
+      return toast({ text: `${m.id} hat Unterpunkte (${deleted.blocked.join(", ")}). Bitte zuerst diese löschen.`, error: true });
+    }
+    if (picked === m.id) closeSheet();
+    const n = deleted.taskIds.length;
+    const meId = me?.id ?? null;
+    let undone = false;
+    toast({
+      text: `${m.id} gelöscht${n ? ` · ${n} ${n === 1 ? "Aufgabe" : "Aufgaben"} ohne Meilenstein` : ""}`,
+      onAction: async () => {
+        undone = true;
+        const res = await restoreMilestone(deleted);
+        if (res === "error") return toast({ text: `${m.id} nicht zurückgeholt.`, error: true });
+        select(m.id);
+        if (res === "partial") toast({ text: `${m.id} ist zurück, die Aufgaben aber nicht wieder verknüpft.`, error: true });
+      },
+      onExpire: () => {
+        if (!undone && m.parent_id) logActivity("milestone", m.parent_id, meId, "sub_deleted", { id: m.id, title: m.title });
+      },
+    });
+  };
   const tops = (milestones ?? []).filter((m) => !m.parent_id);
   const selected = byId(picked) ?? tops.find((m) => m.status !== "erledigt") ?? tops[0] ?? null;
   // In der Liste stehen Unterpunkte in der Karte ihres Meilensteins.
   const listTarget = selected?.parent_id ?? selected?.id;
+
+  // Link auf einen Meilenstein, den es nicht (mehr) gibt (gelöscht, alter WhatsApp-Link): sagen statt still einen
+  // anderen zu zeigen; Auswahl und Adresse leeren.
+  useEffect(() => {
+    if (!milestones || !picked || milestones.some((m) => m.id === picked)) return;
+    toast({ text: `${picked} gibt es nicht mehr.`, error: true });
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- Auswahl folgt den Live-Daten (Meilenstein verschwunden)
+    closeSheet();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- nur wenn Liste oder Auswahl wechseln
+  }, [milestones, picked]);
 
   // Nach dem Laden zum verlinkten Meilenstein scrollen (Liste am Handy).
   const ready = Boolean(milestones && today);
@@ -100,7 +188,7 @@ export function Roadmap() {
 
   return (
     <>
-      <PageHeader title="Roadmap">
+      <PageHeader title="Roadmap" action={{ label: "Meilenstein", onClick: () => milestones && setCreating(true) }}>
         <Segmented
           label="Ansicht"
           value={view}
@@ -111,7 +199,7 @@ export function Roadmap() {
           ]}
         />
       </PageHeader>
-      <MobileTitle title="Roadmap" />
+      <MobileTitle title="Roadmap" action={{ label: "Meilenstein", onClick: () => milestones && setCreating(true) }} />
       <h1 className="sr-only max-md:hidden">Roadmap</h1>
 
       {!milestones || !today ? (
@@ -180,6 +268,7 @@ export function Roadmap() {
         </MobileSheet>
       )}
 
+      <NewMilestoneDialog open={creating} onOpenChange={setCreating} milestones={milestones ?? []} onCreate={addMilestone} />
     </>
   );
 }
@@ -343,7 +432,7 @@ function Timeline({
               ...milestones
                 .filter((m) => m.area_id === a.id && m.start_date)
                 .map((m) => ({ key: m.id, from: m.start_date!, to: m.due_date, label: `${m.id} · ${m.title}`, faint: false })),
-              ...PLAN_BARS.filter((b) => b.areaId === a.id).map((b) => ({ ...b, key: b.label })),
+              ...planBarsFor(milestones).filter((b) => b.areaId === a.id).map((b) => ({ ...b, key: b.label })),
             ];
             return (
               <div key={a.id} className="relative h-[58px] border-t border-line">

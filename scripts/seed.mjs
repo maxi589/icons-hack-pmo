@@ -1,10 +1,17 @@
 // Startdaten einspielen: Team (Allowlist), Bereiche, Meilensteine.
-// Aufruf im Repo: node --env-file=.env.local scripts/seed.mjs
+// Aufruf im Repo: node --env-file=.env.local scripts/seed.mjs --erzwingen
 // Braucht NEXT_PUBLIC_SUPABASE_URL und SUPABASE_SECRET_KEY in .env.local.
-// Mehrfach ausführbar: vorhandene Einträge werden aktualisiert, nichts wird gelöscht.
+// ACHTUNG: Seit 16.10. pflegt das Team Roadmap und Bereiche im Tool. Das Skript überschreibt Bereiche und Meilensteine
+// mit den alten Startdaten (docs/daten/meilensteine.json ist veraltet) und legt abgeschaffte Bereiche wieder an.
+// Am 16.10. abends ist das einmal versehentlich passiert (aus dem Backup repariert). Nur für eine leere Test-Datenbank.
 
 import { readFileSync } from "node:fs";
 import { createClient } from "@supabase/supabase-js";
+
+if (!process.argv.includes("--erzwingen")) {
+  console.error("Abgebrochen: würde die im Tool gepflegte Roadmap und die Bereiche überschreiben. Nur für eine leere Test-Datenbank, dann mit --erzwingen.");
+  process.exit(1);
+}
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const key = process.env.SUPABASE_SECRET_KEY;
