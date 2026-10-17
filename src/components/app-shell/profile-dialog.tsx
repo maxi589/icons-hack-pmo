@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
-import { Plus } from "lucide-react";
+import { Check, Plus } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Avatar } from "@/components/avatar";
 import { CopyLinkButton } from "@/components/copy-link-button";
@@ -266,13 +266,19 @@ function TeamSection({ members, meId, onInvited }: { members: Member[]; meId?: s
           <li key={m.id} className="flex min-h-11 items-center gap-3">
             <Avatar person={m} />
             <div className="flex min-w-0 flex-1 items-baseline gap-2">
-              <span className="shrink-0 text-[13.5px] text-fg">{m.name}</span>
-              <span className="truncate text-[13px] text-fg-3">{m.email}</span>
+              <span className="truncate text-[13.5px] text-fg">{m.name}</span>
+              <span className="flex-1 truncate text-[13px] text-fg-3">{m.email}</span>
             </div>
+            {/* Konto entsteht erst beim ersten Anmelden, user_id gesetzt = hat sich schon angemeldet. */}
             {m.id === meId ? (
-              <span className="text-[12.5px] text-fg-3">du</span>
+              <span className="shrink-0 text-[12.5px] text-fg-3">du</span>
+            ) : m.user_id ? (
+              <span className="inline-flex shrink-0 items-center gap-1 text-[12.5px] text-st-green">
+                <Check className="size-3.5" strokeWidth={2.4} aria-hidden />
+                angemeldet
+              </span>
             ) : (
-              !m.user_id && <span className="text-[12.5px] text-fg-3">eingeladen</span>
+              <span className="shrink-0 whitespace-nowrap text-[12.5px] text-fg-3">noch nicht angemeldet</span>
             )}
           </li>
         ))}
