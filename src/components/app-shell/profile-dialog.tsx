@@ -151,8 +151,8 @@ function PasswordSection() {
               required
               value={repeat}
               onChange={(e) => setRepeat(e.target.value)}
-              placeholder="Wiederholen"
-              aria-label="Neues Passwort wiederholen"
+              placeholder="Passwort bestätigen"
+              aria-label="Neues Passwort bestätigen"
               className={field}
             />
           </div>
