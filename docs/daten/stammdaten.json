@@ -16,7 +16,7 @@
     { "was": "Jurymitglieder zugesagt",    "ziel": 4, "quelle": "M4" },
     { "was": "Venue fixiert (plus Backup)", "ziel": 1, "quelle": "M2" }
   ],
-  "nachfass_termine": ["2026-11-02", "2026-11-16", "2026-11-30"],
+  "nachfass_termine": ["2026-11-16", "2026-11-23", "2026-11-30", "2026-12-07"],
   "pipeline": {
     "typen": ["Partner", "Sponsor", "Venue", "Jury"],
     "stufen": ["Recherche", "Kontaktiert", "Im Gespräch", "Zugesagt", "Fix", "Abgesagt"]

@@ -9,8 +9,8 @@ import { daysBetween, formatDayMonth } from "./dates";
 export type Phase = { name: string; start: string; end: string; label: string };
 
 export const PHASES: readonly Phase[] = [
-  { name: "Vorbereitung", start: "2026-10-01", end: "2026-10-18", label: "bis 18.10." },
-  { name: "Akquise", start: "2026-10-19", end: "2026-12-18", label: "bis 18.12." },
+  { name: "Vorbereitung", start: "2026-10-01", end: "2026-11-01", label: "bis 1.11." },
+  { name: "Akquise", start: "2026-11-02", end: "2026-12-18", label: "bis 18.12." },
   { name: "Bewerbung", start: "2026-12-19", end: "2027-01-22", label: "bis 22.1." },
   { name: "Programm", start: "2027-01-23", end: "2027-02-26", label: "bis 26.2." },
   { name: "Event", start: "2027-02-27", end: "2027-02-28", label: "27.–28.2." },
@@ -57,8 +57,10 @@ export function phaseFill(i: number, today: string, phases: readonly Phase[] = P
   return (daysBetween(p.start, today) + 1) / (daysBetween(p.start, p.end) + 1);
 }
 
-// Outreach: Start Welle 1 und die drei Nachfass-Runden (stammdaten.json). Die Runden sind ein fester Takt des Teams.
-export const WAVE_1 = "2026-10-19";
+// Outreach: Start Welle 1 und die Nachfass-Runden (stammdaten.json). Die Runden sind ein fester Takt des Teams.
+// Neuer Zeitplan ab 28.10. (Zeitplan_27-10.md im OneDrive-Ordner): Wellen im Wochentakt ab 2.11., deshalb jeden Montag
+// vom 16.11. bis 7.12. eine Runde (Welle 1: 16. und 30.11., Welle 2 und 3: 23.11. und 7.12.).
+export const WAVE_1 = "2026-11-02";
 /** Start Welle 1 = Datum von M3.1 (folgt dem Meilenstein, Rückfall WAVE_1). */
 export const wave1For = (list?: readonly Due[] | null) => dueOf(list, "M3.1") ?? WAVE_1;
-export const FOLLOW_UP_ROUNDS = ["2026-11-02", "2026-11-16", "2026-11-30"];
+export const FOLLOW_UP_ROUNDS = ["2026-11-16", "2026-11-23", "2026-11-30", "2026-12-07"];
