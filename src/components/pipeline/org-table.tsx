@@ -6,6 +6,10 @@ import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/avatar";
 import { Chip } from "@/components/chip";
 import { useTeam, type Person } from "@/components/app-shell/team-provider";
+import { Select } from "@/components/ui/select";
+import type { OrgPatch } from "@/lib/data/use-organizations";
+import { notifyAssignment } from "@/lib/data/use-feed";
+import { nameOptions, PRIO_OPTIONS } from "@/lib/options";
 import { formatShort, todayInVienna } from "@/lib/dates";
 import { followState, initials, STAGES, type Organization, type Stage } from "@/lib/pipeline";
 
@@ -20,6 +24,8 @@ import { followState, initials, STAGES, type Organization, type Stage } from "@/
 // Die beiden rechten Spalten (Maxi, 15.10.: weniger leerer Platz rechts) erscheinen nur, wenn Platz ist; mit offenem
 // Detail fallen sie weg, die linken Spalten bleiben stehen.
 // Venues zeigen Kapazität und Preis kurz; Übernachtung und Lage stehen im Detail.
+// Prio und Zuständig lassen sich direkt in der Zeile setzen (27.10., schnelles Priorisieren für M1.2): Klick auf das Feld
+// öffnet nur die Auswahl, der Rest der Zeile öffnet weiter das Detail.
 
 type SortKey = "name" | "stage" | "prio" | "follow" | "owner" | "extra" | "contact" | "changed";
 
@@ -60,14 +66,17 @@ export function OrgTable({
   venue,
   selectedId,
   onOpen,
+  onEdit,
 }: {
   orgs: Organization[];
   today: string;
   venue: boolean;
   selectedId: string | null;
   onOpen: (id: string) => void;
+  onEdit: (org: Organization, patch: OrgPatch) => void;
 }) {
-  const { personById } = useTeam();
+  const { me, people, personById } = useTeam();
+  const ownerOptions = nameOptions(people, "Noch offen");
   const [sort, setSort] = useState<{ key: SortKey; asc: boolean }>({ key: "follow", asc: true });
 
   const rows = [...orgs].sort((a, b) => {
@@ -105,6 +114,11 @@ export function OrgTable({
   const hideContact = "@max-[1200px]:hidden";
   const hideChanged = "@max-[1304px]:hidden";
 
+  // Auswahl in der Zeile: sieht aus wie Text, zeigt beim Überfahren der Zeile bzw. mit Fokus Rahmen und Pfeil
+  const inlineSelect =
+    "h-7 w-full gap-1.5 rounded-md px-1 text-[13px] text-fg hover:shadow-[inset_0_0_0_1px_var(--field)] focus-visible:shadow-[inset_0_0_0_1px_var(--field)]";
+  const inlineChevron = "opacity-0 group-hover/row:opacity-100 group-focus-visible/select:opacity-100 group-data-popup-open/select:opacity-100";
+
   return (
     <div className="@container flex min-h-full flex-col">
       <table className="w-full table-fixed border-separate border-spacing-0 text-[13px]">
@@ -131,11 +145,13 @@ export function OrgTable({
             const contact = contactText(o, venue);
             const changed = todayInVienna(new Date(o.updated_at));
             const cell = "h-11 overflow-hidden border-b border-line px-3 whitespace-nowrap";
+            // Felder zum direkten Setzen: weniger Rand, damit der Text trotz Feld-Innenabstand unter dem Spaltenkopf steht
+            const editCell = "h-11 overflow-hidden border-b border-line px-2 whitespace-nowrap";
             return (
               <tr
                 key={o.id}
                 onClick={() => onOpen(o.id)}
-                className={cn("cursor-pointer transition-colors duration-150", sel ? "bg-active" : "hover:bg-hover")}
+                className={cn("group/row cursor-pointer transition-colors duration-150", sel ? "bg-active" : "hover:bg-hover")}
               >
                 <td className="h-11 overflow-hidden border-b border-line pr-3 pl-[18px]">
                   <span className="flex min-w-0 items-center gap-2.5">
@@ -165,26 +181,53 @@ export function OrgTable({
                     {st.name}
                   </span>
                 </td>
-                <td className={cn(cell, hidePrio)}>
-                  {o.prio && (
-                    <span className="rounded-[5px] px-[5px] py-px font-mono text-[11px] font-medium text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)]">
-                      <span className="sr-only">Prio </span>
-                      {o.prio}
-                    </span>
-                  )}
+                {/* Klicks in der Auswahl (auch in der Liste, die im Portal hängt) öffnen nicht das Detail */}
+                <td className={cn(editCell, hidePrio)} onClick={(e) => e.stopPropagation()}>
+                  <Select
+                    aria-label={`Prio ${o.name}`}
+                    value={o.prio ?? ""}
+                    onChange={(v) => onEdit(o, { prio: (v || null) as Organization["prio"] })}
+                    options={PRIO_OPTIONS}
+                    renderValue={(v) =>
+                      v ? (
+                        <span className="rounded-[5px] px-[5px] py-px font-mono text-[11px] font-medium text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)]">{v}</span>
+                      ) : (
+                        <span className="text-fg-3">
+                          <span aria-hidden>–</span>
+                          <span className="sr-only">keine</span>
+                        </span>
+                      )
+                    }
+                    className={cn(inlineSelect, "gap-0.5")}
+                    chevronClassName={inlineChevron}
+                  />
                 </td>
                 <td className={cell}>
                   {f && (f.tone === "gray" ? <span className="text-fg-2 tabular">{f.label}</span> : <Chip tone={f.tone}>{f.label}</Chip>)}
                 </td>
-                <td className={cell}>
-                  {owner ? (
-                    <span className="flex min-w-0 items-center gap-2" title={owner.name}>
-                      <Avatar person={owner} size={20} />
-                      <span className="truncate">{owner.name}</span>
-                    </span>
-                  ) : (
-                    <span className="text-fg-3">–</span>
-                  )}
+                <td className={editCell} onClick={(e) => e.stopPropagation()} title={owner?.name}>
+                  <Select
+                    aria-label={`Zuständig für ${o.name}`}
+                    value={o.owner_id ?? ""}
+                    onChange={(v) => {
+                      onEdit(o, { owner_id: v || null });
+                      notifyAssignment("organization", o.id, me?.id ?? null, v || null);
+                    }}
+                    options={ownerOptions}
+                    leading={owner && <Avatar person={owner} size={20} />}
+                    renderValue={() =>
+                      owner ? (
+                        owner.name
+                      ) : (
+                        <span className="text-fg-3">
+                          <span aria-hidden>–</span>
+                          <span className="sr-only">noch offen</span>
+                        </span>
+                      )
+                    }
+                    className={inlineSelect}
+                    chevronClassName={inlineChevron}
+                  />
                 </td>
                 <td className={cn(cell, hideExtra, "text-fg-2")} title={(venue ? o.capacity : warmText(o)) || undefined}>
                   <span className="block truncate">{venue ? shortCap(o.capacity) : warmText(o)}</span>

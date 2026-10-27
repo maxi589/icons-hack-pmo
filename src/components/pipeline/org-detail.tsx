@@ -36,6 +36,28 @@ import {
 
 const tasksWord = (n: number) => `${n} offene ${n === 1 ? "Aufgabe" : "Aufgaben"}`;
 
+/** Verlauf „updated“ {field, from, to} in Worten (geschrieben von use-org-log.ts). */
+function describeUpdate(d: Record<string, unknown>, actorId: string | null, name: (id: string) => string) {
+  const from = d.from ? String(d.from) : null;
+  const to = d.to ? String(d.to) : null;
+  if (d.field === "prio") return !to ? `hat die Prio ${from} entfernt` : from ? `hat die Prio von ${from} auf ${to} geändert` : `hat die Prio ${to} gesetzt`;
+  if (d.field === "owner_id") {
+    // Sich selbst eintragen ist der häufigste Fall (Onboarding: jede Person setzt sich selbst)
+    const who = (id: string) => (id === actorId ? "sich" : name(id));
+    if (!to) return `hat ${who(from!)} als zuständig ausgetragen`;
+    if (!from) return `hat ${who(to)} als zuständig eingetragen`;
+    if (to === actorId) return `hat die Zuständigkeit von ${name(from)} übernommen`;
+    return from === actorId ? `hat die Zuständigkeit an ${name(to)} übergeben` : `hat die Zuständigkeit von ${name(from)} an ${name(to)} übergeben`;
+  }
+  if (d.field === "next_follow_up")
+    return !to
+      ? "hat das Nachfassen entfernt"
+      : from
+        ? `hat das Nachfassen von ${formatShort(from)} auf ${formatShort(to)} verschoben`
+        : `hat das Nachfassen auf ${formatShort(to)} gesetzt`;
+  return "hat etwas geändert";
+}
+
 // Firmen-Detail (Board „Pipeline“, rechts 400px; am Handy als Bottom Sheet).
 // Felder speichern beim Verlassen (Text) bzw. sofort (Auswahl). Stufe mit „Rückgängig“ über die Seite.
 
@@ -48,7 +70,8 @@ export function OrgDetail({
 }: {
   org: Organization;
   today: string;
-  onUpdate: (patch: OrgPatch) => void;
+  /** `log = false`: kein Eintrag „updated“ im Verlauf (der Weg schreibt selbst einen). */
+  onUpdate: (patch: OrgPatch, log?: boolean) => void;
   onStage: (to: Stage) => void;
   onClose: () => void;
 }) {
@@ -194,7 +217,7 @@ export function OrgDetail({
                   type="button"
                   className={cn(mini, "gap-1 px-2 text-acc-line")}
                   title="Nachgefasst, wieder in 7 Tagen"
-                  onClick={() => followedUp(org, today, (d) => onUpdate({ next_follow_up: d }))}
+                  onClick={() => followedUp(org, today, (d) => onUpdate({ next_follow_up: d }, false))}
                 >
                   <Check className="size-3.5" strokeWidth={2.5} aria-hidden />
                   <span className="max-md:sr-only">Nachgefasst</span>
@@ -305,8 +328,10 @@ export function OrgDetail({
           targetId={org.id}
           describe={(a) =>
             a.action === "stage_changed"
-              ? `hat die Stufe auf ${stageName(a.data.to as Stage)} gesetzt`
-              : a.action === "created"
+              ? `hat die Stufe ${a.data.from ? `von ${stageName(a.data.from as Stage)} ` : ""}auf ${stageName(a.data.to as Stage)} gesetzt${a.data.follow ? `, nachfassen ${formatShort(String(a.data.follow))}` : ""}`
+              : a.action === "updated"
+                ? describeUpdate(a.data, a.actor_id, (id) => personById(id)?.name ?? "jemand")
+                : a.action === "created"
                 ? "hat die Firma angelegt"
                 : a.action === "followed_up"
                   ? `hat nachgefasst${a.data.next ? `, nächstes Mal ${formatDayMonth(String(a.data.next))}` : ""}`

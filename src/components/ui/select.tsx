@@ -36,6 +36,8 @@ type Props = {
   chevronClassName?: string;
   /** Suchfeld oben in der Liste (für lange Listen wie die 114 Firmen); ohne Gruppen. */
   searchable?: boolean;
+  /** Eigene Anzeige des gewählten Werts im Feld (z. B. „A“ als Kästchen in der Tabelle); die Liste bleibt gleich. Nicht bei `searchable`. */
+  renderValue?: (value: string) => ReactNode;
 };
 
 // Ein Klick neben die offene Liste soll nur die Liste schließen, nicht auch den Dialog bzw. das Sheet dahinter.
@@ -80,7 +82,7 @@ export function Select(props: Props) {
   return <PlainSelect {...props} />;
 }
 
-function PlainSelect({ value, onChange, options, id, className, placeholder = "–", leading, hideChevron, chevronClassName, ...rest }: Props) {
+function PlainSelect({ value, onChange, options, id, className, placeholder = "–", leading, hideChevron, chevronClassName, renderValue, ...rest }: Props) {
   const setOpen = useOpenTracker();
   const label = options.find((o) => o.value === value)?.label;
   // Gruppen in Reihenfolge des ersten Auftretens
@@ -109,7 +111,7 @@ function PlainSelect({ value, onChange, options, id, className, placeholder = "�
       >
         {leading}
         <SelectPrimitive.Value className={cn("min-w-0 grow truncate", label === undefined && "text-fg-3")}>
-          {() => label ?? placeholder}
+          {() => (renderValue ? renderValue(value) : (label ?? placeholder))}
         </SelectPrimitive.Value>
         {!hideChevron && (
           <SelectPrimitive.Icon

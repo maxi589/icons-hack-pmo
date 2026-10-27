@@ -37,6 +37,7 @@ import { NewOrgDialog } from "./new-org-dialog";
 import { OrgCard } from "./org-card";
 import { OrgDetail } from "./org-detail";
 import { OrgTable } from "./org-table";
+import { useOrgLog } from "./use-org-log";
 
 // Pipeline (Board „Graphit-Pipeline“), das Kernstück: Tabs je Typ, Zielbalken, Board mit Ziehen &
 // Ablegen (nur Desktop) oder Liste, Detail rechts bzw. als Bottom Sheet. Zustand in der Adresse:
@@ -70,6 +71,7 @@ export function Pipeline() {
   const { me } = useTeam();
   const isMobile = useIsMobile();
   const { orgs, update, create } = useOrganizations();
+  const logChange = useOrgLog();
 
   const [view, setView] = useState<View>("board");
   const [query, setQuery] = useState("");
@@ -192,7 +194,7 @@ export function Pipeline() {
         });
       },
       onExpire: () => {
-        logActivity("organization", org.id, meId, "stage_changed", { from, to });
+        logActivity("organization", org.id, meId, "stage_changed", autoFollow ? { from, to, follow: autoFollow } : { from, to });
         work.then((r) => r.added.forEach((t) => logActivity("task", t.id, meId, "created")));
       },
     });
@@ -210,7 +212,16 @@ export function Pipeline() {
     });
   };
 
-  const patch = (org: Organization) => (p: OrgPatch) => update(org.id, p);
+  /** Feld ändern (Detail und Tabellenzeile): speichern, Prio/Zuständig/Nachfassen in den Verlauf (use-org-log.ts).
+   *  `log = false` für Wege mit eigenem Eintrag und Hinweis („Nachgefasst“); die Fehlermeldung würde deren Hinweis samt
+   *  „Rückgängig“ verdrängen (Prüfer 27.10.). */
+  const edit = (org: Organization, p: OrgPatch, log = true) => {
+    const saved = update(org.id, p);
+    if (!log) return;
+    logChange(org, p, saved);
+    saved.then((ok) => !ok && toast({ text: `${org.name}: nicht gespeichert. Bitte nochmal versuchen.`, error: true }));
+  };
+  const patch = (org: Organization) => (p: OrgPatch, log?: boolean) => edit(org, p, log);
   const open = (id: string) => setParams({ firma: id });
   /** Klick auf die schon offene Firma schließt das Detail wieder. */
   const toggle = (id: string) => setParams({ firma: id === selectedId ? null : id });
@@ -394,7 +405,7 @@ export function Pipeline() {
             )}
             {view === "list" && visible.length > 0 && (
               <div className="hidden h-full md:block">
-                <OrgTable orgs={visible} today={today} venue={tab === "venues"} selectedId={selectedId} onOpen={toggle} />
+                <OrgTable orgs={visible} today={today} venue={tab === "venues"} selectedId={selectedId} onOpen={toggle} onEdit={edit} />
               </div>
             )}
             {/* Handy: immer die Liste (Tabellen sind dort zu eng) */}

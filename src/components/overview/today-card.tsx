@@ -152,10 +152,12 @@ export function TodayCard({ tasks, orgs, meetings, today }: { tasks: Task[]; org
 
   const snooze = async (i: Item) => {
     const to = shiftFollowUp(i.date, today, 2);
-    await supabase.from("organizations").update({ next_follow_up: to }).eq("id", i.id);
+    const { error } = await supabase.from("organizations").update({ next_follow_up: to }).eq("id", i.id);
     toast({
       text: `${i.title.replace(/ nachfassen$/, "")} auf ${formatShort(to)} verschoben`,
       onAction: () => supabase.from("organizations").update({ next_follow_up: i.date }).eq("id", i.id),
+      // Verlauf wie in der Pipeline (use-org-log.ts), erst wenn nicht zurückgenommen
+      onExpire: () => !error && logActivity("organization", i.id, me.id, "updated", { field: "next_follow_up", from: i.date, to }),
     });
   };
 
