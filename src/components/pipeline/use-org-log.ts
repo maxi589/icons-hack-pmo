@@ -11,7 +11,7 @@ import type { Organization } from "@/lib/pipeline";
 // Gesammelt je Firma und Feld: Erst 5 s nach der letzten Änderung (und wenn alle Speichervorgänge zurück sind) kommt ein
 // Eintrag, mit dem Wert vor der ersten und nach der letzten Änderung. So ergibt dreimal „+2 T“ einen Eintrag und
 // A → B → A (Fehlklick) keinen. „Vorher“ und „nachher“ folgen der Reihenfolge der Klicks, nicht der Antworten (Prüfer 27.10.);
-// scheitert die letzte Änderung, gilt ihr Ausgangswert (so nimmt use-organizations sie auch in der Anzeige zurück).
+// „nachher“ ist die letzte Änderung, die nicht gescheitert ist (ohne eine: der Ausgangswert), also der Stand der Datenbank.
 // Seitenwechsel in der App und Tab-Wechsel schreiben sofort; beim Schließen des Tabs kann der Browser das noch abbrechen.
 
 export const LOGGED_FIELDS = ["prio", "owner_id", "next_follow_up"] as const;
@@ -24,9 +24,8 @@ type Entry = {
   field: Field;
   actorId: string | null;
   from: unknown;
-  to: unknown;
-  /** Nummer der letzten Änderung und wie viele Speichervorgänge noch offen sind */
-  seq: number;
+  /** Alle Änderungen in Klick-Reihenfolge; ok = null, solange die Antwort fehlt */
+  changes: { to: unknown; ok: boolean | null }[];
   waiting: number;
   timer?: ReturnType<typeof setTimeout>;
 };
@@ -43,7 +42,10 @@ export function useOrgLog() {
     if (!e) return;
     clearTimeout(e.timer);
     pending.current.delete(key);
-    if (!same(e.from, e.to)) void logActivity("organization", e.orgId, e.actorId, "updated", { field: e.field, from: e.from ?? null, to: e.to ?? null });
+    // Noch offene Änderungen zählen mit (Tab-Wechsel vor der Antwort): Sie klappen fast immer
+    const last = e.changes.findLast((c) => c.ok !== false);
+    const to = last ? last.to : e.from;
+    if (!same(e.from, to)) void logActivity("organization", e.orgId, e.actorId, "updated", { field: e.field, from: e.from ?? null, to: to ?? null });
   };
 
   useEffect(() => {
@@ -67,15 +69,15 @@ export function useOrgLog() {
       const to = patch[field];
       if (same(from, to)) continue;
       const key = `${org.id}:${field}`;
-      const e: Entry = pending.current.get(key) ?? { orgId: org.id, field, actorId: meId, from, to, seq: 0, waiting: 0 };
+      const e: Entry = pending.current.get(key) ?? { orgId: org.id, field, actorId: meId, from, changes: [], waiting: 0 };
       clearTimeout(e.timer);
-      const seq = ++e.seq;
-      e.to = to;
+      const change: Entry["changes"][number] = { to, ok: null };
+      e.changes.push(change);
       e.waiting++;
       pending.current.set(key, e);
       saved.then((ok) => {
         e.waiting--;
-        if (!ok && seq === e.seq) e.to = from;
+        change.ok = ok;
         // Schon geschrieben (Seite verlassen) oder noch Antworten offen: kein neuer Timer
         if (pending.current.get(key) !== e || e.waiting > 0) return;
         e.timer = setTimeout(() => flush(key), WAIT_MS);

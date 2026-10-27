@@ -18,6 +18,8 @@ export function useOrganizations() {
   // ist veraltet und darf die Änderung nicht überschreiben (sonst springt z. B. „Rückgängig“ zurück).
   const version = useRef(0);
   const pending = useRef(0);
+  // Nach einem Speicherfehler einmal neu laden, sobald nichts mehr offen ist (siehe update)
+  const stale = useRef(false);
 
   const load = useCallback(async () => {
     const v = version.current;
@@ -50,12 +52,29 @@ export function useOrganizations() {
     pending.current++;
     const { error } = await createClient().from("organizations").update(patch).eq("id", id);
     pending.current--;
+    // Fehler: nur die Felder dieser Änderung zurücknehmen, und nur, wenn sie seitdem nicht neu gesetzt wurden.
+    // Sonst ginge z. B. eine gerade gespeicherte Zuständigkeit verloren, wenn die Prio davor scheitert (Prüfer 27.10.).
     if (error && before) {
-      const restore = before;
-      setOrgs((list) => list?.map((o) => (o.id === id ? restore : o)) ?? null);
+      const prev = before;
+      setOrgs(
+        (list) =>
+          list?.map((o) => {
+            if (o.id !== id) return o;
+            const back: Record<string, unknown> = { ...o };
+            for (const [k, v] of Object.entries(patch)) if (back[k] === v) back[k] = prev[k as keyof Organization];
+            return back as Organization;
+          }) ?? null
+      );
+    }
+    // Danach gilt der Stand der Datenbank: Scheitern zwei Änderungen am selben Feld, könnte die Anzeige sonst einen
+    // Zwischenwert zeigen, der nie gespeichert wurde (Prüfer 27.10.).
+    if (error) stale.current = true;
+    if (stale.current && pending.current === 0) {
+      stale.current = false;
+      void load();
     }
     return !error;
-  }, []);
+  }, [load]);
 
   const create = useCallback(async (input: OrgPatch & { name: string; created_by: string | null }) => {
     const { data, error } = await createClient().from("organizations").insert(input).select(FIELDS).single();
