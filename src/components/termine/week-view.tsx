@@ -97,7 +97,7 @@ export function WeekView({
   const { areaById } = useTeam();
   const days = Array.from({ length: 7 }, (_, i) => plusDays(monday, i));
   const scroller = useRef<HTMLDivElement>(null);
-  const [drag, setDrag] = useState<{ day: string; from: number; to: number } | null>(null);
+  const [drag, setDrag] = useState<{ day: string; from: number; to: number; x: number } | null>(null);
   const [now, setNow] = useState(() => viennaParts(new Date()).minutes);
   const grid = useRef<HTMLDivElement>(null);
   // Zusätzlich in einer Ref, damit Loslassen den neuesten Stand kennt, auch wenn noch nicht neu gezeichnet wurde.
@@ -216,17 +216,19 @@ export function WeekView({
                   if (e.button !== 0 || e.target !== e.currentTarget) return;
                   e.currentTarget.setPointerCapture(e.pointerId);
                   const at = minuteAt(e);
-                  setDrag({ day: d, from: at, to: at + SNAP });
+                  setDrag({ day: d, from: at, to: at + SNAP, x: e.clientX });
                 }}
                 onPointerMove={(e) => {
                   if (!drag || drag.day !== d) return;
                   const at = minuteAt(e) + SNAP;
                   setDrag({ ...drag, to: Math.max(drag.from + SNAP, at) });
                 }}
-                onPointerUp={() => {
+                onPointerUp={(e) => {
                   if (!drag || drag.day !== d) return;
                   const len = drag.to - drag.from;
                   setDrag(null);
+                  // Seitlich gewischt (Finger) = Wochenwechsel, kein neuer Termin
+                  if (e.pointerType !== "mouse" && Math.abs(e.clientX - drag.x) > 40) return;
                   onCreate({ date: d, time: hhmm(drag.from), duration_min: len > SNAP ? len : 60 });
                 }}
                 onPointerCancel={() => setDrag(null)}

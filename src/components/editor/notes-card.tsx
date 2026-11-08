@@ -8,6 +8,7 @@ import { useToday } from "@/lib/use-today";
 import { formatShort, TIME_ZONE, todayInVienna } from "@/lib/dates";
 import { createClient } from "@/lib/supabase/client";
 import { NoteEditor } from "./note-editor";
+import type { MentionTarget } from "@/lib/mentions";
 
 // Notizen-Karte mit dem gemeinsamen Editor: speichert von selbst nach 0,8 s bzw. beim Verlassen,
 // zeigt „wer · wann“ und, bei geteilten Notizen, wer gerade schreibt. Wer zuletzt speichert, gewinnt.
@@ -32,9 +33,11 @@ type Props = {
   /** Markierten Text als Team-Dokument teilen */
   onShare?: (markdown: string, title: string) => Promise<string | null>;
   className?: string;
+  /** Personen taggen (geteilte Notizen), Inbox-Eintrag zeigt hierher */
+  mentions?: MentionTarget;
 };
 
-export function NotesCard({ title, label, data, save, placeholder, private: isPrivate, presenceKey, onCreateTask, onShare, className }: Props) {
+export function NotesCard({ title, label, data, save, placeholder, private: isPrivate, presenceKey, onCreateTask, onShare, className, mentions }: Props) {
   const draft = useNotesDraft({ data, save, presenceKey, isPrivate });
   if (data === false) return null;
   const { value, onChange, onBlur, meta, error } = draft;
@@ -69,6 +72,7 @@ export function NotesCard({ title, label, data, save, placeholder, private: isPr
         onBlur={onBlur}
         onCreateTask={onCreateTask}
         onShare={onShare}
+        mentions={mentions}
         className="flex min-h-[320px] flex-1 flex-col border-t border-line lg:min-h-[460px]"
       />
     </section>

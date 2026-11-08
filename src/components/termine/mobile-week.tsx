@@ -1,10 +1,9 @@
 "use client";
 
-import { useRef } from "react";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
 import { de } from "date-fns/locale";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { formatShort, relativeDays } from "@/lib/dates";
@@ -14,7 +13,8 @@ import type { AllDay } from "./week-view";
 
 // Termine am Handy (15.10.): oben eine Wochenleiste Mo–So (klebt beim Scrollen), darunter die Woche Tag für Tag.
 // Punkte unter dem Datum = Termine (Bereichsfarbe), Raute = Meilenstein oder Nachfass-Runde. Tippen auf einen Tag springt
-// zu ihm, Wischen oder die Pfeile wechseln die Woche. Ganztägiges (Meilensteine, Nachfass-Runden) steht oben im Tag.
+// zu ihm, seitliches Wischen (überall auf der Seite, termine.tsx) oder die Pfeile wechseln die Woche. Tippen auf den Monat
+// öffnet die Monatsansicht (8.11.). Ganztägiges (Meilensteine, Nachfass-Runden) steht oben im Tag.
 // Unter der Woche „Danach“: die nächsten Termine nach dieser Woche, damit nichts hinter dem Wochenrand verschwindet.
 
 const diamond = (
@@ -34,6 +34,7 @@ export function MobileWeek({
   onWeek,
   onOpen,
   onDelete,
+  onMonthView,
 }: {
   monday: string;
   today: string;
@@ -45,9 +46,10 @@ export function MobileWeek({
   onWeek: (monday: string | null) => void;
   onOpen: (m: Meeting) => void;
   onDelete: (m: Meeting) => void;
+  /** Monatsansicht öffnen */
+  onMonthView: () => void;
 }) {
   const { areaById } = useTeam();
-  const swipe = useRef<{ x: number; y: number } | null>(null);
   const days = Array.from({ length: 7 }, (_, i) => plusDays(monday, i));
   const sunday = days[6];
   const thisWeek = weekStart(today) === monday;
@@ -83,19 +85,19 @@ export function MobileWeek({
       <div
         id="wochenleiste"
         className="sticky top-0 z-10 bg-bg px-3.5 pt-1 pb-2 shadow-[0_1px_0_var(--line)]"
-        onTouchStart={(e) => (swipe.current = { x: e.touches[0].clientX, y: e.touches[0].clientY })}
-        onTouchEnd={(e) => {
-          const s = swipe.current;
-          swipe.current = null;
-          if (!s) return;
-          const dx = e.changedTouches[0].clientX - s.x;
-          const dy = e.changedTouches[0].clientY - s.y;
-          if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.5) onWeek(plusDays(monday, dx < 0 ? 7 : -7));
-        }}
       >
         <div className="flex items-center gap-1">
-          <h2 className="min-w-0 flex-1 truncate text-[15px] font-semibold capitalize" aria-live="polite">
-            {month}
+          {/* Monatsname öffnet den Monat (wie im Kalender am Handy) */}
+          <h2 className="min-w-0 flex-1" aria-live="polite">
+            <button
+              type="button"
+              onClick={onMonthView}
+              aria-label={`${month}, Monat zeigen`}
+              className="-ml-1 inline-flex min-h-11 max-w-full items-center gap-1 rounded-lg px-1 text-[15px] font-semibold capitalize active:bg-active"
+            >
+              <span className="truncate">{month}</span>
+              <ChevronDown className="size-4 shrink-0 text-fg-3" aria-hidden />
+            </button>
           </h2>
           <button
             type="button"

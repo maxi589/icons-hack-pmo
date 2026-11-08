@@ -91,9 +91,9 @@ const SOURCES: Source[] = [
   {
     type: "meeting",
     table: "meetings",
-    select: "id, title, starts_at, location, agenda, notes",
-    fields: ["title", "location", "agenda", "notes"],
-    md: ["agenda", "notes"],
+    select: "id, title, starts_at, location, goals, agenda, notes",
+    fields: ["title", "location", "goals", "agenda", "notes"],
+    md: ["goals", "agenda", "notes"],
     order: { column: "starts_at", ascending: false },
     limit: 12,
     toHit: (r) => {

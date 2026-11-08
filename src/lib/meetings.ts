@@ -18,6 +18,10 @@ export type Meeting = {
   attendees: string[];
   /** „Nur für mich“: nur diese Person sieht den Termin (RLS). null = ganzes Team. */
   private_for: string | null;
+  /** Ziele (8.11.), Markdown */
+  goals: string;
+  goals_updated_at: string | null;
+  goals_updated_by: string | null;
   agenda: string;
   agenda_updated_at: string | null;
   agenda_updated_by: string | null;

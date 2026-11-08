@@ -8,7 +8,7 @@ import type { Meeting, MeetingPatch } from "@/lib/meetings";
 // Versionszähler wie in use-organizations.ts: eine ältere Antwort überschreibt keine eigene Änderung.
 
 const FIELDS =
-  "id, title, starts_at, duration_min, location, meet_url, area_id, organization_id, attendees, private_for, agenda, agenda_updated_at, agenda_updated_by, notes, notes_updated_at, notes_updated_by, created_by, created_at";
+  "id, title, starts_at, duration_min, location, meet_url, area_id, organization_id, attendees, private_for, goals, goals_updated_at, goals_updated_by, agenda, agenda_updated_at, agenda_updated_by, notes, notes_updated_at, notes_updated_by, created_by, created_at";
 
 const byStart = (a: Meeting, b: Meeting) => a.starts_at.localeCompare(b.starts_at);
 

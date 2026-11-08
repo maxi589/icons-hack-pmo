@@ -97,6 +97,7 @@ export function DocText({
           onChange={draft.onChange}
           onBlur={draft.onBlur}
           onCreateTask={onCreateTask}
+          mentions={{ type: "document", id: d.id }}
           className="flex min-h-[300px] flex-1 flex-col [&_.ProseMirror]:px-[18px]"
         />
 
