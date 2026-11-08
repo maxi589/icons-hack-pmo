@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { format, parseISO } from "date-fns";
+import { KEY } from "@/lib/key-milestones";
 import { de } from "date-fns/locale";
 import { Check, ChevronDown, Video } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -208,9 +209,9 @@ function GoalTiles({ orgs, milestones }: { orgs: Org[]; milestones: Milestone[] 
   };
 
   const goals = [
-    { label: "Track-Partner zugesagt", short: "Track-Partner", value: won("challenge"), target: 4, note: until("M3") },
-    { label: "Jury zugesagt", short: "Jury", value: won("jury"), target: 4, note: until("M4") },
-    { label: "Venue fixiert", short: "Venue", value: won("venue", ["fix"]), target: 1, note: ["plus Backup", until("M2")].filter(Boolean).join(" · ") },
+    { label: "Track-Partner zugesagt", short: "Track-Partner", value: won("challenge"), target: 4, note: until(KEY.partners) },
+    { label: "Jury zugesagt", short: "Jury", value: won("jury"), target: 4, note: until(KEY.jury) },
+    { label: "Venue fixiert", short: "Venue", value: won("venue", ["fix"]), target: 1, note: ["plus Backup", until(KEY.venue)].filter(Boolean).join(" · ") },
   ];
 
   // Sponsoring in € (Maxi, 16.10.): alles Partner-Geld ab „Zugesagt“, Ziel setzt das Team im Bereich Sponsoren

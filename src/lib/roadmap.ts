@@ -1,8 +1,11 @@
 import { daysBetween } from "./dates";
+import { KEY } from "./key-milestones";
 
-// Zeitachse der Roadmap: 1.10.2026 bis 28.2.2027 (151 Tage), Monate proportional (Design-System 6.2).
+// Zeitachse der Roadmap: 1.10.2026 bis 31.3.2027 (182 Tage), Monate proportional (Design-System 6.2).
+// Seit 8.11. bis Ende März, weil der Debrief (M10) am 7.3. liegt.
 export const AXIS_START = "2026-10-01";
-export const AXIS_DAYS = 151;
+export const AXIS_END = "2027-03-31";
+export const AXIS_DAYS = 182;
 
 export const MONTHS = [
   { name: "Oktober", start: "2026-10-01", days: 31 },
@@ -10,7 +13,11 @@ export const MONTHS = [
   { name: "Dezember", start: "2026-12-01", days: 31 },
   { name: "Januar", start: "2027-01-01", days: 31 },
   { name: "Februar", start: "2027-02-01", days: 28 },
+  { name: "März", start: "2027-03-01", days: 31 },
 ];
+
+/** Pausen im Plan (Maxi D, 8.11.): als schraffiertes Band im Zeitstrahl mit Legende und als Hinweis in der Liste. */
+export const BREAKS = [{ from: "2026-12-19", to: "2027-01-10", label: "Weihnachtspause", note: "Outreach schwer" }];
 
 /** Position eines Tages auf der Achse in Prozent (Mitte des Tages). */
 export function axisPos(isoDate: string) {
@@ -24,11 +31,11 @@ export function axisEdge(isoDate: string) {
 }
 
 // Zeiträume ohne eigenen Meilenstein. M2 und M3 kommen mit start_date aus der Datenbank.
-// Seit 16.10. (Punkt 5) folgen sie den Meilensteinen: Welle 3 von M3.3 bis M3, Bewerbung von M5 bis M7.
+// Seit 16.10. (Punkt 5) folgen sie den Meilensteinen (key-milestones.ts): Welle 3 von M4.3 bis M4, Bewerbung von M6 bis M8.
 // Die festen Daten gelten nur, wenn ein Meilenstein fehlt.
 export const PLAN_BARS = [
-  { areaId: "sponsoren", from: "2026-11-30", to: "2026-12-18", label: "Welle 3 Sponsoren bis zur Fixierung", faint: true, fromId: "M3.3", toId: "M3" },
-  { areaId: "marketing", from: "2026-11-30", to: "2027-01-22", label: "Bewerbung (Luma) bis zur Auswahl", faint: false, fromId: "M5", toId: "M7" },
+  { areaId: "sponsoren", from: "2026-12-07", to: "2027-01-29", label: "Welle 3 Sponsoren bis zur Fixierung", faint: true, fromId: KEY.sponsorWave, toId: KEY.partners },
+  { areaId: "marketing", from: "2027-02-01", to: "2027-02-23", label: "Anmeldung (Luma) bis zur Auswahl", faint: false, fromId: KEY.public, toId: KEY.selection },
 ];
 
 export function planBarsFor(list?: readonly { id: string; due_date: string }[] | null) {

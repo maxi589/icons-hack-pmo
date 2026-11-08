@@ -15,7 +15,8 @@ import { logActivity } from "@/lib/data/use-feed";
 import { useToast } from "@/components/toast";
 import { daysBetween, formatDayMonth, formatShort, relativeDays } from "@/lib/dates";
 import { FOLLOW_UP_ROUNDS } from "@/lib/phases";
-import { AXIS_DAYS, axisEdge, axisPos, MONTHS, planBarsFor } from "@/lib/roadmap";
+import { AXIS_DAYS, AXIS_END, axisEdge, axisPos, BREAKS, MONTHS, planBarsFor } from "@/lib/roadmap";
+import { KEY } from "@/lib/key-milestones";
 import { Segmented } from "@/components/segmented";
 import { useTaskActions } from "@/components/tasks/use-task-actions";
 import { useTasks } from "@/lib/data/use-tasks";
@@ -135,9 +136,9 @@ export function Roadmap() {
 
   /** Löschen mit Rückgängig. Unterpunkte zuerst (die Datenbank prüft mit; sonst löschte „on delete cascade“ sie still
    *  mit); Aufgaben bleiben und verlieren nur die Verknüpfung, Rückgängig verknüpft sie wieder. Unterpunkte hinterlassen
-   *  eine Spur im Verlauf des Oberpunkts. M8 ist das Event selbst (Countdown, Zeitachse) und bleibt. */
+   *  eine Spur im Verlauf des Oberpunkts. KEY.event (M9) ist das Event selbst (Countdown, Zeitachse) und bleibt. */
   const removeMilestone = async (m: Milestone) => {
-    if (m.id === "M8") return toast({ text: "M8 ist der Hackathon selbst und bleibt.", error: true });
+    if (m.id === KEY.event) return toast({ text: `${KEY.event} ist der Hackathon selbst und bleibt.`, error: true });
     const deleted = await deleteMilestone(m.id);
     if (!deleted) return toast({ text: `${m.id} nicht gelöscht. Bitte nochmal versuchen.`, error: true });
     if ("blocked" in deleted) {
@@ -351,6 +352,7 @@ function CompactList({
                 );
               })}
           </ul>
+          <BreakNote month={g} monthOf={monthOf} />
         </section>
       ))}
     </>
@@ -392,7 +394,7 @@ function Timeline({
     const due = parentDue(m);
     return !m.parent_id || !due || daysBetween(m.due_date, due) > 3;
   });
-  const todayOnAxis = daysBetween(MONTHS[0].start, today) >= 0 && daysBetween(today, "2027-02-28") >= 0;
+  const todayOnAxis = daysBetween(MONTHS[0].start, today) >= 0 && daysBetween(today, AXIS_END) >= 0;
 
   return (
     <div className="mx-5 mt-3.5 overflow-x-auto rounded-xl shadow-[0_0_0_1px_var(--line)]">
@@ -425,6 +427,16 @@ function Timeline({
               </div>
             ))}
           </div>
+
+          {/* Pausen (Weihnachten): schraffiert hinter den Zeilen, Erklärung in der Legende */}
+          {BREAKS.map((b) => (
+            <div
+              key={b.label}
+              aria-hidden
+              className="pointer-events-none absolute top-10 bottom-0"
+              style={{ left: `${axisEdge(b.from)}%`, width: `${axisEdge(b.to) - axisEdge(b.from) + 100 / AXIS_DAYS}%`, background: BREAK_FILL }}
+            />
+          ))}
 
           {allAreas.map((a) => {
             const items = placeLabels(visible.filter((m) => m.area_id === a.id).sort((x, y) => x.due_date.localeCompare(y.due_date)));
@@ -515,7 +527,58 @@ function Timeline({
           </div>
         </div>
       </div>
+      <TimelineLegend />
     </div>
+  );
+}
+
+/** Schraffur für Pausen: dünne Linien plus leichte Fläche, in hell und dunkel aus --text3. */
+const BREAK_FILL =
+  "repeating-linear-gradient(135deg, color-mix(in srgb, var(--text3) 24%, transparent) 0 1px, transparent 1px 6px), color-mix(in srgb, var(--text3) 7%, transparent)";
+
+function TimelineLegend() {
+  return (
+    <div className="flex min-w-[980px] flex-wrap items-center gap-x-5 gap-y-1.5 border-t border-line px-3.5 py-2.5 text-[12px] text-fg-2">
+      {BREAKS.map((b) => (
+        <span key={b.label} className="inline-flex items-center gap-2">
+          <span className="h-3 w-5 shrink-0 rounded-[3px] shadow-[inset_0_0_0_1px_var(--line2)]" style={{ background: BREAK_FILL }} aria-hidden />
+          <span>
+            <span className="font-medium text-fg">{b.label}</span> {formatDayMonth(b.from)}–{formatDayMonth(b.to)} · {b.note}
+          </span>
+        </span>
+      ))}
+      <span className="inline-flex items-center gap-2">
+        <span className="h-3 w-0 border-l-[1.5px] border-dashed border-fg-3" aria-hidden />
+        Nachfass-Runde
+      </span>
+      <span className="inline-flex items-center gap-2">
+        <span className="h-3 w-0.5 bg-acc-line" aria-hidden />
+        Heute
+      </span>
+    </div>
+  );
+}
+
+/** Hinweis zwischen den Monaten der Liste, z. B. nach Dezember: „Weihnachtspause 19.12.–10.1. · Outreach schwer“. */
+function BreakNote({ month, monthOf }: { month: string; monthOf: (d: string) => string }) {
+  const hits = BREAKS.filter((b) => monthOf(b.from) === month);
+  if (!hits.length) return null;
+  return (
+    <>
+      {hits.map((b) => (
+        <p
+          key={b.label}
+          className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[12.5px] text-fg-2 shadow-[inset_0_0_0_1px_var(--line)]"
+          style={{ background: BREAK_FILL }}
+        >
+          <span className="font-medium text-fg">{b.label}</span>
+          <span className="tabular">
+            {formatDayMonth(b.from)}–{formatDayMonth(b.to)}
+          </span>
+          <span>· {b.note}</span>
+        </p>
+      ))}
+    </>
   );
 }
 
@@ -560,6 +623,7 @@ function MilestoneList({
                 highlighted={m.id === highlightId}
               />
             ))}
+          <BreakNote month={g} monthOf={monthOf} />
         </section>
       ))}
     </>
