@@ -5,16 +5,18 @@ import { useTeam } from "@/components/app-shell/team-provider";
 import { logActivity, type FeedItem } from "@/lib/data/use-feed";
 import { daysBetween, formatShort } from "@/lib/dates";
 import type { Milestone, MilestonePatch } from "@/lib/data/use-milestones";
+import { KEY } from "@/lib/key-milestones";
+import { AXIS_END } from "@/lib/roadmap";
 
 // Plan änderbar (Roadmap-Cockpit, Maxi 16.10.): Datum, Titel und Beschreibung eines Meilensteins.
 // Jede Änderung zeigt einen Hinweis mit „Rückgängig“ (der Plan gilt für alle; versehentliches Tippen soll sich leicht
 // zurücknehmen lassen). In den Verlauf kommt sie erst nach Ablauf des Hinweises und nur, wenn sie gespeichert ist,
 // immer mit altem und neuem Wert.
 
-/** Datum nur im Rahmen des Zeitstrahls 1.10.2026–28.2.2027 (sonst z. B. „0002-10-21“ aus einem halb getippten Jahr oder
+/** Datum nur im Rahmen des Zeitstrahls 1.10.2026–31.3.2027 (Debrief im März, seit 8.11.) (sonst z. B. „0002-10-21“ aus einem halb getippten Jahr oder
  *  eine Raute, die optisch am Rand klebt; Prüfer 16.10.). */
 export const DATE_MIN = "2026-10-01";
-export const DATE_MAX = "2027-02-28";
+export const DATE_MAX = AXIS_END;
 
 const clean = (v: unknown) => (typeof v === "string" ? v.replace(/\s+/g, " ").trim() : "");
 
@@ -47,12 +49,12 @@ export function useMilestoneEdit(update: (id: string, patch: MilestonePatch) => 
   const changeDate = (m: Milestone, to: string) => {
     if (!to || to === m.due_date) return;
     // Das Event-Datum hängt am Countdown und an der Zeitachse (Prüfer 16.10.)
-    if (m.id === "M8") {
-      toast({ text: "M8 ist der Hackathon selbst, sein Datum bleibt fest.", error: true });
+    if (m.id === KEY.event) {
+      toast({ text: `${KEY.event} ist der Hackathon selbst, sein Datum bleibt fest.`, error: true });
       return;
     }
     if (to < DATE_MIN || to > DATE_MAX) {
-      toast({ text: "Datum bitte zwischen 1.10.2026 und 28.2.2027.", error: true });
+      toast({ text: "Datum bitte zwischen 1.10.2026 und 31.3.2027.", error: true });
       return;
     }
     // Balken (M2, M3): Ende nicht vor dem Beginn
@@ -80,7 +82,7 @@ export function useMilestoneEdit(update: (id: string, patch: MilestonePatch) => 
   const changeStart = (m: Milestone, to: string) => {
     if (!to || to === m.start_date) return;
     if (to < DATE_MIN || to > DATE_MAX) {
-      toast({ text: "Datum bitte zwischen 1.10.2026 und 28.2.2027.", error: true });
+      toast({ text: "Datum bitte zwischen 1.10.2026 und 31.3.2027.", error: true });
       return;
     }
     if (to > m.due_date) {

@@ -1,9 +1,10 @@
 import { addDays, format, parseISO } from "date-fns";
 import { daysBetween, formatDayMonth } from "./dates";
+import { KEY } from "./key-milestones";
 
 // Die 5 Phasen bis zum Hackathon (Design-System, Abschnitt 6.1; Zeitplan vom 14.10.). Start = Beginn der Roadmap.
-// Seit 16.10. (Punkt 5) folgen sie den Meilensteinen: Vorbereitung endet mit M1, Akquise mit M3, Bewerbung mit M7,
-// Programm am Tag vor M8, Event = M8 und Folgetag. Wer M1 verschiebt, verschiebt die Phase. Die festen Daten unten
+// Seit 16.10. (Punkt 5) folgen sie den Meilensteinen (Nummern in key-milestones.ts, seit 8.11.): Vorbereitung endet mit
+// M1, Akquise mit M4 (Partner fixiert), Bewerbung mit M8 (Auswahl), Programm am Tag vor M9, Event = M9 und Folgetag. Wer M1 verschiebt, verschiebt die Phase. Die festen Daten unten
 // gelten nur, wenn ein Meilenstein fehlt (z. B. gelöscht).
 
 export type Phase = { name: string; start: string; end: string; label: string };
@@ -23,10 +24,10 @@ const later = (a: string, b: string) => (a > b ? a : b);
 
 /** Phasen aus den Meilenstein-Daten; jede Phase dauert mindestens einen Tag, auch wenn Daten durcheinander geraten. */
 export function phasesFor(list?: readonly Due[] | null): Phase[] {
-  const e1 = dueOf(list, "M1") ?? PHASES[0].end;
-  const e2 = later(dueOf(list, "M3") ?? PHASES[1].end, plus(e1, 1));
-  const e3 = later(dueOf(list, "M7") ?? PHASES[2].end, plus(e2, 1));
-  const ev = later(dueOf(list, "M8") ?? PHASES[4].start, plus(e3, 2));
+  const e1 = dueOf(list, KEY.prep) ?? PHASES[0].end;
+  const e2 = later(dueOf(list, KEY.partners) ?? PHASES[1].end, plus(e1, 1));
+  const e3 = later(dueOf(list, KEY.selection) ?? PHASES[2].end, plus(e2, 1));
+  const ev = later(dueOf(list, KEY.event) ?? PHASES[4].start, plus(e3, 2));
   const evEnd = plus(ev, 1);
   return [
     { name: "Vorbereitung", start: PHASES[0].start, end: e1, label: `bis ${formatDayMonth(e1)}` },
@@ -61,6 +62,6 @@ export function phaseFill(i: number, today: string, phases: readonly Phase[] = P
 // Neuer Zeitplan ab 8.11. (Zeitplan_08-11.md im OneDrive-Ordner): Wellen im Wochentakt ab 16.11., deshalb jeden Montag
 // vom 23.11. bis 14.12. eine Runde (Welle 1: 23.11. und 7.12., Welle 2: 30.11. und 14.12., Welle 3: 7. und 14.12.).
 export const WAVE_1 = "2026-11-16";
-/** Start Welle 1 = Datum von M3.1 (folgt dem Meilenstein, Rückfall WAVE_1). */
-export const wave1For = (list?: readonly Due[] | null) => dueOf(list, "M3.1") ?? WAVE_1;
+/** Start Welle 1 = Datum von M4.1 (folgt dem Meilenstein, Rückfall WAVE_1). */
+export const wave1For = (list?: readonly Due[] | null) => dueOf(list, KEY.wave1) ?? WAVE_1;
 export const FOLLOW_UP_ROUNDS = ["2026-11-23", "2026-11-30", "2026-12-07", "2026-12-14"];

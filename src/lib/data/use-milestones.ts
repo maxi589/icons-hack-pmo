@@ -6,6 +6,7 @@ import { play } from "@/lib/sounds";
 import { celebrateMilestone } from "@/components/milestone-celebration";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { logActivity } from "@/lib/data/use-feed";
+import { KEY } from "@/lib/key-milestones";
 
 // Alle Meilensteine (18, inkl. Unterpunkte) mit Live-Updates. Genutzt von Übersicht, Roadmap, Bereichen, Sidebar.
 // Versionszähler wie in use-tasks.ts: eine ältere Antwort des Live-Neuladens überschreibt keine eigene Änderung.
@@ -178,7 +179,7 @@ export function useMilestones() {
 export type NewMilestone = Pick<Milestone, "id" | "parent_id" | "title" | "due_date" | "area_id" | "sort">;
 
 /** Nummern, die der Code fest kennt (Phasen, Plan-Balken, Welle 1, Ziel-Kacheln): nie neu vergeben. */
-const RESERVED_IDS = ["M1", "M2", "M3", "M3.1", "M3.3", "M4", "M5", "M7", "M8"];
+const RESERVED_IDS: string[] = Object.values(KEY);
 
 /**
  * Alle Nummern, an denen schon etwas hängt (Verlauf, Kommentare, Inbox, Dokumente), auch von gelöschten Meilensteinen.
