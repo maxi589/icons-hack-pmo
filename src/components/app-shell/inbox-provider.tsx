@@ -72,6 +72,7 @@ async function targetNames(rows: Row[]) {
     load("document", "documents", "title"),
     load("meeting", "meetings", "title"),
     load("feedback", "feedback", "body"),
+    load("area", "areas", "name"),
   ]);
   return { names, statuses };
 }

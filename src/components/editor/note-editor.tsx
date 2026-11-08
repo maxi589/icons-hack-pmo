@@ -13,6 +13,8 @@ import { cn } from "@/lib/utils";
 import { keepsAllText } from "@/lib/markdown";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/toast";
+import { useTeam } from "@/components/app-shell/team-provider";
+import { PERSON_LINK, mentionedIn, notifyMentions, type MentionTarget } from "@/lib/mentions";
 import { EditorMenu } from "./editor-menu";
 import { MenuTriggers, TableBlocks, type MenuBridge, type MenuState } from "./suggest";
 import { TableControls } from "./table-controls";
@@ -22,6 +24,7 @@ import { TableControls } from "./table-controls";
 // Markieren öffnet ein kleines Menü: fett, kursiv, Überschrift, Liste, Checkliste, Link, → Aufgabe.
 // „/“ öffnet das Einfügen-Menü (auch Tabelle), „@“ verknüpft Firmen, Aufgaben, Termine, Dokumente, Meilensteine
 // (gespeichert als normaler Link, im Editor als Chip). Notion light, Stufe A.
+// Mit `mentions` (geteilte Texte) bietet „@“ zuerst das Team an; wer neu getaggt wird, bekommt einen Inbox-Eintrag.
 
 type Props = {
   /** Markdown. Fremde Änderungen werden übernommen, solange man selbst nicht im Feld ist. */
@@ -36,6 +39,8 @@ type Props = {
   /** Markierten Text als Team-Dokument teilen (Markdown der Auswahl, Titel = erste Zeile). */
   onShare?: (markdown: string, title: string) => Promise<string | null>;
   className?: string;
+  /** Personen taggen erlaubt: Inbox-Eintrag zeigt auf diesen Eintrag. Ohne (z. B. privater Notizblock) kein Team im „@“-Menü. */
+  mentions?: MentionTarget;
 };
 
 /** Links auf Einträge im Tool → Tabelle, um vor dem Öffnen zu prüfen, ob es den Eintrag noch gibt. */
@@ -47,6 +52,9 @@ const TARGETS: [RegExp, string][] = [
   [/^\/dokumente\?entscheidung=([^&]+)/, "decisions"],
   [/^\/roadmap\?m=([^&]+)/, "milestones"],
 ];
+
+/** Neu Getaggte so lange sammeln (ms), bevor die Inbox-Einträge rausgehen */
+const SEND_AFTER = 5000;
 
 /** Leere Listen- und Checkbox-Zeilen (Enter am Ende) nicht speichern: Sie kämen sonst als Text „[ ]“ zurück. */
 function tidy(md: string) {
@@ -76,9 +84,35 @@ function toMarkdown(editor: Editor, json: DocJson = editor.getJSON()) {
   return tidy(editor.markdown!.serialize(trimBlockStarts(json)));
 }
 
-export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabled, onCreateTask, onShare, className }: Props) {
+export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabled, onCreateTask, onShare, className, mentions }: Props) {
   const router = useRouter();
   const toast = useToast();
+  const { me } = useTeam();
+  // Zuletzt gesehener Stand: eigener Text oder übernommener fremder. Verhindert, dass der eigene Stand nach dem Speichern zurückgesetzt wird.
+  const last = useRef(value);
+  // Schon getaggte Personen (geladener, fremder oder eigener Stand): nur wer neu dazukommt, bekommt einen Inbox-Eintrag.
+  // Einmal gemeldet bleibt gemeldet (Löschen und wieder Einfügen meldet nicht doppelt).
+  const tagged = useRef(new Set<string>(mentionedIn(value)));
+  // Neu Getaggte warten kurz (Prüfer 8.11.): Gemeldet wird beim Verlassen des Felds, nach SEND_AFTER ohne neue
+  // Erwähnung oder beim Schließen, und nur, wer dann noch im Text steht. Ein versehentlich gewählter Name, der gleich
+  // wieder gelöscht wird, löst so nichts aus.
+  const pending = useRef(new Set<string>());
+  const sendTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mentionsRef = useRef(mentions);
+  const meRef = useRef(me);
+  const sendPending = () => {
+    if (sendTimer.current) clearTimeout(sendTimer.current);
+    sendTimer.current = null;
+    const still = new Set(mentionedIn(last.current));
+    const ids = [...pending.current].filter((id) => still.has(id) && !tagged.current.has(id));
+    pending.current.clear();
+    const target = mentionsRef.current;
+    const actor = meRef.current;
+    if (!ids.length || !target || !actor) return;
+    for (const id of ids) tagged.current.add(id);
+    notifyMentions(target, actor.id, ids).then((ok) => !ok && toast({ text: "Inbox-Hinweis für die Erwähnung nicht gesendet." }));
+  };
+  const sendRef = useRef(sendPending);
   // Verlustbremse: Kann der Editor den gespeicherten Text nicht vollständig darstellen, nur lesen (sonst löscht
   // das nächste Speichern, was er nicht kennt, z. B. eine Blockart aus einem neueren App-Stand).
   const [lossy, setLossy] = useState(false);
@@ -99,6 +133,7 @@ export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabl
       const lines = saved.split("\n").map((line) => (line ? { type: "paragraph", content: [{ type: "text", text: line }] } : { type: "paragraph" }));
       ed.commands.setContent({ type: "doc", content: lines }, { emitUpdate: false });
     }
+    for (const id of mentionedIn(saved)) tagged.current.add(id);
     lossyRef.current = !valid || !keepsAllText(saved, ed.getMarkdown());
     setLossy(lossyRef.current);
   };
@@ -110,15 +145,18 @@ export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabl
     bridge.current = { onChange: setMenu, onKeyDown: (e) => menuKey.current?.(e) ?? false };
     return MenuTriggers(bridge);
   });
-  // Zuletzt gesehener Stand: eigener Text oder übernommener fremder. Verhindert, dass der eigene Stand nach dem Speichern zurückgesetzt wird.
-  const last = useRef(value);
   const root = useRef<HTMLDivElement>(null);
   const onChangeRef = useRef(onChange);
   const onBlurRef = useRef(onBlur);
   useEffect(() => {
     onChangeRef.current = onChange;
     onBlurRef.current = onBlur;
+    mentionsRef.current = mentions;
+    meRef.current = me;
+    sendRef.current = sendPending;
   });
+  // Beim Schließen (anderer Termin, Seite verlassen) noch Wartende melden
+  useEffect(() => () => sendRef.current(), []);
 
   const editor = useEditor({
     immediatelyRender: false,
@@ -163,12 +201,18 @@ export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabl
       if (md.trimEnd() === last.current.trimEnd()) return;
       last.current = md;
       onChangeRef.current(md);
+      const fresh = mentionedIn(md).filter((id) => !tagged.current.has(id) && !pending.current.has(id));
+      if (!fresh.length) return;
+      for (const id of fresh) pending.current.add(id);
+      if (sendTimer.current) clearTimeout(sendTimer.current);
+      sendTimer.current = setTimeout(sendPending, SEND_AFTER);
     },
     onBlur: ({ event }) => {
       // Wechsel in ein anderes Feld: Menü zu. Ein Tipp ins eigene Menü zählt nicht (falls ein Gerät den Fokus doch abgibt).
       const to = event.relatedTarget as HTMLElement | null;
       if (!to?.closest("[data-editor-menu]")) setMenu(null);
       onBlurRef.current?.();
+      if (!to?.closest("[data-editor-menu]")) sendPending();
     },
   });
 
@@ -189,6 +233,8 @@ export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabl
     const href = a?.getAttribute("href");
     if (!href) return;
     e.preventDefault();
+    // Getaggte Person: kein Ziel zum Öffnen
+    if (href.startsWith(PERSON_LINK)) return;
     if (!href.startsWith("/")) {
       window.open(href, "_blank", "noopener,noreferrer");
       return;
@@ -212,7 +258,13 @@ export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabl
   };
 
   return (
-    <div ref={root} className={cn("note-editor relative", className)} onClick={onClick}>
+    <div
+      ref={root}
+      className={cn("note-editor relative", className)}
+      onClick={onClick}
+      // Mittelklick auf eine getaggte Person würde eine leere Seite öffnen
+      onAuxClick={(e) => (e.target as HTMLElement).closest("a")?.getAttribute("href")?.startsWith(PERSON_LINK) && e.preventDefault()}
+    >
       {lossy && (
         <div role="status" className="mx-3 mt-3 flex items-center gap-3 rounded-[10px] bg-card-2 px-3 py-2 text-[13px] text-fg-2 max-md:text-[14px]">
           <span className="min-w-0 flex-1">Nicht alles darstellbar, nur lesen.</span>
@@ -223,7 +275,7 @@ export function NoteEditor({ value, onChange, onBlur, label, placeholder, disabl
       )}
       {editor && <SelectionMenu editor={editor} onCreateTask={onCreateTask} onShare={onShare} />}
       {editor && !disabled && !lossy && <TableControls editor={editor} root={root} />}
-      {editor && menu && <EditorMenu editor={editor} state={menu} keyRef={menuKey} />}
+      {editor && menu && <EditorMenu editor={editor} state={menu} keyRef={menuKey} people={!!mentions} />}
       <EditorContent editor={editor} />
     </div>
   );

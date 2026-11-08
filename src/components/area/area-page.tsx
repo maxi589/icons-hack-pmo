@@ -303,6 +303,7 @@ function AreaNotes({ areaId, areaName, onCreateTask }: { areaId: string; areaNam
       placeholder="Absprachen, Kontakte, Links, Ideen …"
       presenceKey={`area-${areaId}`}
       onCreateTask={onCreateTask}
+      mentions={{ type: "area", id: areaId }}
     />
   );
 }

@@ -20,6 +20,7 @@ import {
   Pilcrow,
   Table,
   TextQuote,
+  UserRound,
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,8 @@ import { useIsMobile } from "@/lib/use-is-mobile";
 import { createClient } from "@/lib/supabase/client";
 import { DECISION_TYPE, docType } from "@/lib/documents";
 import { TARGET_NAMES } from "@/lib/links";
+import { personHref } from "@/lib/mentions";
+import { useTeam } from "@/components/app-shell/team-provider";
 import { matchesAll, searchAll, searchWords, type Hit } from "@/lib/search";
 import { type MenuState } from "./suggest";
 import { useToast } from "@/components/toast";
@@ -108,7 +111,19 @@ function useLinkHits(query: string | null) {
   return { hits: loading ? found.hits.filter((h) => matchesAll(h.hay, words)) : found.hits, loading, short: false };
 }
 
-export function EditorMenu({ editor, state, keyRef }: { editor: Editor; state: MenuState; keyRef: { current: ((e: KeyboardEvent) => boolean) | null } }) {
+/** `people`: Team zum Taggen anbieten (nur in geteilten Texten, sonst gäbe es keinen Inbox-Eintrag). */
+export function EditorMenu({
+  editor,
+  state,
+  keyRef,
+  people = false,
+}: {
+  editor: Editor;
+  state: MenuState;
+  keyRef: { current: ((e: KeyboardEvent) => boolean) | null };
+  people?: boolean;
+}) {
+  const team = useTeam();
   const mobile = useIsMobile();
   const toast = useToast();
   const box = useRef<HTMLDivElement>(null);
@@ -127,7 +142,26 @@ export function EditorMenu({ editor, state, keyRef }: { editor: Editor; state: M
       .filter((it) => (!it.when || it.when(editor)) && matches(it, state.query))
       .map((it) => ({ id: it.id, label: it.label, Icon: it.Icon, pick: () => it.run(chain()).run() && it.done?.() }));
   } else {
-    rows = link.hits.map((h) => ({
+    // Personen zuerst (schon ab „@“), Namensanfang oder Kürzel passt. Danach Einträge im Tool.
+    const q = state.query.trim().toLowerCase();
+    const persons: Row[] = people
+      ? team.people
+          .filter((p) => !q || p.name.toLowerCase().split(" ").some((w) => w.startsWith(q)) || p.initials.toLowerCase() === q)
+          .map((p) => ({
+            id: `person-${p.id}`,
+            label: p.name,
+            Icon: UserRound,
+            meta: p.id === team.me?.id ? "du" : "Team",
+            pick: () =>
+              chain()
+                .insertContent([
+                  { type: "text", text: `@${p.name}`, marks: [{ type: "link", attrs: { href: personHref(p.id) } }] },
+                  { type: "text", text: " " },
+                ])
+                .run(),
+          }))
+      : [];
+    rows = [...persons, ...link.hits.map((h) => ({
       id: `${h.type}-${h.id}`,
       label: h.title,
       Icon: hitIcon(h),
@@ -139,7 +173,7 @@ export function EditorMenu({ editor, state, keyRef }: { editor: Editor; state: M
             { type: "text", text: " " },
           ])
           .run(),
-    }));
+    }))];
   }
   const ids = rows.map((r) => r.id).join("|");
   const sel = Math.min(index, Math.max(rows.length - 1, 0));
@@ -238,7 +272,7 @@ export function EditorMenu({ editor, state, keyRef }: { editor: Editor; state: M
   let empty: string | null = null;
   if (!rows.length) {
     if (state.kind === "slash") empty = "Nichts gefunden.";
-    else if (link.short) empty = "Firma, Aufgabe, Termin … suchen";
+    else if (link.short) empty = people ? "Person, Firma, Aufgabe … suchen" : "Firma, Aufgabe, Termin … suchen";
     else empty = link.loading ? "Suche …" : "Nichts gefunden.";
   }
 

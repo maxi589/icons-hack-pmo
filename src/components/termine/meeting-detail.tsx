@@ -14,6 +14,10 @@ import { DocBlock } from "@/components/dokumente/doc-block";
 import { StatusCheck } from "@/components/tasks/status-check";
 import { PeoplePicker } from "@/components/wissen/pickers";
 import { PrivateToggle } from "./private-toggle";
+import type { MentionTarget } from "@/lib/mentions";
+
+/** Texte am Termin: Ziele (8.11.), Agenda, Notizen */
+export type TextField = "goals" | "agenda" | "notes";
 import { useTeam } from "@/components/app-shell/team-provider";
 import { formatLong } from "@/lib/dates";
 import type { Decision } from "@/lib/data/use-knowledge";
@@ -30,7 +34,7 @@ import {
   meetUrlFrom,
 } from "@/lib/meetings";
 
-// Termin-Detail (rechts 460px, am Handy als Bottom Sheet): Wann · Wo · Wer · Firma · Bereich, Agenda und Notizen im
+// Termin-Detail (rechts 460px, am Handy als Bottom Sheet): Wann · Wo · Wer · Firma · Bereich, Ziele, Agenda und Notizen im
 // gemeinsamen Editor, Unterlagen (Dokumente am Termin), Ergebnisse (Aufgaben und Entscheidungen aus dem Termin), Verlauf.
 
 const actionBtn =
@@ -59,7 +63,7 @@ export function MeetingDetail({
   /** Entscheidungen aus diesem Termin */
   decisions: Decision[];
   onUpdate: (patch: MeetingPatch) => void;
-  onSaveText: (field: "agenda" | "notes", markdown: string) => Promise<boolean>;
+  onSaveText: (field: TextField, markdown: string) => Promise<boolean>;
   onCreateTask: (title: string) => Promise<string | null>;
   onToggleTask: (t: Task) => void;
   onNewTask: () => void;
@@ -75,6 +79,8 @@ export function MeetingDetail({
   const area = areaById(m.area_id);
   const sortedOrgs = [...orgs].sort((a, b) => a.name.localeCompare(b.name, "de"));
   const setStart = (date: string, time: string) => date && time && onUpdate({ starts_at: fromVienna(date, time) });
+  // Private Termine sieht nur die eigene Person: dort kein Taggen (Grundsatz: keine Inbox-Einträge aus privaten Terminen).
+  const mentions: MentionTarget | undefined = m.private_for ? undefined : { type: "meeting", id: m.id };
 
   return (
     <div className="flex flex-col">
@@ -245,12 +251,24 @@ export function MeetingDetail({
       </div>
 
       <TextSection
+        key={`goals-${m.id}`}
+        id={m.id}
+        title="Ziele"
+        field="goals"
+        data={{ notes: m.goals, updatedAt: m.goals_updated_at, updatedBy: m.goals_updated_by }}
+        placeholder="Was steht am Ende fest?"
+        mentions={mentions}
+        onSave={onSaveText}
+        onCreateTask={onCreateTask}
+      />
+      <TextSection
         key={`agenda-${m.id}`}
         id={m.id}
         title="Agenda"
         field="agenda"
         data={{ notes: m.agenda, updatedAt: m.agenda_updated_at, updatedBy: m.agenda_updated_by }}
-        placeholder="Punkte für das Meeting …"
+        placeholder="Punkte für das Meeting … @ für Personen"
+        mentions={mentions}
         onSave={onSaveText}
         onCreateTask={onCreateTask}
       />
@@ -261,6 +279,7 @@ export function MeetingDetail({
         field="notes"
         data={{ notes: m.notes, updatedAt: m.notes_updated_at, updatedBy: m.notes_updated_by }}
         placeholder="Mitschrift … Zeile markieren → Aufgabe"
+        mentions={mentions}
         onSave={onSaveText}
         onCreateTask={onCreateTask}
       />
@@ -356,14 +375,16 @@ function TextSection({
   placeholder,
   onSave,
   onCreateTask,
+  mentions,
 }: {
   id: string;
   title: string;
-  field: "agenda" | "notes";
+  field: TextField;
   data: { notes: string; updatedAt: string | null; updatedBy: string | null };
   placeholder: string;
-  onSave: (field: "agenda" | "notes", markdown: string) => Promise<boolean>;
+  onSave: (field: TextField, markdown: string) => Promise<boolean>;
   onCreateTask: (title: string) => Promise<string | null>;
+  mentions?: MentionTarget;
 }) {
   const draft = useNotesDraft({ data, save: (md) => onSave(field, md), presenceKey: `meeting-${field}-${id}` });
   return (
@@ -381,6 +402,7 @@ function TextSection({
         onChange={draft.onChange}
         onBlur={draft.onBlur}
         onCreateTask={onCreateTask}
+        mentions={mentions}
         className="flex min-h-[110px] flex-col [&_.ProseMirror]:px-[18px] [&_.ProseMirror]:pt-2"
       />
     </section>

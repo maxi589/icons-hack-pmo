@@ -23,7 +23,7 @@ import { useOrganizations } from "@/lib/data/use-organizations";
 import { useTasks } from "@/lib/data/use-tasks";
 import { useKnowledge } from "@/lib/data/use-knowledge";
 import { logActivity } from "@/lib/data/use-feed";
-import { plusDays, viennaParts, weekLabel, weekStart, type Meeting, fromVienna } from "@/lib/meetings";
+import { plusDays, viennaParts, weekLabel, weekStart, type Meeting, type MeetingPatch, fromVienna } from "@/lib/meetings";
 import { MeetingDetail } from "./meeting-detail";
 import { NewMeetingDialog, type MeetingDefaults } from "./new-meeting-dialog";
 import { useMeetingActions } from "./use-meeting-actions";
@@ -31,10 +31,13 @@ import { WeekView, type AllDay } from "./week-view";
 import { MeetingOrgs, MeetingRow } from "./meeting-row";
 import { MobileWeek } from "./mobile-week";
 import { GoogleCalendarButton } from "./google-calendar-button";
+import { MonthView, monthLabel, monthOf, shiftMonth } from "./month-view";
+import { SwipeArea } from "./swipe-area";
 
 // Termine (Plan Welle 1, Schritt 3): Team-Meetings und Partner-Calls an einem Ort, mit Agenda, Notizen, Unterlagen
-// und Ergebnissen. Desktop: Woche (Standard) oder Liste; Handy: Liste. Detail rechts, zweiter Klick schließt.
-// Adresse: ?termin=<id> (teilbar), ?woche=<Montag>, ?ansicht=liste, ?neu=1.
+// und Ergebnissen. Desktop: Woche (Standard), Monat oder Liste; Handy: Woche oder Monat. Detail rechts, zweiter Klick schließt.
+// Wischen wie im Kalender (8.11.): seitlich = Woche, in der Monatsansicht senkrecht = Monat (Finger und Trackpad).
+// Adresse: ?termin=<id> (teilbar), ?woche=<Montag>, ?ansicht=liste|monat, ?monat=<JJJJ-MM>, ?neu=1.
 
 export function Termine() {
   const today = useToday();
@@ -57,7 +60,9 @@ export function Termine() {
   const [newDecision, setNewDecision] = useState(false);
 
   const selId = params.get("termin");
-  const list = params.get("ansicht") === "liste" || isMobile;
+  const ansicht = params.get("ansicht");
+  const view: "woche" | "monat" | "liste" = ansicht === "monat" ? "monat" : ansicht === "liste" && !isMobile ? "liste" : "woche";
+  const list = view === "liste";
 
   const setParams = (patch: Record<string, string | null>) => {
     const next = new URLSearchParams(params.toString());
@@ -92,6 +97,13 @@ export function Termine() {
   const meeting = all.find((m) => m.id === selId) ?? null;
   // Direktlink auf einen Termin öffnet dessen Woche.
   const monday = params.get("woche") ?? weekStart(meeting ? viennaParts(meeting.starts_at).date : today);
+  // Monat: aus der Adresse, sonst der heutige. Beim Wechsel aus einer anderen Woche steht er immer in der Adresse,
+  // damit ein geöffneter Termin den Monat nicht umspringen lässt (Prüfer 8.11.).
+  const month = /^\d{4}-(0[1-9]|1[0-2])$/.test(params.get("monat") ?? "") ? params.get("monat")! : monthOf(today);
+  /** In den Monat wechseln: aktuelle Woche → heutiger Monat, sonst der Monat der gezeigten Woche (Donnerstag entscheidet) */
+  const toMonth = () => ({ ansicht: "monat", monat: params.get("woche") ? monthOf(plusDays(monday, 3)) : null });
+  const thisMonth = month === monthOf(today);
+  const showWeekOf = (d: string) => setParams({ ansicht: null, monat: null, woche: weekStart(d) });
   const shown = mine && me ? all.filter((m) => m.attendees.includes(me.id) || m.created_by === me.id) : all;
 
   // Unterpunkte, die am selben Tag wie ihr offener Meilenstein fällig sind (M1.1–M1.4 am 18.10.), stecken schon in ihm.
@@ -122,14 +134,18 @@ export function Termine() {
       tasks={(tasksApi.tasks ?? []).filter((t) => t.meeting_id === meeting.id)}
       decisions={(k.decisions ?? []).filter((d) => d.target_type === "meeting" && d.target_id === meeting.id)}
       onUpdate={(p) => actions.update(meeting, p)}
-      onSaveText={(field, md) =>
-        api.update(
-          meeting.id,
-          field === "agenda"
-            ? { agenda: md, agenda_updated_at: new Date().toISOString(), agenda_updated_by: me?.id ?? null }
-            : { notes: md, notes_updated_at: new Date().toISOString(), notes_updated_by: me?.id ?? null }
-        )
-      }
+      onSaveText={(field, md) => {
+        const at = new Date().toISOString();
+        const by = me?.id ?? null;
+        // Je Feld ausgeschrieben, damit ein Tippfehler im Spaltennamen schon beim Bauen auffällt
+        const patch: MeetingPatch =
+          field === "goals"
+            ? { goals: md, goals_updated_at: at, goals_updated_by: by }
+            : field === "agenda"
+              ? { agenda: md, agenda_updated_at: at, agenda_updated_by: by }
+              : { notes: md, notes_updated_at: at, notes_updated_by: by };
+        return api.update(meeting.id, patch);
+      }}
       onCreateTask={(title) => taskActions.createTask({ title, area_id: meeting.area_id, meeting_id: meeting.id, organization_id: meeting.organization_id }, (id) => `/aufgaben?aufgabe=${id}`)}
       onToggleTask={taskActions.toggleDone}
       onNewTask={() => setNewTask(true)}
@@ -151,8 +167,39 @@ export function Termine() {
           <h1 className="sr-only max-md:hidden">Termine</h1>
 
           {/* Werkzeugleiste (Desktop; am Handy steht „Nur meine“ in der Wochenleiste) */}
-          <div className="hidden flex-wrap items-center gap-2 border-b border-line px-[18px] py-3 md:flex">
-            {!list && (
+          <div className="hidden flex-wrap items-center gap-2 border-b border-line px-[18px] py-3 whitespace-nowrap md:flex">
+            {view === "monat" && (
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setParams({ monat: null, woche: null })}
+                  disabled={thisMonth}
+                  className="inline-flex h-8 items-center rounded-[9px] px-3 text-[13px] font-medium text-fg-2 shadow-[inset_0_0_0_1px_var(--line2)] hover:bg-hover hover:text-fg disabled:opacity-50 disabled:hover:bg-transparent"
+                >
+                  Heute
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setParams({ monat: shiftMonth(month, -1) })}
+                  className="grid size-8 place-items-center rounded-lg text-fg-2 hover:bg-hover hover:text-fg"
+                  aria-label="Voriger Monat"
+                >
+                  <ChevronLeft className="size-4" aria-hidden />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setParams({ monat: shiftMonth(month, 1) })}
+                  className="grid size-8 place-items-center rounded-lg text-fg-2 hover:bg-hover hover:text-fg"
+                  aria-label="Nächster Monat"
+                >
+                  <ChevronRight className="size-4" aria-hidden />
+                </button>
+                <h2 className="ml-1 text-[14px] font-semibold capitalize tabular" aria-live="polite">
+                  {monthLabel(month)}
+                </h2>
+              </div>
+            )}
+            {view === "woche" && (
               <div className="flex items-center gap-1.5">
                 <button
                   type="button"
@@ -182,7 +229,7 @@ export function Termine() {
                 </h2>
               </div>
             )}
-            <div className="ml-auto flex items-center gap-2">
+            <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
               <GoogleCalendarButton />
               <button
                 type="button"
@@ -197,19 +244,37 @@ export function Termine() {
               </button>
               <Segmented
                 label="Ansicht"
-                value={list ? "liste" : "woche"}
+                value={view}
                 options={[
                   { value: "woche", label: "Woche" },
+                  { value: "monat", label: "Monat" },
                   { value: "liste", label: "Liste" },
                 ]}
-                onChange={(v) => setParams({ ansicht: v === "liste" ? "liste" : null })}
+                onChange={(v) =>
+                  v === "monat"
+                    ? setParams(toMonth())
+                    : // Aus dem Monat zurück in die Woche: erste Woche, die zum Monat gehört (im aktuellen Monat: diese Woche)
+                      setParams({ ansicht: v === "liste" ? "liste" : null, monat: null, ...(view === "monat" ? { woche: thisMonth ? null : weekStart(`${month}-04`) } : {}) })
+                }
               />
             </div>
           </div>
 
           {api.meetings === false && <p className="px-5 py-8 text-center text-[13.5px] text-st-red">Termine konnten nicht geladen werden.</p>}
-          {isMobile ? (
-            <>
+          {view === "monat" ? (
+            <MonthView
+              month={month}
+              today={today}
+              meetings={shown}
+              allDay={allDay}
+              selected={selId}
+              compact={isMobile}
+              onMonth={(mo) => setParams(mo ? { monat: mo } : { monat: null, woche: null })}
+              onDay={showWeekOf}
+              onOpen={open}
+            />
+          ) : isMobile ? (
+            <SwipeArea axis="x" onPrev={() => setParams({ woche: plusDays(monday, -7), termin: null })} onNext={() => setParams({ woche: plusDays(monday, 7), termin: null })}>
               <MobileWeek
                 monday={monday}
                 today={today}
@@ -222,16 +287,23 @@ export function Termine() {
                 // Woche festhalten, sonst springt sie beim Öffnen eines Termins aus „Danach“ hinter dem Sheet um
                 onOpen={(m) => setParams({ termin: m.id === selId ? null : m.id, woche: monday })}
                 onDelete={remove}
+                onMonthView={() => setParams({ ...toMonth(), termin: null })}
               />
               <div className="flex justify-center px-3.5 pb-8">
                 <GoogleCalendarButton />
               </div>
-            </>
+            </SwipeArea>
           ) : list ? (
             <div className="min-h-0 flex-1 md:overflow-y-auto">
               <MeetingList meetings={shown} today={today} selected={selId} onOpen={open} onDelete={remove} onNew={() => startDraft()} />
             </div>
           ) : (
+            <SwipeArea
+              axis="x"
+              onPrev={() => setParams({ woche: plusDays(monday, -7) })}
+              onNext={() => setParams({ woche: plusDays(monday, 7) })}
+              className="flex min-h-0 flex-1 flex-col overscroll-x-none"
+            >
             <WeekView
               monday={monday}
               today={today}
@@ -248,6 +320,7 @@ export function Termine() {
                 })
               }
             />
+            </SwipeArea>
           )}
         </div>
 
