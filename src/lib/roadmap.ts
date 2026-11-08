@@ -27,7 +27,7 @@ export function axisEdge(isoDate: string) {
 // Seit 16.10. (Punkt 5) folgen sie den Meilensteinen: Welle 3 von M3.3 bis M3, Bewerbung von M5 bis M7.
 // Die festen Daten gelten nur, wenn ein Meilenstein fehlt.
 export const PLAN_BARS = [
-  { areaId: "sponsoren", from: "2026-11-16", to: "2026-12-18", label: "Welle 3 Sponsoren bis zur Fixierung", faint: true, fromId: "M3.3", toId: "M3" },
+  { areaId: "sponsoren", from: "2026-11-30", to: "2026-12-18", label: "Welle 3 Sponsoren bis zur Fixierung", faint: true, fromId: "M3.3", toId: "M3" },
   { areaId: "marketing", from: "2026-11-30", to: "2027-01-22", label: "Bewerbung (Luma) bis zur Auswahl", faint: false, fromId: "M5", toId: "M7" },
 ];
 
