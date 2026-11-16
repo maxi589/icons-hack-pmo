@@ -55,8 +55,26 @@ function describeUpdate(d: Record<string, unknown>, actorId: string | null, name
       : from
         ? `hat das Nachfassen von ${formatShort(from)} auf ${formatShort(to)} verschoben`
         : `hat das Nachfassen auf ${formatShort(to)} gesetzt`;
-  return "hat etwas geändert";
+  if (d.field === "wave") return to ? `hat Welle ${to} gesetzt` : "hat die Welle entfernt";
+  // Felder, die nur die KI (MCP) einzeln in den Verlauf schreibt, ohne Wert
+  const label = FIELD_LABELS[String(d.field)];
+  return label ? `hat ${label} geändert` : "hat etwas geändert";
 }
+
+const FIELD_LABELS: Record<string, string> = {
+  contact_person: "die Ansprechperson",
+  contact_info: "den Kontakt",
+  url: "die Website",
+  notes: "die Notizen",
+  warm_via: "„warm über“",
+  location: "den Ort",
+  capacity: "die Kapazität",
+  overnight: "die Übernachtung",
+  price: "den Preis",
+};
+
+/** Änderungen über einen KI-Agenten (MCP) tragen data.via = "mcp". */
+const viaAi = (d: Record<string, unknown>) => (d.via === "mcp" ? " (über KI)" : "");
 
 // Firmen-Detail (Board „Pipeline“, rechts 400px; am Handy als Bottom Sheet).
 // Felder speichern beim Verlassen (Text) bzw. sofort (Auswahl). Stufe mit „Rückgängig“ über die Seite.
@@ -327,7 +345,7 @@ export function OrgDetail({
           targetType="organization"
           targetId={org.id}
           describe={(a) =>
-            a.action === "stage_changed"
+            (a.action === "stage_changed"
               ? `hat die Stufe ${a.data.from ? `von ${stageName(a.data.from as Stage)} ` : ""}auf ${stageName(a.data.to as Stage)} gesetzt${a.data.follow ? `, nachfassen ${formatShort(String(a.data.follow))}` : ""}`
               : a.action === "updated"
                 ? describeUpdate(a.data, a.actor_id, (id) => personById(id)?.name ?? "jemand")
@@ -343,7 +361,7 @@ export function OrgDetail({
                       ? `hat ${tasksWord(Array.isArray(a.data.tasks) ? a.data.tasks.length : 0)} entfernt (Absage)`
                       : a.action === "tasks_restored"
                         ? `hat ${tasksWord(Number(a.data.count ?? 0))} zurückgeholt`
-                        : a.action
+                        : a.action) + viaAi(a.data)
           }
         />
       </div>

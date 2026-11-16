@@ -5,7 +5,8 @@ import { createServerClient } from "@supabase/ssr";
 // Die eigentliche Absicherung der Daten macht Row Level Security in der Datenbank.
 
 // /api/ping: täglicher Aufruf von Vercel zum Wachhalten der Datenbank (gibt nur „ok“ zurück).
-const PUBLIC_PATHS = ["/login", "/auth", "/api/ping", "/api/kalender"];
+// /api/mcp: KI-Agenten mit eigenem Schlüssel (Prüfung in src/lib/mcp/token.ts, ohne Schlüssel 401).
+const PUBLIC_PATHS = ["/login", "/auth", "/api/ping", "/api/kalender", "/api/mcp"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
