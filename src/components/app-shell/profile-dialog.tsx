@@ -11,6 +11,7 @@ import { changePassword, invitePerson } from "@/lib/account-actions";
 import { MIN_PASSWORD } from "@/lib/auth";
 import { SoundToggle } from "@/components/sound-toggle";
 import { useTeam } from "./team-provider";
+import { AiSection } from "./ai-section";
 
 // Profil (Klick auf den eigenen Avatar, Strg+K „Profil“, Handy-Menü): Passwort ändern und Team mit Einladen.
 // Einmal im App-Rahmen eingebaut, geöffnet von überall mit openProfile().
@@ -75,6 +76,7 @@ export function ProfileDialog() {
           <SoundToggle />
         </section>
         <PasswordSection key={open ? "open" : "closed"} />
+        {open && <AiSection />}
         <TeamSection key={open ? "team-open" : "team-closed"} members={members} meId={me?.id} onInvited={load} />
       </DialogContent>
     </Dialog>
